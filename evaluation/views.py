@@ -14,7 +14,7 @@ def test_list(request, format=None):
         return Response("Test get")
 
     elif request.method == 'POST':
-        a = request.data.pop('asb')
+        a = request.data.pop('abc')
         return Response(a)
 
     elif request.method == "PUT":
