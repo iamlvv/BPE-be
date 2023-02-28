@@ -1,0 +1,10 @@
+
+.DS_store
+
+.python-version
+
+env/
+
+__pycache__/
+
+venv
