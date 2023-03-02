@@ -16,8 +16,12 @@ def test_list(request, format=None):
         return Response(Evaluate.a)
 
     elif request.method == 'POST':
-        a = request.data.pop('abc')
-        return Response(a)
+        e = Evaluate()
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        e.evaluate(body)
+        json_response = e.result.__dict__
+        return Response(json_response)
 
     elif request.method == "PUT":
         return Response("Test put")
