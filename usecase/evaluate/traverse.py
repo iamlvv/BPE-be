@@ -137,7 +137,9 @@ class Traverse:
             check, pre = self.check_node_traveled(e.previous, c)
             if not check:
                 print("Start loop")
-                return None
+                c.stack_end_loop.append(pre)
+                next_node = self.handle_for_loop(e, pre, c, r)
+                return next_node
 
             print("End gateway")
             c.stack_next_gateway.append(e)
@@ -149,6 +151,9 @@ class Traverse:
             next_node = None
             if len(c.stack_end_loop) > 0 and len(e.next) == 2 and c.stack_end_loop[-1] == e:
                 print("End loop")
+                c.stack_end_loop.pop()
+                r.current_cycle_time = 0
+                return None
             print("Start gateway")
             for i, branch in enumerate(e.next):
                 nextN = self.visit(branch, c, r)
@@ -173,8 +178,8 @@ class Traverse:
         for n in e.node:
             self.visit(n, c, r)
 
-    def visit_for_Pool(self, e: Pool, c: Context, r: Result):
-        print("Visit pool", e.name)
+    def visit_for_Participant(self, e: Participant, c: Context, r: Result):
+        print("Visit participant", e.name)
         for l in e.lane:
             self.visit(l, c, r)
 
@@ -211,7 +216,23 @@ class Traverse:
 
     def check_node_traveled(self, node, c: Context):
         for n in node:
-            if isinstance(n, Gateway):
+            if type(n) is ExclusiveGateway:
                 if n.id not in c.list_gateway_traveled:
                     return False, n
         return True, None
+
+    def handle_for_loop(self, start: ExclusiveGateway, end: ExclusiveGateway, c: Context, r: Result):
+        next_N = self.visit(start.next[0], c, r)
+        time_result = r.current_cycle_time
+        self.calculate_cycle_time_nextNode(next_N, c, r)
+        time_result += r.current_cycle_time
+
+        reloop = 0.0
+        next_node = None
+        for i, n in enumerate(end.next):
+            if isinstance(n, Gateway) and n == start:
+                reloop = end.branching_probabilities[i]
+            else:
+                next_node = n
+        r.current_cycle_time = time_result / (1 - reloop)
+        return next_node

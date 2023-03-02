@@ -14,7 +14,7 @@ class NormalProcess(SubProcess, Node):
 
 class ExpandedSubProcess(SubProcess):
     def __init__(self, element: Element):
-        super().__init__()
+        super().__init__(element)
 
     def accept(self, t, c, r):
         return t.visit_for_ExpandedSubProcess(self, c, r)

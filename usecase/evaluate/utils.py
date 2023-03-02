@@ -55,6 +55,9 @@ class Result:
         self.logs_quality = []
         self.logs_flexibility = []
 
+    def obj_dict(self):
+        return self.__dict__
+
 
 class EventType(Enum):
     STARTEVENT = 0

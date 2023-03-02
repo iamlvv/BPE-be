@@ -27,7 +27,7 @@ class ProcessDirector:
         return result
 
     def build_graph(self):
-        start_node = None
+        collaboration = None
         for e in self.map_element.values():
             n = self.map_node_created[e.id]
             if isinstance(n, Node):
@@ -36,36 +36,42 @@ class ProcessDirector:
                     lane.node.append(n)
                 n.previous = self.get_node_of_ids(e.incoming)
                 n.next = self.get_node_of_ids(e.outgoing)
-            elif type(n) is Pool:
-                start_node = n
+            elif type(n) is Participant:
+                collaboration = self.map_node_created[e.parentID]
+                collaboration.participants.append(n)
             elif type(n) is Lane:
-                pool = self.map_node_created[e.parentID]
-                pool.lane.append(n)
+                participant = self.map_node_created[e.parentID]
+                participant.lane.append(n)
             else:
                 pass
-        return start_node
+        return collaboration
 
 
-class Process:
-    pool: list
+class Collaboration:
+    participants: list
+    result: list
 
-    def __init__(self):
-        self.pool = []
+    def __init__(self, element: Element):
+        self.participants = []
+        self.result = []
 
 
 class Evaluate:
-    result: Result
-
-    def __init__(self) -> None:
-        self.result = Result()
 
     def evaluate(self, map_element: dict):
+        # collaboration = Collaboration()
         p = ProcessDirector(map_element)
         p.create_node_list()
-        start_node = p.build_graph()
+        collaboration = p.build_graph()
         t = Traverse()
         c = Context()
-        start_node.accept(t, c, self.result)
+        for p in collaboration.participants:
+            r = Result()
+            p.accept(t, c, r)
+            print(r.current_cycle_time)
+            collaboration.result.append(r)
+
+        return collaboration.result
 
 
 j = """
@@ -73,7 +79,7 @@ j = """
     "Id_a77e9019-520a-40b3-84aa-9140b31260d7": {
         "id": "Id_a77e9019-520a-40b3-84aa-9140b31260d7",
         "name": "Process 1",
-        "className": "Pool"
+        "className": "Participant"
     },
     "Lane_04n071y": {
         "id": "Lane_04n071y",

@@ -15,7 +15,7 @@ class Lane(BaseElement):
         return t.visit_for_Lane(self, c, r)
 
 
-class Pool(BaseElement):
+class Participant(BaseElement):
     lane: list
 
     def __init__(self, element: Element):
@@ -23,4 +23,4 @@ class Pool(BaseElement):
         self.lane = []
 
     def accept(self, t, c, r):
-        return t.visit_for_Pool(self, c, r)
+        return t.visit_for_Participant(self, c, r)

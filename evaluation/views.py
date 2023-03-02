@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -19,9 +19,9 @@ def test_list(request, format=None):
         e = Evaluate()
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
-        e.evaluate(body)
-        json_response = e.result.__dict__
-        return Response(json_response)
+        result = e.evaluate(body)
+        json_response = [r.__dict__ for r in result]
+        return JsonResponse(json_response, safe=False)
 
     elif request.method == "PUT":
         return Response("Test put")
