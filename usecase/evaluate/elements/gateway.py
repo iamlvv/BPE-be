@@ -3,39 +3,39 @@ from usecase.evaluate.utils import Element
 
 
 class Gateway(Node):
-    def isSplitGateway(self):
+    def is_split_gateway(self):
         return len(self.next) > 1
 
-    def isJoinGateway(self):
+    def is_join_gateway(self):
         return len(self.previous) > 1
 
 
 class ParallelGateway(Gateway):
     def accept(self, t, c, r):
-        return t.visitForParallelGateway(self, c, r)
+        return t.visit_for_ParallelGateway(self, c, r)
 
 
 class EventBasedGateway(Gateway):
     def accept(self, t, c, r):
-        return t.visitForEventBasedGateway(self, c, r)
+        return t.visit_for_EventBasedGateway(self, c, r)
 
 
 class ComplexGateway(Gateway):
     def accept(self, t, c, r):
-        return t.visitForComplexGateway(self, c, r)
+        return t.visit_for_ComplexGateway(self, c, r)
 
 
 class InclusiveGateway(Gateway):
     def accept(self, t, c, r):
-        return t.visitForInclusiveGateway(self, c, r)
+        return t.visit_for_InclusiveGateway(self, c, r)
 
 
 class ExclusiveGateway(Gateway):
-    branchingProbabilities: list
+    branching_probabilities: list
 
     def __init__(self, element: Element):
         super().__init__(element)
-        self.branchingProbabilities = element.branchingProbabilities
+        self.branching_probabilities = element.branchingProbabilities
 
     def accept(self, t, c, r):
-        return t.visitForExclusiveGateway(self, c, r)
+        return t.visit_for_ExclusiveGateway(self, c, r)

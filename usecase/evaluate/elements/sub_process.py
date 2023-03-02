@@ -17,24 +17,24 @@ class ExpandedSubProcess(SubProcess):
         super().__init__()
 
     def accept(self, t, c, r):
-        return t.visitForExpandedSubProcess(self, c, r)
+        return t.visit_for_ExpandedSubProcess(self, c, r)
 
 
 class EventSubProcess(SubProcess):
     def accept(self, t, c, r):
-        return t.visitForEventSubProcess(self, c, r)
+        return t.visit_for_EventSubProcess(self, c, r)
 
 
 class TransactionSubProcess(SubProcess):
     def accept(self, t, c, r):
-        return t.visitForTransactionSubProcess(self, c, r)
+        return t.visit_for_TransactionSubProcess(self, c, r)
 
 
 class CollapsedSubProcess(SubProcess):
     def accept(self, t, c, r):
-        return t.visitForCollapsedSubProcess(self, c, r)
+        return t.visit_for_CollapsedSubProcess(self, c, r)
 
 
 class CallActivity(SubProcess):
     def accept(self, t, c, r):
-        return t.visitForCallActivity(self, c, r)
+        return t.visit_for_CallActivity(self, c, r)

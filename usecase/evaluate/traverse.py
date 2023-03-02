@@ -12,205 +12,206 @@ class Traverse:
     def visit(self, e, c: Context, r: Result):
         return e.accept(self, c, r)
 
-    def visitForNormalTask(self, e: NormalTask, c: Context, r: Result):
-        totalCycleTime = 0.0
-        if e.taskType == TaskType.NONETASK.value:
+    def visit_for_NormalTask(self, e: NormalTask, c: Context, r: Result):
+        total_cycle_time = 0.0
+        if e.task_type == TaskType.NONETASK.value:
             print("Visit task", e.name)
-            nextNode = self.visit(e.next[0], c, r)
-            totalCycleTime += r.currentCycleTime + e.cycleTime
-            self.calculateCyclyTimeNextNode(nextNode, c, r)
-            totalCycleTime += r.currentCycleTime
-            r.currentCycleTime = totalCycleTime
+            next_node = self.visit(e.next[0], c, r)
+            total_cycle_time += r.current_cycle_time + e.cycle_time
+            self.calculate_cycle_time_nextNode(next_node, c, r)
+            total_cycle_time += r.current_cycle_time
+            r.current_cycle_time = total_cycle_time
             return None
 
-    def visitForSendTask(self, e: SendTask, c: Context, r: Result):
+    def visit_for_SendTask(self, e: SendTask, c: Context, r: Result):
         print(3)
 
-    def visitForReceiveTask(self, e: ReceiveTask, c: Context, r: Result):
+    def visit_for_ReceiveTask(self, e: ReceiveTask, c: Context, r: Result):
         print(7)
 
-    def visitForNonEvent(self, e: NonEvent, c: Context, r: Result):
-        if e.eventType == EventType.STARTEVENT.value:
+    def visit_for_NonEvent(self, e: NonEvent, c: Context, r: Result):
+        if e.event_type == EventType.STARTEVENT.value:
             print("Visit start event")
-            nextNode = self.visit(e.next[0], c, r)
-            nextResult = r.currentCycleTime
-            totalCycleTime = nextResult
-            self.calculateCyclyTimeNextNode(nextNode, c, r)
-            totalCycleTime += r.currentCycleTime
-            r.currentCycleTime = totalCycleTime
-        elif e.eventType == EventType.ENDEVENT.value:
+            next_node = self.visit(e.next[0], c, r)
+            next_result = r.current_cycle_time
+            total_cycle_time = next_result
+            self.calculate_cycle_time_nextNode(next_node, c, r)
+            total_cycle_time += r.current_cycle_time
+            r.current_cycle_time = total_cycle_time
+        elif e.event_type == EventType.ENDEVENT.value:
             print("Visit end event")
             return None
 
-    def visitForMessageEvent(self, e: MessageEvent, c: Context, r: Result):
+    def visit_for_MessageEvent(self, e: MessageEvent, c: Context, r: Result):
         print()
 
-    def visitForTimerEvent(self, e: TimerEvent, c: Context, r: Result):
+    def visit_for_TimerEvent(self, e: TimerEvent, c: Context, r: Result):
         print()
 
-    def visitForErrorEvent(self, e: ErrorEvent, c: Context, r: Result):
+    def visit_for_ErrorEvent(self, e: ErrorEvent, c: Context, r: Result):
         print()
 
-    def visitForEscalationEvent(self, e: EscalationEvent, c: Context, r: Result):
+    def visit_for_EscalationEvent(self, e: EscalationEvent, c: Context, r: Result):
         print()
 
-    def visitForCancelEvent(self, e: CancelEvent, c: Context, r: Result):
+    def visit_for_CancelEvent(self, e: CancelEvent, c: Context, r: Result):
         print()
 
-    def visitForSignalEvent(self, e: SignalEvent, c: Context, r: Result):
+    def visit_for_SignalEvent(self, e: SignalEvent, c: Context, r: Result):
         print()
 
-    def visitForMultipleEvent(self, e: MutipleEvent, c: Context, r: Result):
+    def visit_for_MultipleEvent(self, e: MutipleEvent, c: Context, r: Result):
         print()
 
-    def visitForCompensationEvent(self, e: CompensationEvent, c: Context, r: Result):
+    def visit_for_CompensationEvent(self, e: CompensationEvent, c: Context, r: Result):
         print()
 
-    def visitForConditionalEvent(self, e: ConditionalEvent, c: Context, r: Result):
+    def visit_for_ConditionalEvent(self, e: ConditionalEvent, c: Context, r: Result):
         print()
 
-    def visitForLinkEvent(self, e: LinkEvent, c: Context, r: Result):
+    def visit_for_LinkEvent(self, e: LinkEvent, c: Context, r: Result):
         print()
 
-    def visitForTerminateEvent(self, e: TerminateEvent, c: Context, r: Result):
+    def visit_for_TerminateEvent(self, e: TerminateEvent, c: Context, r: Result):
         print()
 
-    def visitForParallelGateway(self, e: ParallelGateway, c: Context, r: Result):
-        c.listGatewayTraveled[e.id] = e
+    def visit_for_ParallelGateway(self, e: ParallelGateway, c: Context, r: Result):
+        c.list_gateway_traveled[e.id] = e
 
-        if e.isJoinGateway():
-            if e.id in c.listGateway:
-                c.listGateway[e.id] += 1
+        if e.is_join_gateway():
+            if e.id in c.list_gateway:
+                c.list_gateway[e.id] += 1
             else:
-                c.listGateway[e.id] = 1 + \
-                    self.numberOfGatewayInNodes(e.previous)
+                c.list_gateway[e.id] = 1 + \
+                    self.number_of_gateway_in_nodes(e.previous)
             # check so lan da duyet cua cong join
-            if c.listGateway[e.id] < len(e.previous):
-                r.currentCycleTime = 0
+            if c.list_gateway[e.id] < len(e.previous):
+                r.current_cycle_time = 0
                 return None
             print("End parallel gateway")
-            c.stackNextGateway.append(e)
-            r.currentCycleTime = 0
+            c.stack_next_gateway.append(e)
+            r.current_cycle_time = 0
             return None
-        elif e.isSplitGateway():
-            totalCycleTime = 0.0
-            nextNode = None
+        elif e.is_split_gateway():
+            total_cycle_time = 0.0
+            next_node = None
             print("Start parallel gateway")
             for branch in e.next:
-                nextN = self.visit(branch, c, r)
-                branchCycleTime = r.currentCycleTime
-                self.calculateCyclyTimeNextNode(nextN, c, r)
-                branchCycleTime += r.currentCycleTime
-                if totalCycleTime < branchCycleTime:
-                    totalCycleTime = branchCycleTime
-            if len(c.stackNextGateway) > 0:
-                nextNode = c.stackNextGateway.pop().next[0]
-            r.currentCycleTime = totalCycleTime
-            return nextNode
+                next_N = self.visit(branch, c, r)
+                branch_cycle_time = r.current_cycle_time
+                self.calculate_cycle_time_nextNode(next_N, c, r)
+                branch_cycle_time += r.current_cycle_time
+                if total_cycle_time < branch_cycle_time:
+                    total_cycle_time = branch_cycle_time
+            if len(c.stack_next_gateway) > 0:
+                next_node = c.stack_next_gateway.pop().next[0]
+            r.current_cycle_time = total_cycle_time
+            return next_node
 
-        r.currentCycleTime = 0
+        r.current_cycle_time = 0
         return None
 
-    def visitForEventBasedGateway(self, e: EventBasedGateway, c: Context, r: Result):
+    def visit_for_EventBasedGateway(self, e: EventBasedGateway, c: Context, r: Result):
         print()
 
-    def visitForComplexGateway(self, e: ComplexGateway, c: Context, r: Result):
+    def visit_for_ComplexGateway(self, e: ComplexGateway, c: Context, r: Result):
         print()
 
-    def visitForInclusiveGateway(self, e: InclusiveGateway, c: Context, r: Result):
+    def visit_for_InclusiveGateway(self, e: InclusiveGateway, c: Context, r: Result):
         print()
 
-    def visitForExclusiveGateway(self, e: ExclusiveGateway, c: Context, r: Result):
-        c.listGatewayTraveled[e.id] = e
+    def visit_for_ExclusiveGateway(self, e: ExclusiveGateway, c: Context, r: Result):
+        c.list_gateway_traveled[e.id] = e
 
-        if e.isJoinGateway():
-            if e.id in c.listGateway:
-                c.listGateway[e.id] += 1
+        if e.is_join_gateway():
+            if e.id in c.list_gateway:
+                c.list_gateway[e.id] += 1
             else:
-                c.listGateway[e.id] = 1 + \
-                    self.numberOfGatewayInNodes(e.previous)
+                c.list_gateway[e.id] = 1 + \
+                    self.number_of_gateway_in_nodes(e.previous)
             # check so lan da duyet cua cong join
-            if c.listGateway[e.id] < len(e.previous):
-                r.currentCycleTime = 0
+            if c.list_gateway[e.id] < len(e.previous):
+                r.current_cycle_time = 0
                 return None
             # kiem tra xem day la mot gateway bat dau khoi loop hay khong
-            check, pre = self.checkNodeTraveled(e.previous, c)
+            check, pre = self.check_node_traveled(e.previous, c)
             if not check:
                 print("Start loop")
                 return None
 
             print("End gateway")
-            c.stackNextGateway.append(e)
-            r.currentCycleTime = 0
+            c.stack_next_gateway.append(e)
+            r.current_cycle_time = 0
             return None
 
-        elif e.isSplitGateway():
-            totalCycleTime = 0.0
-            nextNode = None
-            if len(c.stackEndLoop) > 0 and len(e.next) == 2 and c.stackEndLoop[-1] == e:
+        elif e.is_split_gateway():
+            total_cycle_time = 0.0
+            next_node = None
+            if len(c.stack_end_loop) > 0 and len(e.next) == 2 and c.stack_end_loop[-1] == e:
                 print("End loop")
             print("Start gateway")
             for i, branch in enumerate(e.next):
                 nextN = self.visit(branch, c, r)
-                branchCycleTime = r.currentCycleTime
-                self.calculateCyclyTimeNextNode(nextN, c, r)
-                branchCycleTime += r.currentCycleTime
-                totalCycleTime += e.branchingProbabilities[i] * branchCycleTime
+                branch_cycle_time = r.current_cycle_time
+                self.calculate_cycle_time_nextNode(nextN, c, r)
+                branch_cycle_time += r.current_cycle_time
+                total_cycle_time += e.branching_probabilities[i] * \
+                    branch_cycle_time
 
-            if len(c.stackNextGateway) > 0:
-                nextNode = c.stackNextGateway.pop().next[0]
-            r.currentCycleTime = totalCycleTime
-            return nextNode
+            if len(c.stack_next_gateway) > 0:
+                next_node = c.stack_next_gateway.pop().next[0]
+            r.current_cycle_time = total_cycle_time
+            return next_node
 
-        r.currentCycleTime = 0
+        r.current_cycle_time = 0
         return None
 
-    def visitForLane(self, e: Lane, c: Context, r: Result):
+    def visit_for_Lane(self, e: Lane, c: Context, r: Result):
         print("Visit lane", e.name)
         if len(e.node) == 0:
             return None
         for n in e.node:
             self.visit(n, c, r)
 
-    def visitForPool(self, e: Pool, c: Context, r: Result):
+    def visit_for_Pool(self, e: Pool, c: Context, r: Result):
         print("Visit pool", e.name)
         for l in e.lane:
             self.visit(l, c, r)
 
-    def visitForExpandedSubProcess(self, e: ExpandedSubProcess, c: Context, r: Result):
+    def visit_for_ExpandedSubProcess(self, e: ExpandedSubProcess, c: Context, r: Result):
         print()
 
-    def visitForEventSubProcess(self, e: EventSubProcess, c: Context, r: Result):
+    def visit_for_EventSubProcess(self, e: EventSubProcess, c: Context, r: Result):
         print()
 
-    def visitForTransactionSubProcess(self, e: TransactionSubProcess, c: Context, r: Result):
+    def visit_for_TransactionSubProcess(self, e: TransactionSubProcess, c: Context, r: Result):
         print()
 
-    def visitForCollapsedSubProcess(self, e: CollapsedSubProcess, c: Context, r: Result):
+    def visit_for_CollapsedSubProcess(self, e: CollapsedSubProcess, c: Context, r: Result):
         print()
 
-    def visitForCallActivity(self, e: CallActivity, c: Context, r: Result):
+    def visit_for_CallActivity(self, e: CallActivity, c: Context, r: Result):
         print()
 
-    def calculateCyclyTimeNextNode(self, nextNode, c: Context, r: Result):
-        timeResult = 0.0
-        while nextNode != None:
-            nextNextNode = self.visit(nextNode, c, r)
-            nextNextResult = r.currentCycleTime
-            nextNode = nextNextNode
-            timeResult += nextNextResult
-        r.currentCycleTime = timeResult
+    def calculate_cycle_time_nextNode(self, next_node, c: Context, r: Result):
+        time_result = 0.0
+        while next_node != None:
+            next_next_node = self.visit(next_node, c, r)
+            next_next_result = r.current_cycle_time
+            next_node = next_next_node
+            time_result += next_next_result
+        r.current_cycle_time = time_result
 
-    def numberOfGatewayInNodes(self, node) -> int:
+    def number_of_gateway_in_nodes(self, node) -> int:
         count = 0
         for i in node:
             if isinstance(i, Gateway):
                 count += 1
         return count
 
-    def checkNodeTraveled(self, node, c: Context):
+    def check_node_traveled(self, node, c: Context):
         for n in node:
             if isinstance(n, Gateway):
-                if n.id not in c.listGatewayTraveled:
+                if n.id not in c.list_gateway_traveled:
                     return False, n
         return True, None

@@ -3,47 +3,47 @@ from usecase.evaluate.utils import *
 
 
 class ProcessDirector:
-    mapNodeCreated: dict
-    mapElement: dict
+    map_node_created: dict
+    map_element: dict
 
-    def __init__(self, mapElement):
-        self.mapElement = mapElement
-        self.mapNodeCreated = {}
+    def __init__(self, map_element):
+        self.map_element = map_element
+        self.map_node_created = {}
 
-    def createNode(self, element: Element):
-        targetClass = globals()[element.className]
-        instance = targetClass(element)
-        self.mapNodeCreated[element.id] = instance
+    def create_node(self, element: Element):
+        target_class = globals()[element.className]
+        instance = target_class(element)
+        self.map_node_created[element.id] = instance
 
-    def createNodeList(self):
-        for id in self.mapElement:
-            self.mapElement[id] = Element(**self.mapElement[id])
-            self.createNode(self.mapElement[id])
+    def create_node_list(self):
+        for id in self.map_element:
+            self.map_element[id] = Element(**self.map_element[id])
+            self.create_node(self.map_element[id])
 
-    def getNodeOfIds(self, ids: list):
+    def get_node_of_ids(self, ids: list):
         result = []
         for id in ids:
-            result.append(self.mapNodeCreated[id])
+            result.append(self.map_node_created[id])
         return result
 
-    def buildGraph(self):
-        startNode = None
-        for e in self.mapElement.values():
-            n = self.mapNodeCreated[e.id]
+    def build_graph(self):
+        start_node = None
+        for e in self.map_element.values():
+            n = self.map_node_created[e.id]
             if isinstance(n, Node):
-                if isinstance(n, Event) and n.eventType == EventType.STARTEVENT.value:
-                    lane = self.mapNodeCreated[e.parentID]
+                if isinstance(n, Event) and n.event_type == EventType.STARTEVENT.value:
+                    lane = self.map_node_created[e.parentID]
                     lane.node.append(n)
-                n.previous = self.getNodeOfIds(e.incoming)
-                n.next = self.getNodeOfIds(e.outgoing)
+                n.previous = self.get_node_of_ids(e.incoming)
+                n.next = self.get_node_of_ids(e.outgoing)
             elif type(n) is Pool:
-                startNode = n
+                start_node = n
             elif type(n) is Lane:
-                pool = self.mapNodeCreated[e.parentID]
+                pool = self.map_node_created[e.parentID]
                 pool.lane.append(n)
             else:
                 pass
-        return startNode
+        return start_node
 
 
 class Process:
@@ -59,13 +59,13 @@ class Evaluate:
     def __init__(self) -> None:
         self.result = Result()
 
-    def evaluate(self, mapElement: dict):
-        p = ProcessDirector(mapElement)
-        p.createNodeList()
-        startNode = p.buildGraph()
+    def evaluate(self, map_element: dict):
+        p = ProcessDirector(map_element)
+        p.create_node_list()
+        start_node = p.build_graph()
         t = Traverse()
         c = Context()
-        startNode.accept(t, c, self.result)
+        start_node.accept(t, c, self.result)
 
 
 j = """

@@ -3,22 +3,22 @@ from usecase.evaluate.utils import Element
 
 
 class Task(Node):
-    cycleTime: float
+    cycle_time: float
 
     def __init__(self, element: Element):
         super().__init__(element)
-        self.cycleTime = element.cycleTime
+        self.cycle_time = element.cycleTime
 
 
 class NormalTask(Task):
-    taskType: int
+    task_type: int
 
     def __init__(self, element: Element):
         super().__init__(element)
-        self.taskType = element.taskType
+        self.task_type = element.taskType
 
     def accept(self, t, c, r):
-        return t.visitForNormalTask(self, c, r)
+        return t.visit_for_NormalTask(self, c, r)
 
 
 class MessageTask(Task):
@@ -27,9 +27,9 @@ class MessageTask(Task):
 
 class SendTask(MessageTask):
     def accept(self, t, c, r):
-        return t.visitForSendTask(self, c, r)
+        return t.visit_for_SendTask(self, c, r)
 
 
 class ReceiveTask(MessageTask):
     def accept(self, t, c, r):
-        return t.visitForReceiveTask(self, c, r)
+        return t.visit_for_ReceiveTask(self, c, r)

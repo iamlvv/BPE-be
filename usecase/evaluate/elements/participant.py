@@ -3,16 +3,16 @@ from usecase.evaluate.utils import Element
 
 
 class Lane(BaseElement):
-    eventSubProcess: list
+    event_sub_process: list
     node: list
 
     def __init__(self, element: Element):
         super().__init__(element)
-        self.eventSubProcess = []
+        self.event_sub_process = []
         self.node = []
 
     def accept(self, t, c, r):
-        return t.visitForLane(self, c, r)
+        return t.visit_for_Lane(self, c, r)
 
 
 class Pool(BaseElement):
@@ -23,4 +23,4 @@ class Pool(BaseElement):
         self.lane = []
 
     def accept(self, t, c, r):
-        return t.visitForPool(self, c, r)
+        return t.visit_for_Pool(self, c, r)
