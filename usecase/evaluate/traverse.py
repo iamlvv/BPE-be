@@ -182,6 +182,8 @@ class Traverse:
         print("Visit participant", e.name)
         for l in e.lane:
             self.visit(l, c, r)
+        for n in e.node:
+            self.visit(n, c, r)
 
     def visit_for_ExpandedSubProcess(self, e: ExpandedSubProcess, c: Context, r: Result):
         print()

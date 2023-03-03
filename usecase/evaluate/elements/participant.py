@@ -17,10 +17,12 @@ class Lane(BaseElement):
 
 class Participant(BaseElement):
     lane: list
+    node: list
 
     def __init__(self, element: Element):
         super().__init__(element)
         self.lane = []
+        self.node = []
 
     def accept(self, t, c, r):
         return t.visit_for_Participant(self, c, r)
