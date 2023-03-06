@@ -15,7 +15,7 @@ class Traverse:
     def visit_for_NormalTask(self, e: NormalTask, c: Context, r: Result):
         total_cycle_time = 0.0
         if e.task_type == TaskType.NONETASK.value:
-            print("Visit task", e.name)
+            print("Visit task", e.name, e.cycle_time)
             next_node = self.visit(e.next[0], c, r)
             total_cycle_time += r.current_cycle_time + e.cycle_time
             self.calculate_cycle_time_nextNode(next_node, c, r)
@@ -38,8 +38,10 @@ class Traverse:
             self.calculate_cycle_time_nextNode(next_node, c, r)
             total_cycle_time += r.current_cycle_time
             r.current_cycle_time = total_cycle_time
+            return None
         elif e.event_type == EventType.ENDEVENT.value:
             print("Visit end event")
+            r.current_cycle_time = 0
             return None
 
     def visit_for_MessageEvent(self, e: MessageEvent, c: Context, r: Result):

@@ -20,6 +20,7 @@ def test_list(request, format=None):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
         result = e.evaluate(body)
+        # json_response = [result]
         json_response = [r.__dict__ for r in result]
         return JsonResponse(json_response, safe=False)
 

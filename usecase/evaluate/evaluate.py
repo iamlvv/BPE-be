@@ -65,6 +65,7 @@ class Evaluate:
         c = Context()
         for p in collaboration.participants:
             r = Result()
+            r.participant_name = p.name
             p.accept(t, c, r)
             print(r.current_cycle_time)
             collaboration.result.append(r)

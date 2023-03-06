@@ -38,6 +38,7 @@ class Context:
 
 
 class Result:
+    participant_name: str
     current_cycle_time: float
     number_of_optional_tasks: int
     number_of_total_tasks: int
@@ -47,6 +48,7 @@ class Result:
     logs_flexibility: list
 
     def __init__(self):
+        self.participant_name = ""
         self.current_cycle_time = 0.0
         self.number_of_optional_tasks = 0
         self.number_of_total_tasks = 0
