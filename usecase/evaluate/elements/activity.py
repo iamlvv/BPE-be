@@ -1,10 +1,10 @@
-from usecase.evaluate.elements.base_element import BaseElement
+from usecase.evaluate.elements.node import Node
 from usecase.evaluate.utils import Element
 
 
-class Activity(BaseElement):
+class Activity(Node):
     boundary: list
 
     def __init__(self, element: Element):
         super().__init__(element)
-        self.boundary = element.boundary
+        # self.boundary = element.boundary

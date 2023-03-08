@@ -10,18 +10,14 @@ from usecase.evaluate.elements.sub_process import *
 
 class Traverse:
     def visit(self, e, c: Context, r: Result):
-        return e.accept(self, c, r)
+        e.accept(self, c, r)
 
     def visit_for_NormalTask(self, e: NormalTask, c: Context, r: Result):
-        total_cycle_time = 0.0
         if e.task_type == TaskType.NONETASK.value:
             print("Visit task", e.name, e.cycle_time)
-            next_node = self.visit(e.next[0], c, r)
-            total_cycle_time += r.current_cycle_time + e.cycle_time
-            self.calculate_cycle_time_nextNode(next_node, c, r)
-            total_cycle_time += r.current_cycle_time
-            r.current_cycle_time = total_cycle_time
-            return None
+            self.visit(e.next[0], c, r)
+            r.current_cycle_time += e.cycle_time
+            return
 
     def visit_for_SendTask(self, e: SendTask, c: Context, r: Result):
         print(3)
@@ -32,17 +28,12 @@ class Traverse:
     def visit_for_NonEvent(self, e: NonEvent, c: Context, r: Result):
         if e.event_type == EventType.STARTEVENT.value:
             print("Visit start event")
-            next_node = self.visit(e.next[0], c, r)
-            next_result = r.current_cycle_time
-            total_cycle_time = next_result
-            self.calculate_cycle_time_nextNode(next_node, c, r)
-            total_cycle_time += r.current_cycle_time
-            r.current_cycle_time = total_cycle_time
-            return None
+            self.visit(e.next[0], c, r)
+            return
         elif e.event_type == EventType.ENDEVENT.value:
             print("Visit end event")
             r.current_cycle_time = 0
-            return None
+            return
 
     def visit_for_MessageEvent(self, e: MessageEvent, c: Context, r: Result):
         print()
@@ -89,29 +80,28 @@ class Traverse:
             # check so lan da duyet cua cong join
             if c.list_gateway[e.id] < len(e.previous):
                 r.current_cycle_time = 0
-                return None
+                return
             print("End parallel gateway")
             c.stack_next_gateway.append(e)
             r.current_cycle_time = 0
-            return None
+            return
         elif e.is_split_gateway():
             total_cycle_time = 0.0
             next_node = None
             print("Start parallel gateway")
             for branch in e.next:
-                next_N = self.visit(branch, c, r)
+                self.visit(branch, c, r)
                 branch_cycle_time = r.current_cycle_time
-                self.calculate_cycle_time_nextNode(next_N, c, r)
-                branch_cycle_time += r.current_cycle_time
                 if total_cycle_time < branch_cycle_time:
                     total_cycle_time = branch_cycle_time
             if len(c.stack_next_gateway) > 0:
                 next_node = c.stack_next_gateway.pop().next[0]
-            r.current_cycle_time = total_cycle_time
-            return next_node
+            self.visit(next_node, c, r)
+            r.current_cycle_time += total_cycle_time
+            return
 
         r.current_cycle_time = 0
-        return None
+        return
 
     def visit_for_EventBasedGateway(self, e: EventBasedGateway, c: Context, r: Result):
         print()
@@ -134,19 +124,19 @@ class Traverse:
             # check so lan da duyet cua cong join
             if c.list_gateway[e.id] < len(e.previous):
                 r.current_cycle_time = 0
-                return None
+                return
             # kiem tra xem day la mot gateway bat dau khoi loop hay khong
-            check, pre = self.check_node_traveled(e.previous, c)
+            check, pre = self.check_exclusive_gateway_traveled(e.previous, c)
             if not check:
                 print("Start loop")
                 c.stack_end_loop.append(pre)
-                next_node = self.handle_for_loop(e, pre, c, r)
-                return next_node
+                self.handle_for_loop(e, pre, c, r)
+                return
 
             print("End gateway")
             c.stack_next_gateway.append(e)
             r.current_cycle_time = 0
-            return None
+            return
 
         elif e.is_split_gateway():
             total_cycle_time = 0.0
@@ -155,28 +145,26 @@ class Traverse:
                 print("End loop")
                 c.stack_end_loop.pop()
                 r.current_cycle_time = 0
-                return None
+                return
             print("Start gateway")
             for i, branch in enumerate(e.next):
-                nextN = self.visit(branch, c, r)
-                branch_cycle_time = r.current_cycle_time
-                self.calculate_cycle_time_nextNode(nextN, c, r)
-                branch_cycle_time += r.current_cycle_time
+                self.visit(branch, c, r)
                 total_cycle_time += e.branching_probabilities[i] * \
-                    branch_cycle_time
+                    r.current_cycle_time
 
             if len(c.stack_next_gateway) > 0:
                 next_node = c.stack_next_gateway.pop().next[0]
-            r.current_cycle_time = total_cycle_time
-            return next_node
+            self.visit(next_node, c, r)
+            r.current_cycle_time += total_cycle_time
+            return
 
         r.current_cycle_time = 0
-        return None
+        return
 
     def visit_for_Lane(self, e: Lane, c: Context, r: Result):
         print("Visit lane", e.name)
         if len(e.node) == 0:
-            return None
+            return
         for n in e.node:
             self.visit(n, c, r)
 
@@ -202,15 +190,6 @@ class Traverse:
     def visit_for_CallActivity(self, e: CallActivity, c: Context, r: Result):
         print()
 
-    def calculate_cycle_time_nextNode(self, next_node, c: Context, r: Result):
-        time_result = 0.0
-        while next_node != None:
-            next_next_node = self.visit(next_node, c, r)
-            next_next_result = r.current_cycle_time
-            next_node = next_next_node
-            time_result += next_next_result
-        r.current_cycle_time = time_result
-
     def number_of_gateway_in_nodes(self, node) -> int:
         count = 0
         for i in node:
@@ -218,7 +197,7 @@ class Traverse:
                 count += 1
         return count
 
-    def check_node_traveled(self, node, c: Context):
+    def check_exclusive_gateway_traveled(self, node, c: Context):
         for n in node:
             if type(n) is ExclusiveGateway:
                 if n.id not in c.list_gateway_traveled:
@@ -226,10 +205,7 @@ class Traverse:
         return True, None
 
     def handle_for_loop(self, start: ExclusiveGateway, end: ExclusiveGateway, c: Context, r: Result):
-        next_N = self.visit(start.next[0], c, r)
-        time_result = r.current_cycle_time
-        self.calculate_cycle_time_nextNode(next_N, c, r)
-        time_result += r.current_cycle_time
+        self.visit(start.next[0], c, r)
 
         reloop = 0.0
         next_node = None
@@ -238,5 +214,7 @@ class Traverse:
                 reloop = end.branching_probabilities[i]
             else:
                 next_node = n
-        r.current_cycle_time = time_result / (1 - reloop)
-        return next_node
+        total_cycle_time = r.current_cycle_time / (1 - reloop)
+        self.visit(next_node, c, r)
+        r.current_cycle_time += total_cycle_time
+        return
