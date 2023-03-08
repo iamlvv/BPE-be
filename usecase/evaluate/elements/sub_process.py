@@ -1,14 +1,13 @@
 from usecase.evaluate.elements.base_element import BaseElement
-from usecase.evaluate.elements.node import Node
+from usecase.evaluate.elements.activity import Activity
 from usecase.evaluate.utils import Element
 
 
 class SubProcess(BaseElement):
     node: list
-    boundary: list
 
 
-class NormalProcess(SubProcess, Node):
+class NormalProcess(SubProcess, Activity):
     pass
 
 

@@ -1,8 +1,8 @@
-from usecase.evaluate.elements.node import Node
+from usecase.evaluate.elements.activity import Activity
 from usecase.evaluate.utils import Element
 
 
-class Task(Node):
+class Task(Activity):
     cycle_time: float
 
     def __init__(self, element: Element):

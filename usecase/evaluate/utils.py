@@ -13,6 +13,7 @@ class Element:
     taskType: int
     eventType: int
     parentId: str
+    boundary: list
 
     def __init__(self, **entries):
         self.__dict__.update(entries)
