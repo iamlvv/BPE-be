@@ -6,17 +6,22 @@ from usecase.evaluate.utils import Element
 class SubProcess(BaseElement):
     node: list
 
+    def __init__(self, element: Element):
+        super().__init__(element)
+        self.node = []
 
-class NormalProcess(SubProcess, Activity):
-    pass
+
+class NormalSubProcess(SubProcess, Activity):
+    def __init__(self, element: Element):
+        super().__init__(element)
 
 
-class ExpandedSubProcess(SubProcess):
+class BPESubProcess(NormalSubProcess):
     def __init__(self, element: Element):
         super().__init__(element)
 
     def accept(self, t, c, r):
-        return t.visit_for_ExpandedSubProcess(self, c, r)
+        return t.visit_for_BPESubProcess(self, c, r)
 
 
 class EventSubProcess(SubProcess):
@@ -24,16 +29,11 @@ class EventSubProcess(SubProcess):
         return t.visit_for_EventSubProcess(self, c, r)
 
 
-class TransactionSubProcess(SubProcess):
+class TransactionSubProcess(NormalSubProcess):
     def accept(self, t, c, r):
         return t.visit_for_TransactionSubProcess(self, c, r)
 
 
-class CollapsedSubProcess(SubProcess):
-    def accept(self, t, c, r):
-        return t.visit_for_CollapsedSubProcess(self, c, r)
-
-
-class CallActivity(SubProcess):
+class CallActivity(NormalSubProcess):
     def accept(self, t, c, r):
         return t.visit_for_CallActivity(self, c, r)

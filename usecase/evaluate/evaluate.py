@@ -32,9 +32,6 @@ class ProcessDirector:
         for e in self.map_element.values():
             n = self.map_node_created[e.id]
             if isinstance(n, Node):
-                if isinstance(n, Event) and n.event_type == EventType.STARTEVENT.value:
-                    lane = self.map_node_created[e.parentID]
-                    lane.node.append(n)
                 n.previous = self.get_node_of_ids(e.incoming)
                 n.next = self.get_node_of_ids(e.outgoing)
             elif type(n) is Participant:
@@ -44,6 +41,16 @@ class ProcessDirector:
                 participant = self.map_node_created[e.parentID]
                 participant.lane.append(n)
             else:
+                pass
+
+            if isinstance(n, Event) and n.event_type == EventType.STARTEVENT.value:
+                lane = self.map_node_created[e.parentID]
+                lane.node.append(n)
+            if isinstance(n, Activity) and hasattr(e, 'boundary'):
+                for b in e.boundary:
+                    n.boundary.append(self.map_node_created[b])
+            if isinstance(n, SubProcess):
+                # get all start event of subprocess
                 pass
         return collaboration
 

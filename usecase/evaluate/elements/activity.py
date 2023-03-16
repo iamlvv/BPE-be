@@ -7,4 +7,4 @@ class Activity(Node):
 
     def __init__(self, element: Element):
         super().__init__(element)
-        # self.boundary = element.boundary
+        self.boundary = []

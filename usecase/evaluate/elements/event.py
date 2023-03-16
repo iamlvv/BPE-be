@@ -4,10 +4,12 @@ from usecase.evaluate.utils import Element, EventType
 
 class Event(Node):
     event_type: EventType
+    is_interrupting: bool
 
     def __init__(self, element: Element):
         super().__init__(element)
         self.event_type = element.eventType
+        self.is_interrupting = element.isInterrupting
 
 
 class NonEvent(Event):
@@ -21,6 +23,12 @@ class MessageEvent(Event):
 
 
 class TimerEvent(Event):
+    time_duration: float
+
+    def __init__(self, element: Element):
+        super().__init__(element)
+        self.time_duration = element.timeDuration
+
     def accept(self, t, c, r):
         return t.visit_for_TimerEvent(self, c, r)
 

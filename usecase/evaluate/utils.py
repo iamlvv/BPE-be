@@ -9,9 +9,11 @@ class Element:
     type: str
     className: str
     cycleTime: float
+    timeDuration: float
     branchingProbabilities: list
     taskType: int
     eventType: int
+    isInterrupting: bool
     parentId: str
     boundary: list
 

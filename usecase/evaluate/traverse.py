@@ -13,11 +13,28 @@ class Traverse:
         e.accept(self, c, r)
 
     def visit_for_NormalTask(self, e: NormalTask, c: Context, r: Result):
-        if e.task_type == TaskType.NONETASK.value:
-            print("Visit task", e.name, e.cycle_time)
-            self.visit(e.next[0], c, r)
-            r.current_cycle_time += e.cycle_time
-            return
+        # if e.task_type == TaskType.NONETASK.value:
+        print("Visit task", e.name, e.cycle_time)
+        task_time = e.cycle_time
+        total_cycle_time = task_time
+        list_boundary_timer_event, is_interrupting = self.handle_for_boundary_SubProcess(
+            e, c, r, TimerEvent.__name__)
+
+        self.visit(e.next[0], c, r)
+        next_time = r.current_cycle_time
+
+        # task just only has timer event
+        if len(e.boundary) > 0:
+            # case for timer event
+            if is_interrupting:
+                total_cycle_time += max(list_boundary_timer_event)
+            else:
+                total_cycle_time += max(list_boundary_timer_event, next_time)
+        else:  # case task doesn't have any timer event
+            total_cycle_time += next_time
+
+        r.current_cycle_time = total_cycle_time
+        return
 
     def visit_for_SendTask(self, e: SendTask, c: Context, r: Result):
         print(3)
@@ -39,7 +56,23 @@ class Traverse:
         print()
 
     def visit_for_TimerEvent(self, e: TimerEvent, c: Context, r: Result):
-        print()
+        print("Visit timer event")
+        if not e.time_duration:
+            return
+        if e.event_type == EventType.INTERMIDIATECATCHEVENT.value:
+            self.visit(e.next[0], c, r)
+            r.current_cycle_time += e.time_duration
+            return
+        elif e.event_type == EventType.BOUNDARYEVENT.value:
+            self.visit(e.next[0], c, r)
+            r.current_cycle_time += e.time_duration
+            return
+        elif e.event_type == EventType.STARTEVENT.value and e.is_interrupting:  # same as standard event
+            self.visit(e.next[0], c, r)
+            r.current_cycle_time += e.time_duration
+            return
+        else:  # case start event non-interrupting
+            pass
 
     def visit_for_ErrorEvent(self, e: ErrorEvent, c: Context, r: Result):
         print()
@@ -175,20 +208,75 @@ class Traverse:
         for n in e.node:
             self.visit(n, c, r)
 
-    def visit_for_ExpandedSubProcess(self, e: ExpandedSubProcess, c: Context, r: Result):
-        print()
-
     def visit_for_EventSubProcess(self, e: EventSubProcess, c: Context, r: Result):
-        print()
+        print("Visit expanded subprocess")
+        # traverse start event of subprocess
+        subprocess_time = 0.0
+        # expected subprocess has only one start event
+        for se in e.node:
+            self.visit(se, c, r)
+            subprocess_time += r.current_cycle_time
+
+        r.current_cycle_time = subprocess_time
+
+    def visit_for_BPESubProcess(self, e: BPESubProcess, c: Context, r: Result):
+        print("Visit expanded subprocess")
+        self.handle_for_NormalSubProcess(e, c, r)
 
     def visit_for_TransactionSubProcess(self, e: TransactionSubProcess, c: Context, r: Result):
-        print()
-
-    def visit_for_CollapsedSubProcess(self, e: CollapsedSubProcess, c: Context, r: Result):
-        print()
+        print("Visit transaction subprocess")
+        self.handle_for_NormalSubProcess(e, c, r)
 
     def visit_for_CallActivity(self, e: CallActivity, c: Context, r: Result):
-        print()
+        print("Visit call activity")
+        self.handle_for_NormalSubProcess(e, c, r)
+
+    def handle_for_NormalSubProcess(self, e: NormalSubProcess, c: Context, r: Result):
+        # traverse start event of subprocess
+        subprocess_time = self.handle_for_inner_SubProcess(e, c, r)
+        total_cycle_time = subprocess_time
+
+        # all boundary timer events must be traversed
+        list_boundary_timer_event, is_interrupting = self.handle_for_boundary_SubProcess(
+            e, c, r, TimerEvent.__name__)
+
+        self.visit(e.next[0], c, r)
+        next_time = r.current_cycle_time
+
+        if len(list_boundary_timer_event) > 0:
+            # case for timer event
+            if is_interrupting:
+                total_cycle_time += max(list_boundary_timer_event)
+            else:
+                total_cycle_time += max(max(list_boundary_timer_event),
+                                        next_time)
+        else:  # case subprocess doesn't have any timer event
+            total_cycle_time += next_time
+
+        r.current_cycle_time = total_cycle_time
+
+    def handle_for_inner_SubProcess(self, e: NormalSubProcess, c: Context, r: Result):
+        # return cycle time of subprocess and list of boundary events cycletime
+        subprocess_time = 0.0
+        # expected subprocess has only one start event
+        for se in e.node:
+            self.visit(se, c, r)
+            subprocess_time += r.current_cycle_time
+
+        return subprocess_time
+
+    def handle_for_boundary_SubProcess(self, e: NormalSubProcess, c: Context, r: Result, class_name: str):
+        list_boundary_time = []
+        is_interrupting = True
+
+        for b in e.boundary:
+            # timer event case take all cycle time of boundary
+            if type(b).__name__ == class_name:
+                is_interrupting = b.is_interrupting
+                self.visit(b, c, r)
+                list_boundary_time.append(r.current_cycle_time)
+
+        return list_boundary_time, is_interrupting
 
     def number_of_gateway_in_nodes(self, node) -> int:
         count = 0
