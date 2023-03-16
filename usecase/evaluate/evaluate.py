@@ -5,14 +5,50 @@ from usecase.evaluate.utils import *
 class ProcessDirector:
     map_node_created: dict
     map_element: dict
+    linkEventNode: dict
 
     def __init__(self, map_element):
         self.map_element = map_element
         self.map_node_created = {}
+        self.linkEventNode = {}
+
+    def createLinkEventNode(self, instance: LinkEvent, element: Element):
+        if instance.linkCode in self.linkEventNode:
+            if element.eventType == EventType.INTERMIDIATETHROWEVENT.value:
+                self.linkEventNode[element.linkCode][0].append(element.id)
+            else:
+                self.linkEventNode[element.linkCode][1].append(element.id)
+        else:
+            if element.eventType == EventType.INTERMIDIATETHROWEVENT.value:
+                self.linkEventNode.update({element.linkCode: [[element.id], []]})
+            else:
+                self.linkEventNode.update({element.linkCode: [[], [element.id]]})
+
+    def handleLinkEvent(self):
+        for linkCode in self.linkEventNode:
+            throw_nodes = self.get_node_of_ids(self.linkEventNode[linkCode][0])
+            catch_node = self.get_node_of_ids(self.linkEventNode[linkCode][1])[0]
+
+            for throw_node in throw_nodes:
+                next_nodes_of_prev_node = throw_node.previous[0].next
+                index_of_link_event = next_nodes_of_prev_node.index(throw_node)
+                next_nodes_of_prev_node[index_of_link_event] = catch_node.next[0]
+
+                prev_nodes_of_next_node = catch_node.next[0].previous
+                try:
+                    index_of_link_event = prev_nodes_of_next_node.index(catch_node)
+                    prev_nodes_of_next_node[index_of_link_event] = throw_node.previous[0]
+                except:
+                    pass
 
     def create_node(self, element: Element):
         target_class = globals()[element.className]
         instance = target_class(element)
+
+        if isinstance(instance, LinkEvent):
+            instance.setAttribute(element.linkCode, element.outgoing, element.incoming)
+            self.createLinkEventNode(instance, element)
+
         self.map_node_created[element.id] = instance
 
     def create_node_list(self):
@@ -52,6 +88,8 @@ class ProcessDirector:
             if isinstance(n, SubProcess):
                 # get all start event of subprocess
                 pass
+        self.handleLinkEvent()
+
         return collaboration
 
 

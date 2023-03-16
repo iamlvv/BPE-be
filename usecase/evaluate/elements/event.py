@@ -11,7 +11,6 @@ class Event(Node):
         self.event_type = element.eventType
         self.is_interrupting = element.isInterrupting
 
-
 class NonEvent(Event):
     def accept(self, t, c, r):
         return t.visit_for_NonEvent(self, c, r)
@@ -69,6 +68,30 @@ class ConditionalEvent(Event):
 
 
 class LinkEvent(Event):
+    linkCode: str
+    next: list
+    previous: list
+
+    def setAttribute(self, link_code: str, next: list, previous: list):
+        self.linkCode = link_code
+        self.next = next
+        self.previous = previous
+
+    def setLinkCode(self, link_code: str):
+        self.linkCode = link_code
+
+    def __int__(self, element: Element):
+        self.next = super().next
+        self.previous = super().previous
+
+    @staticmethod
+    def isLinkThrowEvent(node: Node):
+        return isinstance(node, LinkEvent) and node.event_type == EventType.INTERMIDIATETHROWEVENT.value
+
+    @staticmethod
+    def isLinkCatchEvent(node: Node):
+        return isinstance(node, LinkEvent) and node.event_type == EventType.INTERMIDIATECATCHEVENT.value
+
     def accept(self, t, c, r):
         return t.visit_for_LinkEvent(self, c, r)
 

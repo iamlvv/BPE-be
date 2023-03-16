@@ -8,6 +8,7 @@ class Element:
     outgoing: list
     type: str
     className: str
+    linkCode: str
     cycleTime: float
     timeDuration: float
     branchingProbabilities: list
