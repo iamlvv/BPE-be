@@ -17,6 +17,7 @@ class Element:
     isInterrupting: bool
     parentId: str
     boundary: list
+    percentage: int
 
     def __init__(self, **entries):
         self.__dict__.update(entries)

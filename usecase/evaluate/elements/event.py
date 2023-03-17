@@ -11,6 +11,7 @@ class Event(Node):
         self.event_type = element.eventType
         self.is_interrupting = element.isInterrupting
 
+
 class NonEvent(Event):
     def accept(self, t, c, r):
         return t.visit_for_NonEvent(self, c, r)
@@ -63,6 +64,11 @@ class CompensationEvent(Event):
 
 
 class ConditionalEvent(Event):
+    percentage: int
+
+    def set_percentage(self, percentage):
+        self.percentage = percentage
+
     def accept(self, t, c, r):
         return t.visit_for_ConditionalEvent(self, c, r)
 

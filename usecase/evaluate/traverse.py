@@ -1,6 +1,4 @@
 from usecase.evaluate.utils import *
-from usecase.evaluate.elements.base_element import *
-from usecase.evaluate.elements.node import *
 from usecase.evaluate.elements.gateway import *
 from usecase.evaluate.elements.task import *
 from usecase.evaluate.elements.event import *
@@ -13,28 +11,18 @@ class Traverse:
         e.accept(self, c, r)
 
     def visit_for_NormalTask(self, e: NormalTask, c: Context, r: Result):
-        # if e.task_type == TaskType.NONETASK.value:
         print("Visit task", e.name, e.cycle_time)
-        task_time = e.cycle_time
-        total_cycle_time = task_time
-        list_boundary_timer_event, is_interrupting = self.handle_for_boundary_SubProcess(
-            e, c, r, TimerEvent.__name__)
 
-        self.visit(e.next[0], c, r)
-        next_time = r.current_cycle_time
-
-        # task just only has timer event
         if len(e.boundary) > 0:
-            # case for timer event
-            if is_interrupting:
-                total_cycle_time += max(list_boundary_timer_event)
-            else:
-                total_cycle_time += max(list_boundary_timer_event, next_time)
-        else:  # case task doesn't have any timer event
-            total_cycle_time += next_time
-
-        r.current_cycle_time = total_cycle_time
-        return
+            for boundary_event in e.boundary:
+                if isinstance(boundary_event, ConditionalEvent):
+                    self.handle_for_boundary_conditional_event(e, boundary_event, c, r)
+                elif isinstance(boundary_event, TimerEvent):
+                    total_cycle_time = self.handle_for_boundary_timer_event(e, c, r)
+                    r.current_cycle_time = total_cycle_time
+        else:
+            self.visit(e.next[0], c, r)
+            r.current_cycle_time += e.cycle_time
 
     def visit_for_SendTask(self, e: SendTask, c: Context, r: Result):
         print(3)
@@ -93,13 +81,23 @@ class Traverse:
         print()
 
     def visit_for_ConditionalEvent(self, e: ConditionalEvent, c: Context, r: Result):
-        print()
+        print("Visit conditional event", e.name)
+        if e.event_type in [EventType.INTERMIDIATETHROWEVENT.value, EventType.STARTEVENT.value,
+                            EventType.INTERMIDIATECATCHEVENT.value]:
+            temp_result = Result()
+            self.visit(e.next[0], c, temp_result)
+            r.current_cycle_time += e.percentage * temp_result.current_cycle_time
+            print()
+        elif e.event_type == EventType.BOUNDARYEVENT.value:
+            pass
 
     def visit_for_LinkEvent(self, e: LinkEvent, c: Context, r: Result):
-        print()
+        pass
 
     def visit_for_TerminateEvent(self, e: TerminateEvent, c: Context, r: Result):
-        print()
+        print("Visit terminate event")
+        r.current_cycle_time = 0
+        return
 
     def visit_for_ParallelGateway(self, e: ParallelGateway, c: Context, r: Result):
         c.list_gateway_traveled[e.id] = e
@@ -109,7 +107,7 @@ class Traverse:
                 c.list_gateway[e.id] += 1
             else:
                 c.list_gateway[e.id] = 1 + \
-                    self.number_of_gateway_in_nodes(e.previous)
+                                       self.number_of_gateway_in_nodes(e.previous)
             # check so lan da duyet cua cong join
             if c.list_gateway[e.id] < len(e.previous):
                 r.current_cycle_time = 0
@@ -153,7 +151,7 @@ class Traverse:
                 c.list_gateway[e.id] += 1
             else:
                 c.list_gateway[e.id] = 1 + \
-                    self.number_of_gateway_in_nodes(e.previous)
+                                       self.number_of_gateway_in_nodes(e.previous)
             # check so lan da duyet cua cong join
             if c.list_gateway[e.id] < len(e.previous):
                 r.current_cycle_time = 0
@@ -183,7 +181,7 @@ class Traverse:
             for i, branch in enumerate(e.next):
                 self.visit(branch, c, r)
                 total_cycle_time += e.branching_probabilities[i] * \
-                    r.current_cycle_time
+                                    r.current_cycle_time
 
             if len(c.stack_next_gateway) > 0:
                 next_node = c.stack_next_gateway.pop().next[0]
@@ -306,3 +304,44 @@ class Traverse:
         self.visit(next_node, c, r)
         r.current_cycle_time += total_cycle_time
         return
+
+    def handle_for_boundary_conditional_event(self, e: NormalTask, boundary_event: ConditionalEvent, c: Context,
+                                              r: Result):
+        interrupt = boundary_event.is_interrupting
+        percentage = boundary_event.percentage
+
+        task_from_boundary_event = boundary_event.next[0]
+        next_task = e.next[0]
+
+        total_cycle_time = e.cycle_time
+
+        boundary_temp_result = Result()
+        self.visit(task_from_boundary_event, c, boundary_temp_result)
+
+        seq_temp_result = Result()
+        self.visit(next_task, c, seq_temp_result)
+
+        boundary_ct = boundary_temp_result.current_cycle_time
+        sequence_ct = seq_temp_result.current_cycle_time
+
+        if interrupt:
+            total_cycle_time += percentage * boundary_ct + (1 - percentage) * sequence_ct
+        else:
+            total_cycle_time += percentage * max(boundary_ct, sequence_ct) + (
+                    1 - percentage) * sequence_ct
+        r.current_cycle_time += total_cycle_time
+
+    def handle_for_boundary_timer_event(self, e: NormalTask, c: Context, r: Result):
+        task_time = e.cycle_time
+        total_cycle_time = task_time
+        list_boundary_timer_event, is_interrupting = self.handle_for_boundary_SubProcess(
+            e, c, r, TimerEvent.__name__)
+
+        self.visit(e.next[0], c, r)
+        next_time = r.current_cycle_time
+
+        if is_interrupting:
+            total_cycle_time += max(list_boundary_timer_event)
+        else:
+            total_cycle_time += max(list_boundary_timer_event, next_time)
+        return total_cycle_time

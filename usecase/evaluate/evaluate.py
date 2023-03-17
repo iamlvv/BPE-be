@@ -49,6 +49,10 @@ class ProcessDirector:
             instance.setAttribute(element.linkCode, element.outgoing, element.incoming)
             self.createLinkEventNode(instance, element)
 
+
+        if isinstance(instance, ConditionalEvent):
+            instance.set_percentage(element.percentage)
+
         self.map_node_created[element.id] = instance
 
     def create_node_list(self):
