@@ -49,7 +49,6 @@ class ProcessDirector:
             instance.setAttribute(element.linkCode, element.outgoing, element.incoming)
             self.createLinkEventNode(instance, element)
 
-
         if isinstance(instance, ConditionalEvent):
             instance.set_percentage(element.percentage)
 
@@ -116,7 +115,9 @@ class Evaluate:
             r = Result()
             r.participant_name = p.name
             p.accept(t, c, r)
-            print(r.current_cycle_time)
+            r.flexibility = r.number_of_optional_tasks / r.number_of_total_tasks
+            print("Cycle time", r.current_cycle_time)
+            print("Flexibility", r.flexibility)
             collaboration.result.append(r)
 
         return collaboration.result

@@ -11,7 +11,11 @@ class Traverse:
         e.accept(self, c, r)
 
     def visit_for_NormalTask(self, e: NormalTask, c: Context, r: Result):
-        print("Visit task", e.name, e.cycle_time)
+        print("Visit task", e.name, e.cycle_time, "In xor block", c.in_xor_block)
+
+        r.number_of_total_tasks += 1
+        if c.in_xor_block > 0:
+            r.number_of_optional_tasks += 1
 
         if len(e.boundary) > 0:
             for boundary_event in e.boundary:
@@ -147,49 +151,9 @@ class Traverse:
         c.list_gateway_traveled[e.id] = e
 
         if e.is_join_gateway():
-            if e.id in c.list_gateway:
-                c.list_gateway[e.id] += 1
-            else:
-                c.list_gateway[e.id] = 1 + \
-                                       self.number_of_gateway_in_nodes(e.previous)
-            # check so lan da duyet cua cong join
-            if c.list_gateway[e.id] < len(e.previous):
-                r.current_cycle_time = 0
-                return
-            # kiem tra xem day la mot gateway bat dau khoi loop hay khong
-            check, pre = self.check_exclusive_gateway_traveled(e.previous, c)
-            if not check:
-                print("Start loop")
-                c.stack_end_loop.append(pre)
-                self.handle_for_loop(e, pre, c, r)
-                return
-
-            print("End gateway")
-            c.stack_next_gateway.append(e)
-            r.current_cycle_time = 0
-            return
-
+            self.handle_for_join_gateway(e, c, r)
         elif e.is_split_gateway():
-            total_cycle_time = 0.0
-            next_node = None
-            if len(c.stack_end_loop) > 0 and len(e.next) == 2 and c.stack_end_loop[-1] == e:
-                print("End loop")
-                c.stack_end_loop.pop()
-                r.current_cycle_time = 0
-                return
-            print("Start gateway")
-            for i, branch in enumerate(e.next):
-                self.visit(branch, c, r)
-                total_cycle_time += e.branching_probabilities[i] * \
-                                    r.current_cycle_time
-
-            if len(c.stack_next_gateway) > 0:
-                next_node = c.stack_next_gateway.pop().next[0]
-            self.visit(next_node, c, r)
-            r.current_cycle_time += total_cycle_time
-            return
-
-        r.current_cycle_time = 0
+            self.handle_for_split_gateway(e, c, r)
         return
 
     def visit_for_Lane(self, e: Lane, c: Context, r: Result):
@@ -286,7 +250,7 @@ class Traverse:
     def check_exclusive_gateway_traveled(self, node, c: Context):
         for n in node:
             if type(n) is ExclusiveGateway:
-                if n.id not in c.list_gateway_traveled:
+                if n.id not in c.list_gateway_traveled and n.is_split_gateway():
                     return False, n
         return True, None
 
@@ -316,10 +280,16 @@ class Traverse:
         total_cycle_time = e.cycle_time
 
         boundary_temp_result = Result()
-        self.visit(task_from_boundary_event, c, boundary_temp_result)
-
         seq_temp_result = Result()
+
+        if interrupt:
+            c.in_xor_block += 1
+
+        self.visit(task_from_boundary_event, c, boundary_temp_result)
         self.visit(next_task, c, seq_temp_result)
+
+        if interrupt:
+            c.in_xor_block -= 1
 
         boundary_ct = boundary_temp_result.current_cycle_time
         sequence_ct = seq_temp_result.current_cycle_time
@@ -330,6 +300,8 @@ class Traverse:
             total_cycle_time += percentage * max(boundary_ct, sequence_ct) + (
                     1 - percentage) * sequence_ct
         r.current_cycle_time += total_cycle_time
+        r.number_of_optional_tasks += boundary_temp_result.number_of_optional_tasks + seq_temp_result.number_of_optional_tasks
+        r.number_of_total_tasks += boundary_temp_result.number_of_total_tasks + seq_temp_result.number_of_total_tasks
 
     def handle_for_boundary_timer_event(self, e: NormalTask, c: Context, r: Result):
         task_time = e.cycle_time
@@ -345,3 +317,56 @@ class Traverse:
         else:
             total_cycle_time += max(list_boundary_timer_event, next_time)
         return total_cycle_time
+
+    def handle_for_join_gateway(self, e: Task, c: Context, r: Result):
+
+        if e.id in c.list_gateway:
+            c.list_gateway[e.id] += 1
+        else:
+            c.list_gateway[e.id] = 1 + \
+                                   self.number_of_gateway_in_nodes(e.previous)
+
+        # Check how many times this join gateway has been visited
+        if c.list_gateway[e.id] < len(e.previous):
+            r.current_cycle_time = 0
+            return
+
+        # Check
+        check, pre = self.check_exclusive_gateway_traveled(e.previous, c)
+        if not check:
+            print("Start loop")
+            c.stack_end_loop.append(pre)
+            self.handle_for_loop(e, pre, c, r)
+            return
+
+        print("End gateway")
+        c.stack_next_gateway.append(e)
+        r.current_cycle_time = 0
+        return
+
+    def handle_for_split_gateway(self, e, c, r):
+        total_cycle_time = 0.0
+        next_node = None
+        if len(c.stack_end_loop) > 0 and len(e.next) == 2 and c.stack_end_loop[-1] == e:
+            print("End loop")
+            c.stack_end_loop.pop()
+            r.current_cycle_time = 0
+            return
+        print("Start gateway")
+
+        if isinstance(e, ExclusiveGateway):
+            c.in_xor_block += 1
+
+        for i, branch in enumerate(e.next):
+            self.visit(branch, c, r)
+            total_cycle_time += e.branching_probabilities[i] * \
+                                r.current_cycle_time
+
+        if isinstance(e, ExclusiveGateway):
+            c.in_xor_block -= 1
+
+        if len(c.stack_next_gateway) > 0:
+            next_node = c.stack_next_gateway.pop().next[0]
+        self.visit(next_node, c, r)
+        r.current_cycle_time += total_cycle_time
+        return
