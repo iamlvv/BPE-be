@@ -115,6 +115,10 @@ class Evaluate:
             r = Result()
             r.participant_name = p.name
             p.accept(t, c, r)
+            if r.number_of_handled_exceptions + r.number_of_unhandled_exceptions > 0:
+                r.exception_handling = r.number_of_handled_exceptions / \
+                    (r.number_of_handled_exceptions +
+                     r.number_of_unhandled_exceptions)
             r.flexibility = r.number_of_optional_tasks / r.number_of_total_tasks
             print("Cycle time", r.current_cycle_time)
             print("Flexibility", r.flexibility)

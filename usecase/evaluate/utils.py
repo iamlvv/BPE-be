@@ -31,6 +31,8 @@ class Context:
     in_xor_block: int
     in_loop: int
     in_block: int
+    in_transaction_subprocess: list
+    number_of_cancel_events: dict
 
     def __init__(self):
         self.list_gateway = {}
@@ -40,6 +42,8 @@ class Context:
         self.in_xor_block = 0
         self.in_loop = 0
         self.in_block = 0
+        self.in_transaction_subprocess = []
+        self.number_of_cancel_events = {}
 
 
 class Result:
@@ -52,6 +56,9 @@ class Result:
     logs_cycle_time: list
     logs_quality: list
     logs_flexibility: list
+    number_of_handled_exceptions: int
+    number_of_unhandled_exceptions: int
+    exception_handling: float
 
     def __init__(self):
         self.participant_name = ""
@@ -63,6 +70,9 @@ class Result:
         self.logs_cycle_time = []
         self.logs_quality = []
         self.logs_flexibility = []
+        self.number_of_handled_exceptions = 0
+        self.number_of_unhandled_exceptions = 0
+        self.exception_handling = 0.0
 
     def obj_dict(self):
         return self.__dict__

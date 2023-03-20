@@ -73,7 +73,17 @@ class Traverse:
         print()
 
     def visit_for_CancelEvent(self, e: CancelEvent, c: Context, r: Result):
-        print()
+        print("Visit cancel event")
+        # must be attached to transaction subprocess
+        if e.event_type == EventType.ENDEVENT.value:
+            if len(c.in_transaction_subprocess) > 0:
+                c.number_of_cancel_events[c.in_transaction_subprocess[-1]
+                                          ]["end_event"] += 1
+            r.current_cycle_time = 0
+            return
+        elif e.event_type == EventType.BOUNDARYEVENT.value:
+            self.visit(e.next[0], c, r)
+            return
 
     def visit_for_SignalEvent(self, e: SignalEvent, c: Context, r: Result):
         print()
@@ -187,7 +197,17 @@ class Traverse:
 
     def visit_for_TransactionSubProcess(self, e: TransactionSubProcess, c: Context, r: Result):
         print("Visit transaction subprocess")
+        c.in_transaction_subprocess.append(e.id)
+        c.number_of_cancel_events[e.id] = {
+            "end_event": 0,
+            "boundary_event": 0
+        }
         self.handle_for_NormalSubProcess(e, c, r)
+        print(c.number_of_cancel_events)
+        if c.number_of_cancel_events[e.id]["boundary_event"] > 0 and c.number_of_cancel_events[e.id]["end_event"] > 0:
+            r.number_of_handled_exceptions += 1
+        elif c.number_of_cancel_events[e.id]["boundary_event"] == 0 and c.number_of_cancel_events[e.id]["end_event"] > 0:
+            r.number_of_unhandled_exceptions += 1
 
     def visit_for_CallActivity(self, e: CallActivity, c: Context, r: Result):
         print("Visit call activity")
@@ -198,13 +218,14 @@ class Traverse:
         subprocess_time = self.handle_for_inner_SubProcess(e, c, r)
         total_cycle_time = subprocess_time
 
-        # all boundary timer events must be traversed
-        list_boundary_timer_event, is_interrupting = self.handle_for_boundary_SubProcess(
-            e, c, r, TimerEvent.__name__)
+        c.in_transaction_subprocess.remove(e.id)
 
         self.visit(e.next[0], c, r)
         next_time = r.current_cycle_time
 
+        # all boundary timer events must be traversed
+        list_boundary_timer_event, is_interrupting = self.handle_for_boundary_SubProcess(
+            e, c, r, TimerEvent.__name__)
         if len(list_boundary_timer_event) > 0:
             # case for timer event
             if is_interrupting:
@@ -212,7 +233,13 @@ class Traverse:
             else:
                 total_cycle_time += max(max(list_boundary_timer_event),
                                         next_time)
-        else:  # case subprocess doesn't have any timer event
+        # case subprocess doesn't have any timer event
+        list_boundary_cancel_event, _ = self.handle_for_boundary_SubProcess(
+            e, c, r, CancelEvent.__name__)
+        if len(list_boundary_cancel_event) > 0:
+            total_cycle_time += max(list_boundary_cancel_event)
+
+        if len(e.boundary) == 0 and not len(list_boundary_cancel_event):
             total_cycle_time += next_time
 
         r.current_cycle_time = total_cycle_time
@@ -237,6 +264,8 @@ class Traverse:
                 is_interrupting = b.is_interrupting
                 self.visit(b, c, r)
                 list_boundary_time.append(r.current_cycle_time)
+                if type(b) is CancelEvent and b.event_type == EventType.BOUNDARYEVENT.value:
+                    c.number_of_cancel_events[e.id]["boundary_event"] += 1
 
         return list_boundary_time, is_interrupting
 
