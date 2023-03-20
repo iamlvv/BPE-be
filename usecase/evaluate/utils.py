@@ -6,6 +6,8 @@ class Element:
     name: str
     incoming: list
     outgoing: list
+    incoming_messageflow: list
+    outgoing_messageflow: list
     type: str
     className: str
     linkCode: str
@@ -79,18 +81,18 @@ class Result:
 
 
 class EventType(Enum):
-    STARTEVENT = 0
-    ENDEVENT = 1
-    IMPLICITTHROWEVENT = 2
-    INTERMIDIATETHROWEVENT = 3
-    INTERMIDIATECATCHEVENT = 4
-    BOUNDARYEVENT = 5
+    START_EVENT = 0
+    END_EVENT = 1
+    IMPLICIT_THROW_EVENT = 2
+    INTERMIDIATE_THROW_EVENT = 3
+    INTERMIDIATE_CATCH_EVENT = 4
+    BOUNDARY_EVENT = 5
 
 
 class TaskType(Enum):
-    NONETASK = 0
-    SERVICETASK = 1
-    MANUALTASK = 2
-    SCRIPTTASK = 3
-    BUSINESSTASK = 4
-    USERTASK = 5
+    NONE_TASK = 0
+    SERVICE_TASK = 1
+    MANUAL_TASK = 2
+    SCRIPT_TASK = 3
+    BUSINESS_TASK = 4
+    USER_TASK = 5

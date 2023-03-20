@@ -14,20 +14,23 @@ class ProcessDirector:
 
     def createLinkEventNode(self, instance: LinkEvent, element: Element):
         if instance.linkCode in self.linkEventNode:
-            if element.eventType == EventType.INTERMIDIATETHROWEVENT.value:
+            if element.eventType == EventType.INTERMIDIATE_THROW_EVENT.value:
                 self.linkEventNode[element.linkCode][0].append(element.id)
             else:
                 self.linkEventNode[element.linkCode][1].append(element.id)
         else:
-            if element.eventType == EventType.INTERMIDIATETHROWEVENT.value:
-                self.linkEventNode.update({element.linkCode: [[element.id], []]})
+            if element.eventType == EventType.INTERMIDIATE_THROW_EVENT.value:
+                self.linkEventNode.update(
+                    {element.linkCode: [[element.id], []]})
             else:
-                self.linkEventNode.update({element.linkCode: [[], [element.id]]})
+                self.linkEventNode.update(
+                    {element.linkCode: [[], [element.id]]})
 
     def handleLinkEvent(self):
         for linkCode in self.linkEventNode:
             throw_nodes = self.get_node_of_ids(self.linkEventNode[linkCode][0])
-            catch_node = self.get_node_of_ids(self.linkEventNode[linkCode][1])[0]
+            catch_node = self.get_node_of_ids(
+                self.linkEventNode[linkCode][1])[0]
 
             for throw_node in throw_nodes:
                 next_nodes_of_prev_node = throw_node.previous[0].next
@@ -36,7 +39,8 @@ class ProcessDirector:
 
                 prev_nodes_of_next_node = catch_node.next[0].previous
                 try:
-                    index_of_link_event = prev_nodes_of_next_node.index(catch_node)
+                    index_of_link_event = prev_nodes_of_next_node.index(
+                        catch_node)
                     prev_nodes_of_next_node[index_of_link_event] = throw_node.previous[0]
                 except:
                     pass
@@ -46,7 +50,8 @@ class ProcessDirector:
         instance = target_class(element)
 
         if isinstance(instance, LinkEvent):
-            instance.setAttribute(element.linkCode, element.outgoing, element.incoming)
+            instance.setAttribute(
+                element.linkCode, element.outgoing, element.incoming)
             self.createLinkEventNode(instance, element)
 
         if isinstance(instance, ConditionalEvent):
@@ -73,6 +78,10 @@ class ProcessDirector:
             if isinstance(n, Node):
                 n.previous = self.get_node_of_ids(e.incoming)
                 n.next = self.get_node_of_ids(e.outgoing)
+                n.incoming_messageflow = self.get_node_of_ids(
+                    e.incoming_messageflow)
+                n.outgoing_messageflow = self.get_node_of_ids(
+                    e.outgoing_messageflow)
             elif type(n) is Participant:
                 collaboration = self.map_node_created[e.parentID]
                 collaboration.participants.append(n)
@@ -82,7 +91,7 @@ class ProcessDirector:
             else:
                 pass
 
-            if isinstance(n, Event) and n.event_type == EventType.STARTEVENT.value:
+            if isinstance(n, Event) and n.event_type == EventType.START_EVENT.value:
                 lane = self.map_node_created[e.parentID]
                 lane.node.append(n)
             if isinstance(n, Activity) and hasattr(e, 'boundary'):
@@ -119,7 +128,8 @@ class Evaluate:
                 r.exception_handling = r.number_of_handled_exceptions / \
                     (r.number_of_handled_exceptions +
                      r.number_of_unhandled_exceptions)
-            r.flexibility = r.number_of_optional_tasks / r.number_of_total_tasks
+            if r.number_of_total_tasks > 0:
+                r.flexibility = r.number_of_optional_tasks / r.number_of_total_tasks
             print("Cycle time", r.current_cycle_time)
             print("Flexibility", r.flexibility)
             collaboration.result.append(r)

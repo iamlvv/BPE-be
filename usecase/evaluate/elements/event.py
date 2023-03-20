@@ -92,11 +92,11 @@ class LinkEvent(Event):
 
     @staticmethod
     def isLinkThrowEvent(node: Node):
-        return isinstance(node, LinkEvent) and node.event_type == EventType.INTERMIDIATETHROWEVENT.value
+        return isinstance(node, LinkEvent) and node.event_type == EventType.INTERMIDIATE_THROW_EVENT.value
 
     @staticmethod
     def isLinkCatchEvent(node: Node):
-        return isinstance(node, LinkEvent) and node.event_type == EventType.INTERMIDIATECATCHEVENT.value
+        return isinstance(node, LinkEvent) and node.event_type == EventType.INTERMIDIATE_CATCH_EVENT.value
 
     def accept(self, t, c, r):
         return t.visit_for_LinkEvent(self, c, r)
