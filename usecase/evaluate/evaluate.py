@@ -116,7 +116,8 @@ class Collaboration:
 
 class Evaluate:
 
-    def evaluate(self, map_element: dict):
+    @classmethod
+    def evaluate(cls, map_element: dict):
         collaboration = ProcessDirector(map_element).build_graph()
         t = Traverse()
         c = Context()
@@ -130,8 +131,6 @@ class Evaluate:
                      r.number_of_unhandled_exceptions)
             if r.number_of_total_tasks > 0:
                 r.flexibility = r.number_of_optional_tasks / r.number_of_total_tasks
-            print("Cycle time", r.current_cycle_time)
-            print("Flexibility", r.flexibility)
             collaboration.result.append(r)
 
         return collaboration.result

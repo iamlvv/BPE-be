@@ -1,0 +1,40 @@
+version: "2.3"
+
+services:
+  web:
+    build:
+      context: .
+      target: bpe-be
+    container_name: bpe-be
+    image: python:alpine3.16
+    volumes:
+      - ./:/python/src/bpe
+    ports:
+      - "8000:8000"
+    working_dir: /python/src/bpe
+    command: sh -c "pip install -r ./requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+    restart: unless-stopped
+    tty: true
+
+  db:
+    container_name: bpe-db
+    image: postgres:15.1-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${PGDATA}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./postgres-database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres-database/load_data.sql:/docker-entrypoint-initdb.d/load_data.sql
+
+volumes:
+  postgres:
+    name: postgres
+    driver: local
