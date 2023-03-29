@@ -17,12 +17,15 @@ class Lane(BaseElement):
 
 class Participant(BaseElement):
     lane: list
+    # if pool doesn't have anylane
+    event_sub_process: list
     node: list
 
     def __init__(self, element: Element):
         super().__init__(element)
         self.lane = []
         self.node = []
+        self.event_sub_process = []
 
     def accept(self, t, c, r):
         return t.visit_for_Participant(self, c, r)

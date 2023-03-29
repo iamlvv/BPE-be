@@ -12,8 +12,11 @@ class SubProcess(BaseElement):
 
 
 class NormalSubProcess(SubProcess, Activity):
+    event_sub_process: list
+
     def __init__(self, element: Element):
         super().__init__(element)
+        self.event_sub_process = []
 
 
 class BPESubProcess(NormalSubProcess):

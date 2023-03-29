@@ -20,6 +20,8 @@ class Element:
     parentId: str
     boundary: list
     percentage: int
+    isStart: bool
+    code: str
 
     def __init__(self, **entries):
         self.__dict__.update(entries)
@@ -29,23 +31,27 @@ class Context:
     list_gateway: dict
     list_gateway_traveled: dict
     stack_next_gateway: list
+    stack_next_message: list
     stack_end_loop: list
     in_xor_block: int
     in_loop: int
-    in_block: int
     in_transaction_subprocess: list
     number_of_cancel_events: dict
+    list_event_subprocess: dict
+    list_boundary_event: dict
 
     def __init__(self):
         self.list_gateway = {}
         self.list_gateway_traveled = {}
         self.stack_next_gateway = []
+        self.stack_next_message = []
         self.stack_end_loop = []
         self.in_xor_block = 0
         self.in_loop = 0
-        self.in_block = 0
         self.in_transaction_subprocess = []
         self.number_of_cancel_events = {}
+        self.list_event_subprocess = {}
+        self.list_boundary_event = {}
 
 
 class Result:

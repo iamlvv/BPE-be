@@ -97,6 +97,9 @@ class ProcessDirector:
             if isinstance(n, Activity) and hasattr(e, 'boundary'):
                 for b in e.boundary:
                     n.boundary.append(self.map_node_created[b])
+            if isinstance(n, EventSubProcess):
+                subprocess = self.map_node_created[e.parentID]
+                subprocess.event_sub_process.append(n)
             if isinstance(n, SubProcess):
                 # get all start event of subprocess
                 pass

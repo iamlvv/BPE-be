@@ -5,11 +5,13 @@ from usecase.evaluate.utils import Element, EventType
 class Event(Node):
     event_type: EventType
     is_interrupting: bool
+    code: str
 
     def __init__(self, element: Element):
         super().__init__(element)
         self.event_type = element.eventType
         self.is_interrupting = element.isInterrupting
+        self.code = element.code if hasattr(element, "code") else None
 
 
 class NonEvent(Event):
@@ -18,6 +20,13 @@ class NonEvent(Event):
 
 
 class MessageEvent(Event):
+    is_start: bool
+
+    def __init__(self, element: Element):
+        super().__init__(element)
+        self.is_start = element.isStart if hasattr(
+            element, "isStart") else False
+
     def accept(self, t, c, r):
         return t.visit_for_MessageEvent(self, c, r)
 

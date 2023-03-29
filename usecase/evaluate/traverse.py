@@ -55,10 +55,45 @@ class Traverse:
             return
 
     def visit_for_MessageEvent(self, e: MessageEvent, c: Context, r: Result):
+        print("Visit message event")
         if e.event_type == EventType.INTERMIDIATE_THROW_EVENT.value:
-            pass
+            if e.is_start:  # send and start a messsage
+                self.visit(e.next[0], c, r)
+                next_time = r.current_cycle_time
+                new_result = Result()
+                self.visit(e.outgoing_messageflow[0], c, new_result)
+                message_time = new_result.current_cycle_time
+                total_cycle_time = max(next_time, message_time)
+                next_node = c.stack_next_message.pop()
+                self.visit(next_node, c, r)
+                r.current_cycle_time += total_cycle_time
+            else:  # receive and stop a message
+                r.current_cycle_time = 0
+                return
         elif e.event_type == EventType.INTERMIDIATE_CATCH_EVENT.value:
-            pass
+            if e.is_start:  # receive and start a message
+                self.visit(e.next[0], c, r)
+            else:  # receive and stop a message
+                r.current_cycle_time = 0
+                c.stack_next_message.append(e.next[0])
+        elif e.event_type == EventType.END_EVENT.value:
+            if e.code in c.list_event_subprocess:
+                # end event triggers a event subprocess
+                cycletime_event_subprocess = c.list_event_subprocess[
+                    e.code]
+                r.current_cycle_time += cycletime_event_subprocess
+            else:
+                # end event triggers a boundary event
+                r.current_cycle_time = 0
+            # if e.is_interrupting:
+            #     r.current_cycle_time = cycletime_event_subprocess
+            # else:
+            #     r.current_cycle_time = max(
+            #         next_time, cycletime_event_subprocess)
+        elif e.event_type == EventType.START_EVENT.value:
+            self.visit(e.next[0], c, r)
+        elif e.event_type == EventType.BOUNDARY_EVENT.value:
+            self.visit(e.next[0], c, r)
 
     def visit_for_TimerEvent(self, e: TimerEvent, c: Context, r: Result):
         print("Visit timer event")
@@ -114,7 +149,6 @@ class Traverse:
             temp_result = Result()
             self.visit(e.next[0], c, temp_result)
             r.current_cycle_time += e.percentage * temp_result.current_cycle_time
-            print()
         elif e.event_type == EventType.BOUNDARY_EVENT.value:
             pass
 
@@ -181,6 +215,8 @@ class Traverse:
 
     def visit_for_Lane(self, e: Lane, c: Context, r: Result):
         print("Visit lane", e.name)
+        for esp in e.event_sub_process:
+            self.visit(esp, c, r)
         if len(e.node) == 0:
             return
         for n in e.node:
@@ -188,21 +224,18 @@ class Traverse:
 
     def visit_for_Participant(self, e: Participant, c: Context, r: Result):
         print("Visit participant", e.name)
+        for esp in e.event_sub_process:
+            self.visit(esp, c, r)
         for l in e.lane:
             self.visit(l, c, r)
         for n in e.node:
             self.visit(n, c, r)
 
     def visit_for_EventSubProcess(self, e: EventSubProcess, c: Context, r: Result):
-        print("Visit expanded subprocess")
-        # traverse start event of subprocess
-        subprocess_time = 0.0
-        # expected subprocess has only one start event
-        for se in e.node:
-            self.visit(se, c, r)
-            subprocess_time += r.current_cycle_time
-
-        r.current_cycle_time = subprocess_time
+        print("Visit event subprocess")
+        # event subprocess must have one and only one start event
+        self.visit(e.node[0], c, r)
+        c.list_event_subprocess[e.node[0].code] = r.current_cycle_time
 
     def visit_for_BPESubProcess(self, e: BPESubProcess, c: Context, r: Result):
         print("Visit expanded subprocess")
@@ -226,14 +259,22 @@ class Traverse:
         self.handle_for_NormalSubProcess(e, c, r)
 
     def handle_for_NormalSubProcess(self, e: NormalSubProcess, c: Context, r: Result):
+        # traverse all of event sub-processes
+        for esp in e.event_sub_process:
+            self.visit(esp, c, r)
         # traverse start event of subprocess
         subprocess_time = self.handle_for_inner_SubProcess(e, c, r)
         total_cycle_time = subprocess_time
 
-        c.in_transaction_subprocess.remove(e.id)
+        if isinstance(e, TransactionSubProcess):
+            c.in_transaction_subprocess.remove(e.id)
 
         self.visit(e.next[0], c, r)
         next_time = r.current_cycle_time
+
+        if not len(e.boundary):
+            r.current_cycle_time = total_cycle_time + next_time
+            return
 
         # all boundary timer events must be traversed
         if type(e.boundary[0]) is TimerEvent:
@@ -243,6 +284,10 @@ class Traverse:
         # case subprocess doesn't have any timer event
         if type(e.boundary[0]) is CancelEvent:
             self.handle_for_boundary_cancel_event(e, c, r, next_time)
+            total_cycle_time += r.current_cycle_time
+
+        if type(e.boundary[0]) is MessageEvent:
+            self.handle_for_boundary_message_event(e, c, r, next_time)
             total_cycle_time += r.current_cycle_time
 
         r.current_cycle_time = total_cycle_time
@@ -362,8 +407,17 @@ class Traverse:
 
         r.current_cycle_time = total_cycle_time
 
-    def handle_for_join_gateway(self, e: Task, c: Context, r: Result):
+    def handle_for_boundary_message_event(self, e: NormalSubProcess, c: Context, r: Result, next_time: float):
+        total_cycle_time = 0.0
+        list_boundary_message_event, is_interupting = self.handle_for_boundary_SubProcess(
+            e, c, r, MessageEvent.__name__)
+        if is_interupting:
+            total_cycle_time += max(list_boundary_message_event)
+        else:
+            total_cycle_time += max(list_boundary_message_event, next_time)
+        r.current_cycle_time = total_cycle_time
 
+    def handle_for_join_gateway(self, e: Task, c: Context, r: Result):
         if e.id in c.list_gateway:
             c.list_gateway[e.id] += 1
         else:
@@ -388,7 +442,7 @@ class Traverse:
         r.current_cycle_time = 0
         return
 
-    def handle_for_split_gateway(self, e, c, r):
+    def handle_for_split_gateway(self, e: Task, c: Context, r: Result):
         total_cycle_time = 0.0
         next_node = None
         if len(c.stack_end_loop) > 0 and len(e.next) == 2 and c.stack_end_loop[-1] == e:
@@ -403,14 +457,19 @@ class Traverse:
 
         for i, branch in enumerate(e.next):
             self.visit(branch, c, r)
+            print(r.current_cycle_time)
             total_cycle_time += e.branching_probabilities[i] * \
                 r.current_cycle_time
+            r.current_cycle_time = 0
 
         if isinstance(e, ExclusiveGateway):
             c.in_xor_block -= 1
 
         if len(c.stack_next_gateway) > 0:
             next_node = c.stack_next_gateway.pop().next[0]
+        else:
+            r.current_cycle_time = total_cycle_time
+            return
         self.visit(next_node, c, r)
         r.current_cycle_time += total_cycle_time
         return
