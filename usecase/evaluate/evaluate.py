@@ -134,7 +134,10 @@ class Evaluate:
                                         r.number_of_unhandled_exceptions)
             if r.number_of_total_tasks > 0:
                 r.flexibility = r.number_of_optional_tasks / r.number_of_total_tasks
-            r.quality = 1 - (r.total_loop_probability / r.total_loop)
+            if r.total_loop == 0:
+                r.quality = 1
+            else:
+                r.quality = 1 - (r.total_loop_probability / r.total_loop)
             collaboration.result.append(r)
 
         return collaboration.result
