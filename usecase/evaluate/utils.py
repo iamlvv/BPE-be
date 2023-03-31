@@ -60,7 +60,10 @@ class Result:
     number_of_optional_tasks: int
     number_of_total_tasks: int
     flexibility: float
-    total_cycle_time_all_loops: float
+    total_loop: int
+    total_probability: float
+    quality: float
+    # total_cycle_time_all_loops: float
     logs_cycle_time: list
     logs_quality: list
     logs_flexibility: list
@@ -74,7 +77,9 @@ class Result:
         self.number_of_optional_tasks = 0
         self.number_of_total_tasks = 0
         self.flexibility = 0
-        self.total_cycle_time_all_loops = 0.0
+        self.total_loop = 0
+        self.total_loop_probability = 0
+        # self.total_cycle_time_all_loops = 0.0
         self.logs_cycle_time = []
         self.logs_quality = []
         self.logs_flexibility = []

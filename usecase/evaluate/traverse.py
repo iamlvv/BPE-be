@@ -127,7 +127,7 @@ class Traverse:
         elif e.event_type == EventType.END_EVENT.value:
             if len(c.in_subprocess) > 0:
                 c.number_of_exception_events[c.in_subprocess[-1]
-                                             ]["throwing_event"] += 1
+                ]["throwing_event"] += 1
             if e.code in c.list_event_subprocess:
                 # end event triggers a event subprocess
                 cycletime_event_subprocess = c.list_event_subprocess[
@@ -147,7 +147,11 @@ class Traverse:
         if e.event_type == EventType.END_EVENT.value:
             if len(c.in_subprocess) > 0:
                 c.number_of_exception_events[c.in_subprocess[-1]
-                                             ]["throwing_event"] += 1
+                ]["throwing_event"] += 1
+            if len(c.in_transaction_subprocess) > 0:
+                c.number_of_cancel_events[c.in_transaction_subprocess[-1]
+                ]["end_event"] += 1
+            r.current_cycle_time = 0
             return
         elif e.event_type == EventType.BOUNDARY_EVENT.value:
             self.visit(e.next[0], c, r)
@@ -188,7 +192,7 @@ class Traverse:
                 c.list_gateway[e.id] += 1
             else:
                 c.list_gateway[e.id] = 1 + \
-                    self.number_of_gateway_in_nodes(e.previous)
+                                       self.number_of_gateway_in_nodes(e.previous)
             # check so lan da duyet cua cong join
             if c.list_gateway[e.id] < len(e.previous):
                 r.current_cycle_time = 0
@@ -314,9 +318,11 @@ class Traverse:
             self.handle_for_boundary_error_event(e, c, r, next_time)
             total_cycle_time += r.current_cycle_time
 
-        if c.number_of_exception_events[e.id]["catching_event"] > 0 and c.number_of_exception_events[e.id]["throwing_event"] > 0:
+        if c.number_of_exception_events[e.id]["catching_event"] > 0 and c.number_of_exception_events[e.id][
+            "throwing_event"] > 0:
             r.number_of_handled_exceptions += 1
-        elif c.number_of_exception_events[e.id]["catching_event"] == 0 and c.number_of_exception_events[e.id]["throwing_event"] > 0:
+        elif c.number_of_exception_events[e.id]["catching_event"] == 0 and c.number_of_exception_events[e.id][
+            "throwing_event"] > 0:
             r.number_of_unhandled_exceptions += 1
 
         r.current_cycle_time = total_cycle_time + next_time
@@ -379,7 +385,13 @@ class Traverse:
             else:
                 next_node = n
         total_cycle_time = r.current_cycle_time / (1 - reloop)
+        print("After", c.in_loop)
+
+        if c.in_loop == 0:
+            r.total_loop_probability += reloop
+            r.total_loop += 1
         self.visit(next_node, c, r)
+
         r.current_cycle_time += total_cycle_time
         return
 
@@ -410,15 +422,15 @@ class Traverse:
 
         if interrupt:
             total_cycle_time += percentage * \
-                boundary_ct + (1 - percentage) * sequence_ct
+                                boundary_ct + (1 - percentage) * sequence_ct
         else:
             total_cycle_time += percentage * max(boundary_ct, sequence_ct) + (
-                1 - percentage) * sequence_ct
+                    1 - percentage) * sequence_ct
         r.current_cycle_time += total_cycle_time
         r.number_of_optional_tasks += boundary_temp_result.number_of_optional_tasks + \
-            seq_temp_result.number_of_optional_tasks
+                                      seq_temp_result.number_of_optional_tasks
         r.number_of_total_tasks += boundary_temp_result.number_of_total_tasks + \
-            seq_temp_result.number_of_total_tasks
+                                   seq_temp_result.number_of_total_tasks
 
     def handle_for_boundary_timer_event(self, e: NormalTask, c: Context, r: Result, next_time: float):
         total_cycle_time = 0.0
@@ -471,7 +483,7 @@ class Traverse:
             c.list_gateway[e.id] += 1
         else:
             c.list_gateway[e.id] = 1 + \
-                self.number_of_gateway_in_nodes(e.previous)
+                                   self.number_of_gateway_in_nodes(e.previous)
 
         # Check how many times this join gateway has been visited
         if c.list_gateway[e.id] < len(e.previous):
@@ -482,7 +494,9 @@ class Traverse:
         check, pre = self.check_exclusive_gateway_traveled(e.previous, c)
         if not check:
             print("Start loop")
+            c.in_loop += 1
             c.stack_end_loop.append(pre)
+
             self.handle_for_loop(e, pre, c, r)
             return
 
@@ -496,6 +510,7 @@ class Traverse:
         next_node = None
         if len(c.stack_end_loop) > 0 and len(e.next) == 2 and c.stack_end_loop[-1] == e:
             print("End loop")
+            c.in_loop -= 1
             c.stack_end_loop.pop()
             r.current_cycle_time = 0
             return
@@ -507,8 +522,7 @@ class Traverse:
         for i, branch in enumerate(e.next):
             self.visit(branch, c, r)
             total_cycle_time += e.branching_probabilities[i] * \
-                r.current_cycle_time
-            r.current_cycle_time = 0
+                                r.current_cycle_time
 
         if isinstance(e, ExclusiveGateway):
             c.in_xor_block -= 1

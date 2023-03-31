@@ -130,10 +130,11 @@ class Evaluate:
             p.accept(t, c, r)
             if r.number_of_handled_exceptions + r.number_of_unhandled_exceptions > 0:
                 r.exception_handling = r.number_of_handled_exceptions / \
-                    (r.number_of_handled_exceptions +
-                     r.number_of_unhandled_exceptions)
+                                       (r.number_of_handled_exceptions +
+                                        r.number_of_unhandled_exceptions)
             if r.number_of_total_tasks > 0:
                 r.flexibility = r.number_of_optional_tasks / r.number_of_total_tasks
+            r.quality = 1 - (r.total_loop_probability / r.total_loop)
             collaboration.result.append(r)
 
         return collaboration.result
