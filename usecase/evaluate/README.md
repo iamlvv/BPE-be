@@ -1,20 +1,21 @@
 ## Context:
 
 ```
-in_transaction_subprocess:
+in_subprocess:
 [
-    "${transaction_subprocess_id}"
+    "${subprocess_id}"
 ]
 
-# transaction_subprocess_id will be removed when it is inactive
+# in_subprocess is list of present subprocess (descending level)
+# subprocess_id will be removed when it is inactive
 ```
 
 ```
-number_of_cancel_events:
+number_of_exception_events:
 {
     "${transaction_subprocess_id}": {
         "end_event": ${number of cancel end event},
-        "boundary_event": ${number of cancel boundary event}
+        "catching_event": ${number of cancel catching event}
     }
 }
 ```
@@ -33,13 +34,14 @@ list_event_subprocess:
 list_boundary_event:
 {
 	"${subprocess_id}": {
-		"${code}": ${total_cycletime}
+		"${code}": (${total_cycletime}, ${is_interupting})
 	}
 }
 
 # subprocess_id: subprocess' id
 # code: code of send or receive event
 # total_cycletime: total cycle time of boudary event
+# is_interupting: type of boundary event
 ```
 
 ## Element:

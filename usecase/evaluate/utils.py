@@ -35,8 +35,8 @@ class Context:
     stack_end_loop: list
     in_xor_block: int
     in_loop: int
-    in_transaction_subprocess: list
-    number_of_cancel_events: dict
+    in_subprocess: list
+    number_of_exception_events: dict
     list_event_subprocess: dict
     list_boundary_event: dict
 
@@ -48,8 +48,8 @@ class Context:
         self.stack_end_loop = []
         self.in_xor_block = 0
         self.in_loop = 0
-        self.in_transaction_subprocess = []
-        self.number_of_cancel_events = {}
+        self.in_subprocess = []
+        self.number_of_exception_events = {}
         self.list_event_subprocess = {}
         self.list_boundary_event = {}
 
