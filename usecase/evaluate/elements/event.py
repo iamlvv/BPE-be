@@ -33,10 +33,12 @@ class MessageEvent(Event):
 
 class TimerEvent(Event):
     time_duration: float
+    unit_cost: float
 
     def __init__(self, element: Element):
         super().__init__(element)
         self.time_duration = element.timeDuration
+        self.unit_cost = 0
 
     def accept(self, t, c, r):
         return t.visit_for_TimerEvent(self, c, r)

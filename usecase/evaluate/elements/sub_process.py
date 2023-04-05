@@ -5,10 +5,12 @@ from usecase.evaluate.utils import Element
 
 class SubProcess(BaseElement):
     node: list
+    unit_cost: float
 
     def __init__(self, element: Element):
         super().__init__(element)
         self.node = []
+        self.unit_cost = 0
 
 
 class NormalSubProcess(SubProcess, Activity):

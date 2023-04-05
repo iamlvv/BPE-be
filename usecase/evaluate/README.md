@@ -23,7 +23,10 @@ number_of_exception_events:
 ```
 list_event_subprocess:
 {
-	"${code}": ${total_cycletime}
+	"${code}": {
+        "cycle_time": ${total_cycletime},
+        "cost": ${total_cost}
+    }
 }
 
 # code: code of send or receive message
@@ -72,16 +75,39 @@ code: str
 ## Result:
 
 ``` 
-participant_name: str
-current_cycle_time: float
-number_of_optional_tasks: int
-number_of_total_tasks: int
-flexibility: float
-total_cycle_time_all_loops: float
-logs_cycle_time: list
-logs_quality: list
-logs_flexibility: list
-number_of_handled_exceptions: int
-number_of_unhandled_exceptions: int
-exception_handling: float
+[
+  {
+    "name": "Process 1",
+    "totalCycleTime": 12,
+    "totalCost": 123.000,
+    "unitCost": [
+    {
+      "lane": "Department A",
+      "cost": 0.1
+    },
+    {
+      "lane": "Department B",
+      "cost": 0.3
+    }
+    ],
+    "transparency": {
+      "processA": {
+        "view": "Subprocess A",
+        "numberOfExplicitTask": 2
+      },
+      "processB": {
+        "view": "Process B",
+        "numberOfExplicitTask": 3
+      }
+    },
+    "totalNumberExplicitTasks": 5,
+    "quality": 0.345,
+    "numberOfOptionalTasks": 12,
+    "totalTasks": 24,
+    "flexibility": 0.5,
+    "handledTasks": 2,
+    "unHandledTasks": 3,
+    "exceptionHandling": 0.67
+  }
+]
 ```

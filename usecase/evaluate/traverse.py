@@ -14,29 +14,34 @@ class Traverse:
         print("Visit task", e.name, e.cycle_time,
               "In xor block", c.in_xor_block)
 
-        r.number_of_total_tasks += 1
+        r.totalTasks += 1
+        r.totalNumberExplicitTasks += 1
         if c.in_xor_block > 0:
-            r.number_of_optional_tasks += 1
+            r.numberOfOptionalTasks += 1
 
         total_cycle_time = e.cycle_time
+        total_cost = e.cycle_time * e.unit_cost
+        print(e.unit_cost)
 
         if not len(e.boundary):
             self.visit(e.next[0], c, r)
-            next_time = r.current_cycle_time
-            total_cycle_time += next_time
-            r.current_cycle_time = total_cycle_time
+            r.totalCycleTime += total_cycle_time
+            r.totalCost += total_cost
             return
 
         if type(e.boundary[0]) is TimerEvent:
             self.visit(e.next[0], c, r)
-            next_time = r.current_cycle_time
-            self.handle_for_boundary_timer_event(e, c, r, next_time)
-            total_cycle_time += r.current_cycle_time
+            next_time = r.totalCycleTime
+            next_cost = r.totalCost
+            self.handle_for_boundary_timer_event(e, c, r, next_time, next_cost)
+            total_cycle_time += r.totalCycleTime
+            total_cost += r.totalCost
         elif type(e.boundary[0]) is ConditionalEvent:
             self.handle_for_boundary_conditional_event(
                 e, e.boundary[0], c, r)
 
-        r.current_cycle_time = total_cycle_time
+        r.totalCycleTime = total_cycle_time
+        r.totalCost = total_cost
 
     def visit_for_SendTask(self, e: SendTask, c: Context, r: Result):
         print(3)
@@ -45,7 +50,8 @@ class Traverse:
         print(7)
 
     def visit_for_NonEvent(self, e: NonEvent, c: Context, r: Result):
-        r.current_cycle_time = 0
+        r.totalCycleTime = 0
+        r.totalCost = 0
         if e.event_type == EventType.START_EVENT.value:
             print("Visit start event")
             self.visit(e.next[0], c, r)
@@ -59,39 +65,49 @@ class Traverse:
         if e.event_type == EventType.INTERMIDIATE_THROW_EVENT.value:
             if e.is_start:  # send and start a messsage
                 self.visit(e.next[0], c, r)
-                next_time = r.current_cycle_time
+                next_time = r.totalCycleTime
+                next_cost = r.totalCost
                 new_result = Result()
                 self.visit(e.outgoing_messageflow[0], c, new_result)
-                message_time = new_result.current_cycle_time
+                message_time = new_result.totalCycleTime
+                message_cost = new_result.totalCost
                 total_cycle_time = max(next_time, message_time)
+                total_cost = max(next_cost, message_cost)
                 next_node = c.stack_next_message.pop()
                 self.visit(next_node, c, r)
-                r.current_cycle_time += total_cycle_time
+                r.totalCycleTime += total_cycle_time
+                r.totalCost += total_cost
             else:  # receive and stop a message
-                r.current_cycle_time = 0
+                r.totalCycleTime = 0
+                r.totalCost = 0
                 return
         elif e.event_type == EventType.INTERMIDIATE_CATCH_EVENT.value:
             if e.is_start:  # receive and start a message
                 self.visit(e.next[0], c, r)
             else:  # receive and stop a message
-                r.current_cycle_time = 0
+                r.totalCycleTime = 0
+                r.totalCost = 0
                 c.stack_next_message.append(e.next[0])
         elif e.event_type == EventType.END_EVENT.value:
             if e.code in c.list_event_subprocess:
                 # end event triggers a event subprocess
                 cycletime_event_subprocess = c.list_event_subprocess[
-                    e.code]
-                r.current_cycle_time += cycletime_event_subprocess
+                    e.code]["cycle_time"]
+                cost_event_subprocess = c.list_event_subprocess[e.code]["cost"]
+                r.totalCycleTime += cycletime_event_subprocess
+                r.totalCost += cost_event_subprocess
             else:
                 # end event triggers a boundary event
-                r.current_cycle_time = 0
+                r.totalCycleTime = 0
+                r.totalCost = 0
             # if e.is_interrupting:
             #     r.current_cycle_time = cycletime_event_subprocess
             # else:
             #     r.current_cycle_time = max(
             #         next_time, cycletime_event_subprocess)
         elif e.event_type == EventType.START_EVENT.value:
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             self.visit(e.next[0], c, r)
         elif e.event_type == EventType.BOUNDARY_EVENT.value:
             self.visit(e.next[0], c, r)
@@ -102,56 +118,68 @@ class Traverse:
             return
         if e.event_type == EventType.INTERMIDIATE_CATCH_EVENT.value:
             self.visit(e.next[0], c, r)
-            r.current_cycle_time += e.time_duration
+            r.totalCycleTime += e.time_duration
+            r.totalCost += e.time_duration * e.unit_cost
             return
         elif e.event_type == EventType.BOUNDARY_EVENT.value:
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             self.visit(e.next[0], c, r)
-            r.current_cycle_time += e.time_duration
+            r.totalCycleTime += e.time_duration
+            r.totalCost += e.time_duration * e.unit_cost
             return
         elif e.event_type == EventType.START_EVENT.value and e.is_interrupting:  # same as standard event
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             self.visit(e.next[0], c, r)
-            r.current_cycle_time += e.time_duration
+            r.totalCycleTime += e.time_duration
+            r.totalCost += e.time_duration * e.unit_cost
             return
         else:  # case start event non-interrupting
             pass
 
     def visit_for_ErrorEvent(self, e: ErrorEvent, c: Context, r: Result):
         if e.event_type == EventType.START_EVENT.value:
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             self.visit(e.next[0], c, r)
         elif e.event_type == EventType.BOUNDARY_EVENT.value:
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             self.visit(e.next[0], c, r)
         elif e.event_type == EventType.END_EVENT.value:
             if len(c.in_subprocess) > 0:
                 c.number_of_exception_events[c.in_subprocess[-1]
-                ]["throwing_event"] += 1
+                                             ]["throwing_event"] += 1
             if e.code in c.list_event_subprocess:
                 # end event triggers a event subprocess
                 cycletime_event_subprocess = c.list_event_subprocess[
-                    e.code]
-                r.current_cycle_time += cycletime_event_subprocess
+                    e.code]["cycle_time"]
+                cost_event_subprocess = c.list_event_subprocess[e.code]["cost"]
+                r.totalCycleTime += cycletime_event_subprocess
+                r.totalCost += cost_event_subprocess
             else:
                 # end event triggers a boundary event
-                r.current_cycle_time = 0
+                r.totalCycleTime = 0
+                r.totalCost = 0
 
     def visit_for_EscalationEvent(self, e: EscalationEvent, c: Context, r: Result):
         print()
 
     def visit_for_CancelEvent(self, e: CancelEvent, c: Context, r: Result):
         print("Visit cancel event")
-        r.current_cycle_time = 0
+        r.totalCycleTime = 0
+        r.totalCost = 0
         # must be attached to transaction subprocess
         if e.event_type == EventType.END_EVENT.value:
             if len(c.in_subprocess) > 0:
                 c.number_of_exception_events[c.in_subprocess[-1]
-                ]["throwing_event"] += 1
-            if len(c.in_transaction_subprocess) > 0:
-                c.number_of_cancel_events[c.in_transaction_subprocess[-1]
-                ]["end_event"] += 1
-            r.current_cycle_time = 0
+                                             ]["throwing_event"] += 1
+            if len(c.in_subprocess) > 0:
+                c.number_of_exception_events[c.in_subprocess[-1]
+                                             ]["end_event"] += 1
+            r.totalCycleTime = 0
+            r.totalCost = 0
             return
         elif e.event_type == EventType.BOUNDARY_EVENT.value:
             self.visit(e.next[0], c, r)
@@ -172,7 +200,8 @@ class Traverse:
                             EventType.INTERMIDIATE_CATCH_EVENT.value]:
             temp_result = Result()
             self.visit(e.next[0], c, temp_result)
-            r.current_cycle_time += e.percentage * temp_result.current_cycle_time
+            r.totalCycleTime += e.percentage * temp_result.totalCycleTime
+            r.totalCost += e.percentage * temp_result.totalCost
         elif e.event_type == EventType.BOUNDARY_EVENT.value:
             pass
 
@@ -181,7 +210,8 @@ class Traverse:
 
     def visit_for_TerminateEvent(self, e: TerminateEvent, c: Context, r: Result):
         print("Visit terminate event")
-        r.current_cycle_time = 0
+        r.totalCycleTime = 0
+        r.totalCost = 0
         return
 
     def visit_for_ParallelGateway(self, e: ParallelGateway, c: Context, r: Result):
@@ -192,31 +222,37 @@ class Traverse:
                 c.list_gateway[e.id] += 1
             else:
                 c.list_gateway[e.id] = 1 + \
-                                       self.number_of_gateway_in_nodes(e.previous)
+                    self.number_of_gateway_in_nodes(e.previous)
             # check so lan da duyet cua cong join
             if c.list_gateway[e.id] < len(e.previous):
-                r.current_cycle_time = 0
+                r.totalCycleTime = 0
+                r.totalCost = 0
                 return
             print("End parallel gateway")
             c.stack_next_gateway.append(e)
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             return
         elif e.is_split_gateway():
             total_cycle_time = 0.0
+            total_cost = 0.0
             next_node = None
             print("Start parallel gateway")
             for branch in e.next:
                 self.visit(branch, c, r)
-                branch_cycle_time = r.current_cycle_time
+                branch_cycle_time = r.totalCycleTime
+                branch_cost = r.totalCost
                 if total_cycle_time < branch_cycle_time:
                     total_cycle_time = branch_cycle_time
+                    total_cost = branch_cost
             if len(c.stack_next_gateway) > 0:
                 next_node = c.stack_next_gateway.pop().next[0]
             self.visit(next_node, c, r)
-            r.current_cycle_time += total_cycle_time
+            r.totalCycleTime += total_cycle_time
+            r.totalCost += total_cost
             return
 
-        r.current_cycle_time = 0
+        r.totalCycleTime = 0
         return
 
     def visit_for_EventBasedGateway(self, e: EventBasedGateway, c: Context, r: Result):
@@ -241,26 +277,62 @@ class Traverse:
         print("Visit lane", e.name)
         for esp in e.event_sub_process:
             self.visit(esp, c, r)
+        r.totalCycleTime = 0
+        r.totalCost = 0
         if len(e.node) == 0:
             return
         for n in e.node:
             self.visit(n, c, r)
 
+        # r.unitCost.append({
+        #     "lane": e.name,
+        #     "cost": r.totalCycleTime * e.unit_cost
+        # })
+
     def visit_for_Participant(self, e: Participant, c: Context, r: Result):
         print("Visit participant", e.name)
-        for esp in e.event_sub_process:
-            self.visit(esp, c, r)
+        total_cycle_time = 0.0
+        total_cost = 0.0
+
+        # participant dont have any lane
+        if not len(e.lane):
+            for esp in e.event_sub_process:
+                self.visit(esp, c, r)
+            for n in e.node:
+                self.visit(n, c, r)
+
+            r.transparency[e.id] = {
+                "view": e.name,
+                "numberOfExplicitTask": e.number_of_tasks,
+                "transparency": e.number_of_tasks / r.totalNumberExplicitTasks
+            }
+            return
+
         for l in e.lane:
             self.visit(l, c, r)
-        for n in e.node:
-            self.visit(n, c, r)
+            total_cycle_time += r.totalCycleTime
+            total_cost += r.totalCost
+
+        for l in e.lane:
+            r.transparency[l.id] = {
+                "view": l.name,
+                "numberOfExplicitTask": l.number_of_tasks,
+                "transparency": l.number_of_tasks / r.totalNumberExplicitTasks
+            }
+
+        r.totalCycleTime = total_cycle_time
+        r.totalCost = total_cost
 
     def visit_for_EventSubProcess(self, e: EventSubProcess, c: Context, r: Result):
         print("Visit event subprocess")
-        r.current_cycle_time = 0
+        r.totalCycleTime = 0
+        r.totalCost = 0
         # event subprocess must have one and only one start event
         self.visit(e.node[0], c, r)
-        c.list_event_subprocess[e.node[0].code] = r.current_cycle_time
+        c.list_event_subprocess[e.node[0].code] = {
+            "cycle_time": r.totalCycleTime,
+            "cost": r.totalCost
+        }
 
     def visit_for_BPESubProcess(self, e: BPESubProcess, c: Context, r: Result):
         print("Visit expanded subprocess")
@@ -290,55 +362,66 @@ class Traverse:
         # self.handle_for_all_boundary_SubProcess(e, c, r)
 
         # traverse start event of subprocess
-        subprocess_time = self.handle_for_inner_SubProcess(e, c, r)
+        subprocess_time, subprocess_cost = self.handle_for_inner_SubProcess(
+            e, c, r)
         total_cycle_time = subprocess_time
+        total_cost = subprocess_cost
 
         # if isinstance(e, TransactionSubProcess):
         c.in_subprocess.remove(e.id)
-        print(c.number_of_exception_events)
 
         self.visit(e.next[0], c, r)
-        next_time = r.current_cycle_time
+        next_time = r.totalCycleTime
+        next_cost = r.totalCost
 
         # all boundary timer events must be traversed
         if len(e.boundary) and type(e.boundary[0]) is TimerEvent:
-            self.handle_for_boundary_timer_event(e, c, r, next_time)
-            total_cycle_time += r.current_cycle_time
+            self.handle_for_boundary_timer_event(e, c, r, next_time, next_cost)
+            total_cycle_time += r.totalCycleTime
+            total_cost += r.totalCost
 
         # case subprocess doesn't have any timer event
         if len(e.boundary) and type(e.boundary[0]) is CancelEvent:
-            self.handle_for_boundary_cancel_event(e, c, r, next_time)
-            total_cycle_time += r.current_cycle_time
+            self.handle_for_boundary_cancel_event(
+                e, c, r, next_time, next_cost)
+            total_cycle_time += r.totalCycleTime
+            total_cost += r.totalCost
 
         if len(e.boundary) and type(e.boundary[0]) is MessageEvent:
-            self.handle_for_boundary_message_event(e, c, r, next_time)
-            total_cycle_time += r.current_cycle_time
+            self.handle_for_boundary_message_event(
+                e, c, r, next_time, next_cost)
+            total_cycle_time += r.totalCycleTime
+            total_cost += r.totalCost
 
         if len(e.boundary) and type(e.boundary[0]) is ErrorEvent:
-            self.handle_for_boundary_error_event(e, c, r, next_time)
-            total_cycle_time += r.current_cycle_time
+            self.handle_for_boundary_error_event(e, c, r, next_time, next_cost)
+            total_cycle_time += r.totalCycleTime
+            total_cost += r.totalCost
 
         if c.number_of_exception_events[e.id]["catching_event"] > 0 and c.number_of_exception_events[e.id][
-            "throwing_event"] > 0:
-            r.number_of_handled_exceptions += 1
+                "throwing_event"] > 0:
+            r.handledTasks += 1
         elif c.number_of_exception_events[e.id]["catching_event"] == 0 and c.number_of_exception_events[e.id][
-            "throwing_event"] > 0:
-            r.number_of_unhandled_exceptions += 1
+                "throwing_event"] > 0:
+            r.unHandledTasks += 1
 
-        r.current_cycle_time = total_cycle_time + next_time
+        r.totalCycleTime = total_cycle_time + next_time
+        r.totalCost = total_cost + next_cost
 
     def handle_for_inner_SubProcess(self, e: NormalSubProcess, c: Context, r: Result):
         # return cycle time of subprocess and list of boundary events cycletime
         subprocess_time = 0.0
+        subprocess_cost = 0.0
         # expected subprocess has only one start event
         for se in e.node:
             self.visit(se, c, r)
-            subprocess_time += r.current_cycle_time
-
-        return subprocess_time
+            subprocess_time += r.totalCycleTime
+            subprocess_cost += r.totalCost
+        return subprocess_time, subprocess_cost
 
     def handle_for_boundary_SubProcess(self, e: NormalSubProcess, c: Context, r: Result, class_name: str):
         list_boundary_time = []
+        list_boundary_cost = []
         is_interrupting = True
 
         for b in e.boundary:
@@ -346,19 +429,21 @@ class Traverse:
             if type(b).__name__ == class_name:
                 is_interrupting = b.is_interrupting
                 self.visit(b, c, r)
-                list_boundary_time.append(r.current_cycle_time)
+                list_boundary_time.append(r.totalCycleTime)
+                list_boundary_cost.append(r.totalCost)
                 if type(b) is CancelEvent and b.event_type == EventType.BOUNDARY_EVENT.value:
                     c.number_of_exception_events[e.id]["catching_event"] += 1
                 if type(b) is ErrorEvent and b.event_type == EventType.BOUNDARY_EVENT.value:
                     c.number_of_exception_events[e.id]["catching_event"] += 1
 
-        return list_boundary_time, is_interrupting
+        return list_boundary_time, list_boundary_cost, is_interrupting
 
     def handle_for_all_boundary_SubProcess(self, e: NormalSubProcess, c: Context, r: Result):
         for b in e.boundary:
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             self.visit(b, c, r)
-            c.list_boundary_event[e.id][b.code] = r.current_cycle_time, b.is_interupting
+            c.list_boundary_event[e.id][b.code] = r.totalCycleTime, r.totalCost, b.is_interupting
 
     def number_of_gateway_in_nodes(self, node) -> int:
         count = 0
@@ -384,7 +469,8 @@ class Traverse:
                 reloop = end.branching_probabilities[i]
             else:
                 next_node = n
-        total_cycle_time = r.current_cycle_time / (1 - reloop)
+        total_cycle_time = r.totalCycleTime / (1 - reloop)
+        total_cost = r.totalCost / (1 - reloop)
         print("After", c.in_loop)
 
         if c.in_loop == 0:
@@ -392,7 +478,8 @@ class Traverse:
             r.total_loop += 1
         self.visit(next_node, c, r)
 
-        r.current_cycle_time += total_cycle_time
+        r.totalCycleTime += total_cycle_time
+        r.totalCost += total_cost
         return
 
     def handle_for_boundary_conditional_event(self, e: NormalTask, boundary_event: ConditionalEvent, c: Context,
@@ -404,6 +491,7 @@ class Traverse:
         next_task = e.next[0]
 
         total_cycle_time = e.cycle_time
+        total_cost = e.cycle_time * e.unit_cost
 
         boundary_temp_result = Result()
         seq_temp_result = Result()
@@ -417,77 +505,105 @@ class Traverse:
         if interrupt:
             c.in_xor_block -= 1
 
-        boundary_ct = boundary_temp_result.current_cycle_time
-        sequence_ct = seq_temp_result.current_cycle_time
+        boundary_ct = boundary_temp_result.totalCycleTime
+        boundary_cost = boundary_temp_result.totalCost
+        sequence_ct = seq_temp_result.totalCycleTime
+        sequence_cost = seq_temp_result.totalCost
 
         if interrupt:
             total_cycle_time += percentage * \
-                                boundary_ct + (1 - percentage) * sequence_ct
+                boundary_ct + (1 - percentage) * sequence_ct
+            total_cost += percentage * \
+                boundary_cost + (1 - percentage) * sequence_cost
         else:
             total_cycle_time += percentage * max(boundary_ct, sequence_ct) + (
-                    1 - percentage) * sequence_ct
-        r.current_cycle_time += total_cycle_time
-        r.number_of_optional_tasks += boundary_temp_result.number_of_optional_tasks + \
-                                      seq_temp_result.number_of_optional_tasks
-        r.number_of_total_tasks += boundary_temp_result.number_of_total_tasks + \
-                                   seq_temp_result.number_of_total_tasks
+                1 - percentage) * sequence_ct
+            total_cost += percentage * max(boundary_cost, sequence_cost) + (
+                1 - percentage) * sequence_cost
+        r.totalCycleTime += total_cycle_time
+        r.totalCost += total_cost
+        r.numberOfOptionalTasks += boundary_temp_result.numberOfOptionalTasks + \
+            seq_temp_result.numberOfOptionalTasks
+        r.totalTasks += boundary_temp_result.totalTasks + \
+            seq_temp_result.totalTasks
 
-    def handle_for_boundary_timer_event(self, e: NormalTask, c: Context, r: Result, next_time: float):
+    def handle_for_boundary_timer_event(self, e: NormalTask, c: Context, r: Result, next_time: float, next_cost: float):
         total_cycle_time = 0.0
-        list_boundary_timer_event, is_interrupting = self.handle_for_boundary_SubProcess(
+        total_cost = 0.0
+        list_cycle_time_boundary_timer_event, list_cost_boundary_timer_event, is_interrupting = self.handle_for_boundary_SubProcess(
             e, c, r, TimerEvent.__name__)
 
         if is_interrupting:
-            total_cycle_time += max(list_boundary_timer_event)
+            total_cycle_time += max(list_cycle_time_boundary_timer_event)
+            total_cost += max(list_cost_boundary_timer_event)
         else:
-            total_cycle_time += max(max(list_boundary_timer_event), next_time)
-        r.current_cycle_time = total_cycle_time
+            total_cycle_time += max(
+                max(list_cycle_time_boundary_timer_event), next_time)
+            total_cost += max(
+                max(list_cost_boundary_timer_event), next_cost)
+        r.totalCycleTime = total_cycle_time
+        r.totalCost = total_cost
 
-    def handle_for_boundary_cancel_event(self, e: NormalSubProcess, c: Context, r: Result, next_time: float):
+    def handle_for_boundary_cancel_event(self, e: NormalSubProcess, c: Context, r: Result, next_time: float, next_cost: float):
         total_cycle_time = 0.0
-        list_boundary_cancel_event, _ = self.handle_for_boundary_SubProcess(
+        total_cost = 0.0
+        list_cycle_time_boundary_timer_event, list_cost_boundary_timer_event, _ = self.handle_for_boundary_SubProcess(
             e, c, r, CancelEvent.__name__)
 
-        if len(list_boundary_cancel_event) > 0:
-            total_cycle_time += max(list_boundary_cancel_event)
+        if len(list_cycle_time_boundary_timer_event) > 0:
+            total_cycle_time += max(list_cycle_time_boundary_timer_event)
+            total_cost += max(list_cost_boundary_timer_event)
 
-        if len(e.boundary) == 0 and not len(list_boundary_cancel_event):
+        if len(e.boundary) == 0 and not len(list_cycle_time_boundary_timer_event):
             total_cycle_time += next_time
+            total_cost += next_cost
 
-        r.current_cycle_time = total_cycle_time
+        r.totalCycleTime = total_cycle_time
+        r.totalCost = total_cost
 
-    def handle_for_boundary_message_event(self, e: NormalSubProcess, c: Context, r: Result, next_time: float):
+    def handle_for_boundary_message_event(self, e: NormalSubProcess, c: Context, r: Result, next_time: float, next_cost: float):
         total_cycle_time = 0.0
-        list_boundary_message_event, is_interupting = self.handle_for_boundary_SubProcess(
+        total_cost = 0.0
+        list_cycle_time_boundary_timer_event, list_cost_boundary_timer_event, is_interupting = self.handle_for_boundary_SubProcess(
             e, c, r, MessageEvent.__name__)
         if is_interupting:
-            total_cycle_time += max(list_boundary_message_event)
+            total_cycle_time += max(list_cycle_time_boundary_timer_event)
+            total_cost += max(list_cost_boundary_timer_event)
         else:
-            total_cycle_time += max(max(list_boundary_message_event),
+            total_cycle_time += max(max(list_cycle_time_boundary_timer_event),
                                     next_time)
-        r.current_cycle_time = total_cycle_time
+            total_cost += max(max(list_cost_boundary_timer_event),
+                              next_cost)
+        r.totalCycleTime = total_cycle_time
+        r.totalCost = total_cost
 
-    def handle_for_boundary_error_event(self, e: NormalSubProcess, c: Context, r: Result, next_time: float):
+    def handle_for_boundary_error_event(self, e: NormalSubProcess, c: Context, r: Result, next_time: float, next_cost: float):
         total_cycle_time = 0.0
-        list_boundary_message_event, is_interupting = self.handle_for_boundary_SubProcess(
+        total_cost = 0.0
+        list_cycle_time_boundary_timer_event, list_cost_boundary_timer_event, is_interupting = self.handle_for_boundary_SubProcess(
             e, c, r, ErrorEvent.__name__)
         if is_interupting:
-            total_cycle_time += max(list_boundary_message_event)
+            total_cycle_time += max(list_cycle_time_boundary_timer_event)
+            total_cost += max(list_cost_boundary_timer_event)
         else:
-            total_cycle_time += max(max(list_boundary_message_event),
+            total_cycle_time += max(max(list_cycle_time_boundary_timer_event),
                                     next_time)
-        r.current_cycle_time = total_cycle_time
+            total_cost += max(max(list_cost_boundary_timer_event),
+                              next_cost)
+        r.totalCycleTime = total_cycle_time
+        r.totalCost = total_cost
 
     def handle_for_join_gateway(self, e: Task, c: Context, r: Result):
         if e.id in c.list_gateway:
             c.list_gateway[e.id] += 1
         else:
             c.list_gateway[e.id] = 1 + \
-                                   self.number_of_gateway_in_nodes(e.previous)
+                self.number_of_gateway_in_nodes(e.previous)
 
         # Check how many times this join gateway has been visited
         if c.list_gateway[e.id] < len(e.previous):
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             return
 
         # Check
@@ -502,17 +618,20 @@ class Traverse:
 
         print("End gateway")
         c.stack_next_gateway.append(e)
-        r.current_cycle_time = 0
+        r.totalCycleTime = 0
+        r.totalCost = 0
         return
 
     def handle_for_split_gateway(self, e: Task, c: Context, r: Result):
         total_cycle_time = 0.0
+        total_cost = 0.0
         next_node = None
         if len(c.stack_end_loop) > 0 and len(e.next) == 2 and c.stack_end_loop[-1] == e:
             print("End loop")
             c.in_loop -= 1
             c.stack_end_loop.pop()
-            r.current_cycle_time = 0
+            r.totalCycleTime = 0
+            r.totalCost = 0
             return
         print("Start gateway")
 
@@ -520,9 +639,14 @@ class Traverse:
             c.in_xor_block += 1
 
         for i, branch in enumerate(e.next):
+            r.totalCycleTime = 0
+            r.totalCost = 0
             self.visit(branch, c, r)
+            print(r.totalCycleTime, r.totalCost)
             total_cycle_time += e.branching_probabilities[i] * \
-                                r.current_cycle_time
+                r.totalCycleTime
+            total_cost += e.branching_probabilities[i] * \
+                r.totalCost
 
         if isinstance(e, ExclusiveGateway):
             c.in_xor_block -= 1
@@ -530,8 +654,10 @@ class Traverse:
         if len(c.stack_next_gateway) > 0:
             next_node = c.stack_next_gateway.pop().next[0]
         else:
-            r.current_cycle_time = total_cycle_time
+            r.totalCycleTime = total_cycle_time
+            r.totalCost = total_cost
             return
         self.visit(next_node, c, r)
-        r.current_cycle_time += total_cycle_time
+        r.totalCycleTime += total_cycle_time
+        r.totalCost += total_cost
         return

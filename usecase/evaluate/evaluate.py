@@ -88,6 +88,14 @@ class ProcessDirector:
             elif type(n) is Lane:
                 participant = self.map_node_created[e.parentID]
                 participant.lane.append(n)
+
+            if isinstance(n, (Task, SubProcess, TimerEvent)):
+                parent_object = n
+                while not isinstance(parent_object, (Participant, Lane)):
+                    parent_element = self.map_element[parent_object.id]
+                    parent_object = self.map_node_created[parent_element.parentID]
+
+                n.unit_cost = parent_object.unit_cost
             else:
                 pass
 
@@ -100,9 +108,6 @@ class ProcessDirector:
             if isinstance(n, EventSubProcess):
                 subprocess = self.map_node_created[e.parentID]
                 subprocess.event_sub_process.append(n)
-            if isinstance(n, SubProcess):
-                # get all start event of subprocess
-                pass
         self.handleLinkEvent()
 
         return collaboration
@@ -126,14 +131,14 @@ class Evaluate:
         c = Context()
         for p in collaboration.participants:
             r = Result()
-            r.participant_name = p.name
+            r.name = p.name
             p.accept(t, c, r)
-            if r.number_of_handled_exceptions + r.number_of_unhandled_exceptions > 0:
-                r.exception_handling = r.number_of_handled_exceptions / \
-                                       (r.number_of_handled_exceptions +
-                                        r.number_of_unhandled_exceptions)
-            if r.number_of_total_tasks > 0:
-                r.flexibility = r.number_of_optional_tasks / r.number_of_total_tasks
+            if r.handledTasks + r.unHandledTasks > 0:
+                r.exceptionHandling = r.handledTasks / \
+                    (r.handledTasks +
+                     r.unHandledTasks)
+            if r.totalTasks > 0:
+                r.flexibility = r.numberOfOptionalTasks / r.totalTasks
             if r.total_loop == 0:
                 r.quality = 1
             else:

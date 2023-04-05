@@ -4,10 +4,12 @@ from usecase.evaluate.utils import Element
 
 class Task(Activity):
     cycle_time: float
+    unit_cost: float
 
     def __init__(self, element: Element):
         super().__init__(element)
         self.cycle_time = element.cycleTime
+        self.unit_cost = 0
 
 
 class NormalTask(Task):

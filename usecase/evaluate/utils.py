@@ -22,6 +22,8 @@ class Element:
     percentage: int
     isStart: bool
     code: str
+    numberOfTasks: int
+    unitCost: float
 
     def __init__(self, **entries):
         self.__dict__.update(entries)
@@ -55,37 +57,37 @@ class Context:
 
 
 class Result:
-    participant_name: str
-    current_cycle_time: float
-    number_of_optional_tasks: int
-    number_of_total_tasks: int
+    name: str
+    totalCycleTime: float
+    totalCost: float
+    unitCost: list
+    transparency: dict
+    totalNumberExplicitTasks: list
+    numberOfOptionalTasks: int
+    totalTasks: int
     flexibility: float
     total_loop: int
     total_probability: float
     quality: float
-    # total_cycle_time_all_loops: float
-    logs_cycle_time: list
-    logs_quality: list
-    logs_flexibility: list
-    number_of_handled_exceptions: int
-    number_of_unhandled_exceptions: int
-    exception_handling: float
+    handledTasks: int
+    unHandledTasks: int
+    exceptionHandling: float
 
     def __init__(self):
-        self.participant_name = ""
-        self.current_cycle_time = 0.0
-        self.number_of_optional_tasks = 0
-        self.number_of_total_tasks = 0
+        self.name = ""
+        self.totalCycleTime = 0.0
+        self.totalCost = 0.0
+        self.unitCost = []
+        self.transparency = {}
+        self.totalNumberExplicitTasks = 0
+        self.numberOfOptionalTasks = 0
+        self.totalTasks = 0
         self.flexibility = 0
         self.total_loop = 0
         self.total_loop_probability = 0
-        # self.total_cycle_time_all_loops = 0.0
-        self.logs_cycle_time = []
-        self.logs_quality = []
-        self.logs_flexibility = []
-        self.number_of_handled_exceptions = 0
-        self.number_of_unhandled_exceptions = 0
-        self.exception_handling = 0.0
+        self.handledTasks = 0
+        self.unHandledTasks = 0
+        self.exceptionHandling = 0.0
 
     def obj_dict(self):
         return self.__dict__
