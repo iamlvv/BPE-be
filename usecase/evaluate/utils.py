@@ -89,9 +89,6 @@ class Result:
         self.unHandledTasks = 0
         self.exceptionHandling = 0.0
 
-    def obj_dict(self):
-        return self.__dict__
-
 
 class EventType(Enum):
     START_EVENT = 0

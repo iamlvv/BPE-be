@@ -10,6 +10,15 @@ from usecase.evaluate.evaluate import Evaluate
 from django.core.files.storage import FileSystemStorage
 
 
+class BPEResponse:
+    err: str
+    data: object
+
+    def __init__(self, err, data) -> None:
+        self.err = err
+        self.data = data
+
+
 def load_request_body(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
