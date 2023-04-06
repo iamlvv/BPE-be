@@ -7,6 +7,7 @@ from evaluation.models.evaluated_result import EvaluatedResult
 from evaluation.models.project import Project
 from evaluation.models.user import User
 from usecase.evaluate.evaluate import Evaluate
+from usecase.evaluate.compare import Compare
 from django.core.files.storage import FileSystemStorage
 
 

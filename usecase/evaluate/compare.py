@@ -1,0 +1,108 @@
+
+
+class CompareProcess:
+    name: str
+    cycleTime: float
+    cost: float
+    transparency: list
+    flexibility: float
+    exceptionHandling: float
+    quality: float
+
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
+
+
+class CompareRequest:
+    target: dict
+    worst: dict
+    as_is: CompareProcess
+    to_be: CompareProcess
+
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
+        print(entries["as_is"], entries["to_be"])
+        self.as_is = CompareProcess(**entries["as_is"])
+        self.to_be = CompareProcess(**entries["to_be"])
+
+
+class CompareResponse:
+    cycle_time: float
+    cost: float
+    flexibility: float
+    quality: float
+    exception_handling: float
+    transparency: list
+
+    def __init__(self) -> None:
+        self.cycle_time = 0
+        self.cost = 0
+        self.flexibility = 0
+        self.quality = 0
+        self.exception_handling = 0
+        self.transparency = []
+
+
+class Compare:
+    cycle_time_target: float
+    cycle_time_worst: float
+    cost_target: float
+    cost_worst: float
+    flexibility_target: float
+    flexibility_worst: float
+    quality_target: float
+    quality_worst: float
+    exception_handling_target: float
+    exception_handling_worst: float
+    transparency_target: float
+    transparency_worst: float
+
+    def config(self, cr: CompareRequest):
+        self.flexibility_target = 1
+        self.flexibility_worst = 0
+        self.quality_target = 1
+        self.quality_worst = 0
+        self.exception_handling_target = 1
+        self.exception_handling_worst = 0
+        self.transparency_target = 1
+        self.transparency_worst = 0
+        self.cycle_time_target = cr.target["cycleTime"]
+        self.cycle_time_worst = cr.worst["cycleTime"]
+        self.cost_target = cr.target["cost"]
+        self.cost_worst = cr.worst["cost"]
+
+    def pl(self, current, threshold, target, worst):
+        if current >= threshold:
+            return (current - threshold) / (target - threshold)
+        else:
+            return (current - threshold) / (threshold - worst)
+
+    @classmethod
+    def compare(self, cr: dict):
+        compare_resquest = CompareRequest(**cr)
+        as_is = compare_resquest.as_is
+        to_be = compare_resquest.to_be
+        # print(compare_resquest.__dict__)
+        self.config(self, cr=compare_resquest)
+        compare_response = CompareResponse()
+        compare_response.cycle_time = self.pl(
+            self, to_be.cycleTime, as_is.cycleTime, self.cycle_time_target, self.cycle_time_worst)
+        compare_response.cost = self.pl(
+            self, to_be.cost, as_is.cost, self.cost_target, self.cost_worst)
+        compare_response.flexibility = self.pl(
+            self, to_be.flexibility, as_is.flexibility, self.flexibility_target, self.flexibility_worst)
+        compare_response.quality = self.pl(
+            self, to_be.quality, as_is.quality, self.quality_target, self.quality_worst)
+        compare_response.exception_handling = self.pl(
+            self, to_be.exceptionHandling, as_is.exceptionHandling, self.exception_handling_target, self.exception_handling_worst)
+        for i in range(len(to_be.transparency)):
+            compare_response.transparency.append({
+                "view": to_be.transparency[i]["view"],
+                "pl": self.pl(
+                    self, to_be.transparency[i]["transparency"], as_is.transparency[i][
+                        "transparency"], self.exception_handling_target, self.exception_handling_worst
+                )
+            }
+            )
+
+        return compare_response

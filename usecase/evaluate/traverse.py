@@ -21,7 +21,6 @@ class Traverse:
 
         total_cycle_time = e.cycle_time
         total_cost = e.cycle_time * e.unit_cost
-        print(e.unit_cost)
 
         if not len(e.boundary):
             self.visit(e.next[0], c, r)
@@ -642,7 +641,6 @@ class Traverse:
             r.totalCycleTime = 0
             r.totalCost = 0
             self.visit(branch, c, r)
-            print(r.totalCycleTime, r.totalCost)
             total_cycle_time += e.branching_probabilities[i] * \
                 r.totalCycleTime
             total_cost += e.branching_probabilities[i] * \
