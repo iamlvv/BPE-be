@@ -36,23 +36,23 @@ class EvaluateView:
                         "cost": 0.08
                     }
                 ],
-                "transparency": [
-                    {
+                "transparency": {
+                    "1": {
                         "view": "Customer Service Department View",
                         "numberOfExplicitTask": 4,
                         "transparency": 0.308
                     },
-                    {
+                    "2": {
                         "view": "Finance Department View",
                         "numberOfExplicitTask": 4,
                         "transparency": 0.308
                     },
-                    {
+                    "3": {
                         "view": "Customer View",
                         "numberOfExplicitTask": 5,
                         "transparency": 0.384
                     }
-                ],
+                },
                 "totalNumberExplicitTasks": 13,
                 "quality": 0.76,
                 "numberOfOptionalTasks": 3,
@@ -84,23 +84,23 @@ class EvaluateView:
                         "cost": 0.08
                     }
                 ],
-                "transparency": [
-                    {
+                "transparency": {
+                    "1": {
                         "view": "Customer Service Department View",
                         "numberOfExplicitTask": 4,
                         "transparency": 0.333
                     },
-                    {
+                    "2": {
                         "view": "Finance Department View",
                         "numberOfExplicitTask": 3,
                         "transparency": 0.25
                     },
-                    {
+                    "3": {
                         "view": "Customer View",
                         "numberOfExplicitTask": 5,
                         "transparency": 0.417
                     }
-                ],
+                },
                 "totalNumberExplicitTasks": 12,
                 "quality": 0.76,
                 "numberOfOptionalTasks": 2,
@@ -132,23 +132,23 @@ class EvaluateView:
                         "cost": 0.08
                     }
                 ],
-                "transparency": [
-                    {
+                "transparency": {
+                    "1": {
                         "view": "Customer Service Department View",
                         "numberOfExplicitTask": 4,
                         "transparency": 0.4
                     },
-                    {
+                    "2": {
                         "view": "Finance Department View",
                         "numberOfExplicitTask": 3,
                         "transparency": 0.3
                     },
-                    {
+                    "3": {
                         "view": "Customer View",
                         "numberOfExplicitTask": 3,
                         "transparency": 0.3
                     }
-                ],
+                },
                 "totalNumberExplicitTasks": 10,
                 "quality": 0.2,
                 "numberOfOptionalTasks": 8,
@@ -181,23 +181,23 @@ class EvaluateView:
                         "cost": 0.08
                     }
                 ],
-                "transparency": [
-                    {
+                "transparency": {
+                    "1": {
                         "view": "Customer Service Department View",
                         "numberOfExplicitTask": 4,
                         "transparency": 0.445
                     },
-                    {
+                    "2": {
                         "view": "Finance Department View",
                         "numberOfExplicitTask": 2,
                         "transparency": 0.222
                     },
-                    {
+                    "3": {
                         "view": "Customer View",
                         "numberOfExplicitTask": 3,
                         "transparency": 0.333
                     }
-                ],
+                },
                 "totalNumberExplicitTasks": 9,
                 "quality": 0.7,
                 "numberOfOptionalTasks": 7,
