@@ -61,7 +61,7 @@ class EvaluateView:
                 "steps": [
                     {
                         "event": "Start loop",
-                        "startGateway": "Gateway_1gwq4rz",
+                        "gateWay": "Gateway_1gwq4rz",
                         "rework": 0.7,
                     },
                     {
@@ -72,7 +72,7 @@ class EvaluateView:
                     },
                     {
                         "event": "End Loop",
-                        "endGateway": "Gateway_1v8mhbs",
+                        "gateWay": "Gateway_1v8mhbs",
                     },
                     {
                         "activity": "Activity_0qr3vb0",
@@ -82,7 +82,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_1i9ffc9",
+                        "gateWay": "Gateway_1i9ffc9",
                         "branchingProbability": [0.2, 0.8]
                     },
                     {
@@ -93,7 +93,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start loop",
-                        "startGateway": "Gateway_0o2luuy",
+                        "gateWay": "Gateway_0o2luuy",
                         "rework": 0.01,
                     },
                     {
@@ -104,7 +104,7 @@ class EvaluateView:
                     },
                     {
                         "event": "End loop",
-                        "endGateway": "Gateway_1v8mhbs",
+                        "gateWay": "Gateway_1v8mhbs",
                     },
                     {
                         "activity": "Activity_1y0zxmo",
@@ -114,7 +114,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_1v8mhbs",
+                        "gateWay": "Gateway_1v8mhbs",
                         "branchingProbability": [0.01, 0.99]
                     },
                     {
@@ -137,7 +137,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start parallel gateway",
-                        "startGateway": "Gateway_1n3qwia",
+                        "gateWay": "Gateway_1n3qwia",
                     },
                     {
                         "activity": "Activity_0yh3440",
@@ -159,7 +159,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_02l0nhx",
+                        "gateWay": "Gateway_02l0nhx",
                         "branchingProbability": [0.6, 0.4]
                     },
                     {
@@ -170,7 +170,7 @@ class EvaluateView:
                     },
                     {
                         "event": "End exclusive gateway",
-                        "endGateway": "Gateway_02l0nhx",
+                        "gateWay": "Gateway_02l0nhx",
                     }
                 ],
                 "handledTasks": 0,
@@ -224,7 +224,7 @@ class EvaluateView:
                 "steps": [
                     {
                         "event": "Start loop",
-                        "startGateway": "Gateway_1gwq4rz",
+                        "gateWay": "Gateway_1gwq4rz",
                         "rework": 0.7,
                     },
                     {
@@ -235,7 +235,7 @@ class EvaluateView:
                     },
                     {
                         "event": "End Loop",
-                        "endGateway": "Gateway_1v8mhbs",
+                        "gateWay": "Gateway_1v8mhbs",
                     },
                     {
                         "activity": "Activity_0qr3vb0",
@@ -245,7 +245,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_1i9ffc9",
+                        "gateWay": "Gateway_1i9ffc9",
                         "branchingProbability": [0.2, 0.8]
                     },
                     {
@@ -256,7 +256,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start loop",
-                        "startGateway": "Gateway_0o2luuy",
+                        "gateWay": "Gateway_0o2luuy",
                         "rework": 0.01,
                     },
                     {
@@ -267,7 +267,7 @@ class EvaluateView:
                     },
                     {
                         "event": "End loop",
-                        "endGateway": "Gateway_1v8mhbs",
+                        "gateWay": "Gateway_1v8mhbs",
                     },
                     {
                         "activity": "Activity_1y0zxmo",
@@ -277,7 +277,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_1v8mhbs",
+                        "gateWay": "Gateway_1v8mhbs",
                         "branchingProbability": [0.01, 0.99]
                     },
                     {
@@ -300,7 +300,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start parallel gateway",
-                        "startGateway": "Gateway_1n3qwia",
+                        "gateWay": "Gateway_1n3qwia",
                     },
                     {
                         "activity": "Activity_0yh3440",
@@ -322,7 +322,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_02l0nhx",
+                        "gateWay": "Gateway_02l0nhx",
                         "branchingProbability": [0.6, 0.4]
                     },
                     {
@@ -333,13 +333,14 @@ class EvaluateView:
                     },
                     {
                         "event": "End exclusive gateway",
-                        "endGateway": "Gateway_02l0nhx",
+                        "gateWay": "Gateway_02l0nhx",
                     }
                 ],
                 "handledTasks": 0,
                 "unHandledTasks": 0,
                 "exceptionHandling": 1
             }
+
         ]
 
         return JsonResponse(result, safe=False)
@@ -378,8 +379,6 @@ class EvaluateView:
                         "numberOfExplicitTask": 3,
                         "transparency": 0.3,
                     },
-
-
                 },
                 "totalNumberExplicitTasks": 10,
                 "quality": 0.2,
@@ -570,8 +569,6 @@ class EvaluateView:
                         "cost": 0.04,
                         "label": "Pay the airlines",
                     },
-
-
                     {
                         "activity": "Activity_1x7n5g3",
                         "cycleTime": 5,
@@ -583,8 +580,6 @@ class EvaluateView:
                         "startGateway": "Gateway_0doview",
                         "branchingProbability": [0.6, 0.4]
                     },
-
-
                     {
                         "activity": "Activity_1jf5diz",
                         "cycleTime": 5,
@@ -596,8 +591,6 @@ class EvaluateView:
                         "endGateway": "Gateway_10scsjy",
                     },
                 ],
-
-
                 "handledTasks": 0,
                 "unHandledTasks": 0,
                 "exceptionHandling": 1
