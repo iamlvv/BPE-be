@@ -400,12 +400,12 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_0doview",
+                        "gateWay": "Gateway_0doview",
                         "branchingProbability": [0.3, 0.7]
                     },
                     {
                         "event": "Start loop",
-                        "startGateway": "Gateway_0o2luuy",
+                        "gateWay": "Gateway_0o2luuy",
                         "rework": 0.8,
                     },
                     {
@@ -422,7 +422,7 @@ class EvaluateView:
                     },
                     {
                         "event": "End loop",
-                        "endGateway": "Gateway_1kpivk4",
+                        "gateWay": "Gateway_1kpivk4",
                     },
                     {
                         "activity": "Activity_18zy42u",
@@ -450,7 +450,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_0doview",
+                        "gateWay": "Gateway_0doview",
                         "branchingProbability": [0.6, 0.4]
                     },
                     {
@@ -461,7 +461,7 @@ class EvaluateView:
                     },
                     {
                         "event": "End exclusive gateway",
-                        "endGateway": "Gateway_10scsjy",
+                        "gateWay": "Gateway_10scsjy",
                     },
                 ],
                 "handledTasks": 0,
@@ -527,12 +527,12 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_0doview",
+                        "gateWay": "Gateway_0doview",
                         "branchingProbability": [0.3, 0.7]
                     },
                     {
                         "event": "Start loop",
-                        "startGateway": "Gateway_0o2luuy",
+                        "gateWay": "Gateway_0o2luuy",
                         "rework": 0.8,
                     },
                     {
@@ -549,7 +549,7 @@ class EvaluateView:
                     },
                     {
                         "event": "End loop",
-                        "endGateway": "Gateway_1kpivk4",
+                        "gateWay": "Gateway_1kpivk4",
                     },
                     {
                         "activity": "Activity_18zy42u",
@@ -577,7 +577,7 @@ class EvaluateView:
                     },
                     {
                         "event": "Start exclusive gateway",
-                        "startGateway": "Gateway_0doview",
+                        "gateWay": "Gateway_0doview",
                         "branchingProbability": [0.6, 0.4]
                     },
                     {
@@ -588,14 +588,13 @@ class EvaluateView:
                     },
                     {
                         "event": "End exclusive gateway",
-                        "endGateway": "Gateway_10scsjy",
+                        "gateWay": "Gateway_10scsjy",
                     },
                 ],
                 "handledTasks": 0,
                 "unHandledTasks": 0,
                 "exceptionHandling": 1
             }
-
         ]
 
         return JsonResponse(result, safe=False)
