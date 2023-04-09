@@ -385,7 +385,7 @@ class EvaluateView:
                 "numberOfOptionalTasks": 8,
                 "totalTasks": 10,
                 "flexibility": 0.8,
-                "step": [
+                "steps": [
                     {
                         "activity": "Activity_1v63p18",
                         "cycleTime": 1,
@@ -512,7 +512,7 @@ class EvaluateView:
                 "numberOfOptionalTasks": 7,
                 "totalTasks": 9,
                 "flexibility": 0.777,
-                "step": [
+                "steps": [
                     {
                         "activity": "Activity_1v63p18",
                         "cycleTime": 1,
