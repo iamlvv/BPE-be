@@ -1,8 +1,7 @@
+from datetime import datetime
+from django.db import models
+from django.http import JsonResponse
+from django.forms.models import model_to_dict
+from evaluation.auth.jwt import *
+import uuid
 import hashlib
-
-mySalt = "$2b$12$6rMnsklapuHBKL."
-
-
-def hash_password(password: str):
-    pwd_hash = hashlib.sha256((password + mySalt).encode("utf-8"))
-    return pwd_hash.hexdigest()

@@ -1,6 +1,4 @@
-from django.db import models
-from evaluation.models.utils import *
-from evaluation.auth.jwt import *
+from .utils import *
 
 
 class User(models.Model):
@@ -15,26 +13,24 @@ class User(models.Model):
         db_table = "bpe_user"
 
     @classmethod
-    def create(self, password, email, name, phone, avatar):
-        user = self(password=hash_password(password), email=email,
+    def create(self, hash_password, email, name, phone, avatar):
+        user = self(password=hash_password, email=email,
                     name=name, phone=phone, avatar=avatar)
         user.save()
 
     @classmethod
-    def login(self, email, password):
-        result = self.objects.filter(
-            email=email, password=hash_password(password))
-        print(result)
-        return encode({
-            "id": result[0].id,
-            "email": result[0].email,
-            "password": result[0].password
-        }) if len(result) > 0 else ""
+    def get(self, email, hash_password):
+        result = self.objects.get(email=email, password=hash_password)
+        return result
 
     @classmethod
-    def get(self, token):
-        id = decode(token)["id"]
-        return self.objects.get(id=id)
+    def get_by_id(self, id):
+        user = self.objects.get(id=id)
+        return user
+
+    @classmethod
+    def get_many(self, user_ids):
+        return list(User.objects.filter(id__in=user_ids).values('name', 'phone', 'avatar'))
 
     @classmethod
     def check_exist(self, email):

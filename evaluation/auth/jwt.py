@@ -8,3 +8,9 @@ def encode(payload):
 
 def decode(jwt_string):
     return jwt.decode(jwt_string, os.environ.get("SECRET"), algorithms="HS256")
+
+
+def get_id_from_token(jwt_string):
+    result = jwt.decode(jwt_string, os.environ.get(
+        "SECRET"), algorithms="HS256")
+    return result["id"]

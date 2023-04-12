@@ -1,5 +1,5 @@
-from usecase.evaluate.elements.activity import Activity
-from usecase.evaluate.utils import Element
+from .activity import Activity
+from ..utils import Element
 
 
 class Task(Activity):

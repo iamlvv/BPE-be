@@ -1,9 +1,9 @@
-from usecase.evaluate.utils import *
-from usecase.evaluate.elements.gateway import *
-from usecase.evaluate.elements.task import *
-from usecase.evaluate.elements.event import *
-from usecase.evaluate.elements.participant import *
-from usecase.evaluate.elements.sub_process import *
+from .utils import *
+from .elements.gateway import *
+from .elements.task import *
+from .elements.event import *
+from .elements.participant import *
+from .elements.sub_process import *
 
 
 class Traverse:

@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS public.project
     name      character varying(25) COLLATE pg_catalog."default" NOT NULL,
     is_delete boolean,
     create_at timestamp without time zone,
-    user_id   integer                                            NOT NULL,
     CONSTRAINT project_pkey PRIMARY KEY (id),
     CONSTRAINT project_name_key UNIQUE (name)
 )
@@ -39,12 +38,30 @@ CREATE TABLE IF NOT EXISTS public.project
 ALTER TABLE IF EXISTS public.project
     OWNER to postgres;
 
+-- Table: public.work_on
+
+-- DROP TABLE IF EXISTS public.work_on;
+
+CREATE TABLE IF NOT EXISTS public.work_on
+(
+    id         serial,
+    user_id    integer NOT NULL,
+    project_id integer NOT NULL,
+    role       integer NOT NULL,
+    CONSTRAINT work_on_pkey PRIMARY KEY (user_id, project_id)
+)
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.work_on
+    OWNER to postgres;
+
 -- Table: public.bpmn_file
 
 -- DROP TABLE IF EXISTS public.bpmn_file;
 
 CREATE TABLE IF NOT EXISTS public.bpmn_file
 (
+    id            serial,
     xml_file_link character varying(255) COLLATE pg_catalog."default" NOT NULL UNIQUE,
     project_id    integer                                             NOT NULL,
     version       varchar(10),
@@ -57,17 +74,42 @@ CREATE TABLE IF NOT EXISTS public.bpmn_file
 ALTER TABLE IF EXISTS public.bpmn_file
     OWNER to postgres;
 
--- Table: public.cost
+-- Table: public.comment_on
 
--- DROP TABLE IF EXISTS public.cost;
+-- DROP TABLE IF EXISTS public.comment_on;
 
+CREATE TABLE IF NOT EXISTS public.comment_on
+(
+    id            serial,
+    user_id       integer NOT NULL,
+    project_id    integer NOT NULL,
+    xml_file_link character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    content       character varying COLLATE pg_catalog."default" NOT NULL,
+    create_at     timestamp without time zone,
+    CONSTRAINT    comment_on_pkey PRIMARY KEY (user_id, project_id, xml_file_link)
+)
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.comment_on
+    OWNER to postgres;
+
+-- Table: public.evaluated_result
+
+-- DROP TABLE IF EXISTS public.evaluated_result;
 
 CREATE TABLE IF NOT EXISTS public.evaluated_result
 (
-    xml_file_link character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    project_id    integer                                             NOT NULL,
-    result        jsonb,
-    CONSTRAINT evaluated_result_pkey PRIMARY KEY (xml_file_link, project_id),
+    id                 serial,
+    xml_file_link      character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    project_id         integer                                             NOT NULL,
+    name               character varying(100) COLLATE pg_catalog."default" NOT NULL UNIQUE,
+    result             jsonb,
+    description        character varying COLLATE pg_catalog."default",
+    project_start_time timestamp without time zone NOT NULL,
+    base_time_unit     double precision NOT NULL,
+    base_currency_unit character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    create_at          timestamp without time zone,
+    CONSTRAINT evaluated_result_pkey PRIMARY KEY (xml_file_link, project_id, name),
     CONSTRAINT evaluated_result_xml_file_link_key UNIQUE (xml_file_link)
 )
     TABLESPACE pg_default;
@@ -81,6 +123,7 @@ ALTER TABLE IF EXISTS public.evaluated_result
 
 CREATE TABLE IF NOT EXISTS public.history_image
 (
+    id            serial,
     xml_file_link character varying(255) COLLATE pg_catalog."default" NOT NULL,
     project_id    integer                                             NOT NULL,
     save_at       timestamp without time zone                         NOT NULL,
@@ -96,39 +139,44 @@ CREATE TABLE IF NOT EXISTS public.history_image
 ALTER TABLE IF EXISTS public.history_image
     OWNER to postgres;
 
-ALTER TABLE IF EXISTS public.project
-    ADD CONSTRAINT project_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES public.bpe_user (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION;
-
 ALTER TABLE IF EXISTS public.bpmn_file
     ADD CONSTRAINT bpmn_file_project_id_fkey FOREIGN KEY (project_id)
         REFERENCES public.project (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
 
-ALTER TABLE IF EXISTS public.evaluated_result
-    ADD CONSTRAINT evaluated_result_project_id_fkey FOREIGN KEY (project_id)
+ALTER TABLE IF EXISTS public.work_on
+    ADD CONSTRAINT work_on_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.work_on
+    ADD CONSTRAINT work_on_project_id_fkey FOREIGN KEY (project_id)
         REFERENCES public.project (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
 
+ALTER TABLE IF EXISTS public.comment_on
+    ADD CONSTRAINT comment_on_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.comment_on
+    ADD CONSTRAINT comment_on_project_id_fkey FOREIGN KEY (project_id, xml_file_link)
+        REFERENCES public.bpmn_file (project_id, xml_file_link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
 ALTER TABLE IF EXISTS public.evaluated_result
-    ADD CONSTRAINT evaluated_result_xml_file_link_fkey FOREIGN KEY (xml_file_link)
-        REFERENCES public.bpmn_file (xml_file_link) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION;
-
-
-ALTER TABLE IF EXISTS public.history_image
-    ADD CONSTRAINT history_image_project_id_fkey FOREIGN KEY (project_id)
-        REFERENCES public.project (id) MATCH SIMPLE
+    ADD CONSTRAINT evaluated_result_project_id_fkey FOREIGN KEY (project_id, xml_file_link)
+        REFERENCES public.bpmn_file (project_id, xml_file_link) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
 
 ALTER TABLE IF EXISTS public.history_image
-    ADD CONSTRAINT history_image_xml_file_link_fkey FOREIGN KEY (xml_file_link)
-        REFERENCES public.bpmn_file (xml_file_link) MATCH SIMPLE
+    ADD CONSTRAINT history_image_xml_file_link_fkey FOREIGN KEY (project_id, xml_file_link)
+        REFERENCES public.bpmn_file (project_id, xml_file_link) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;

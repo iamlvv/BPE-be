@@ -1,4 +1,4 @@
-from usecase.evaluate.utils import Element
+from ..utils import Element
 
 
 class BaseElement:

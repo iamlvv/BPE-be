@@ -1,5 +1,5 @@
-from usecase.evaluate.elements.base_element import BaseElement
-from usecase.evaluate.utils import Element
+from .base_element import BaseElement
+from ..utils import Element
 
 
 class Node(BaseElement):

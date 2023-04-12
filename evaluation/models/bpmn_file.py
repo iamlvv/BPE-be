@@ -1,13 +1,9 @@
-from datetime import datetime
-from django.db import models
-from django.http import JsonResponse
-import uuid
+from .utils import *
 
 
 class BPMNFile(models.Model):
-    xml_file_link = models.CharField(
-        unique=True, max_length=500, primary_key=True)
-    project_id = models.IntegerField(unique=True)
+    xml_file_link = models.CharField(max_length=255)
+    project_id = models.BigIntegerField()
     version = models.CharField(max_length=10)
     last_saved = models.DateTimeField(auto_now_add=True)
 

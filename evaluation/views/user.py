@@ -1,4 +1,4 @@
-from evaluation.views.utils import *
+from .utils import *
 
 
 class UserView:
@@ -12,31 +12,24 @@ class UserView:
             email = body["email"]
             phone = body["phone"]
             avatar = body["avatar"]
-            if not User.check_exist(email):
-                User.create(password, email, name, phone, avatar)
-                return HttpResponse("Signup successfully")
-            else:
-                return HttpResponse("Account exist")
+            return HttpResponse(UserUsecase.signup(password, email, name, phone, avatar))
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_401_UNAUTHORIZED, content_type="text")
 
     @staticmethod
     @api_view(['GET'])
     def get_all(request):
-        data = list(User.objects.values())
+        data = UserUsecase.get_all()
         return JsonResponse(data, safe=False)
 
     @staticmethod
     @api_view(['GET'])
     def get(request):
-        if "Authorization" in request.headers:
-            try:
-                token = request.headers["Authorization"]
-                user = User.get(token.split()[1])
-                return Response(model_to_dict(user))
-            except Exception as e:
-                return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
-        return HttpResponse("token invalid", status=status.HTTP_401_UNAUTHORIZED, content_type="text")
+        try:
+            user = UserUsecase.get(get_token(request))
+            return Response(user)
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
 
     @staticmethod
     @api_view(['POST'])
@@ -45,10 +38,7 @@ class UserView:
             body = load_request_body(request)
             password = body["password"]
             email = body["email"]
-            result = User.login(email, password)
-            if result == "":
-                return HttpResponse("Username or password is incorrect",
-                                    status=status.HTTP_401_UNAUTHORIZED, content_type='text')
+            result = UserUsecase.signin(email, password)
             return HttpResponse(result, content_type='text')
         except Exception as e:
-            return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
+            return HttpResponse("Username or password is incorrect", status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")

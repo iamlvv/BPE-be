@@ -1,5 +1,5 @@
-from usecase.evaluate.elements.node import Node
-from usecase.evaluate.utils import Element, EventType
+from .node import Node
+from ..utils import Element, EventType
 
 
 class Event(Node):
