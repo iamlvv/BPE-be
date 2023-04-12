@@ -37,7 +37,8 @@ class TimerEvent(Event):
 
     def __init__(self, element: Element):
         super().__init__(element)
-        self.time_duration = element.timeDuration
+        self.time_duration = element.timeDuration if hasattr(
+            element, "timeDuration") else 0
         self.unit_cost = 0
 
     def accept(self, t, c, r):

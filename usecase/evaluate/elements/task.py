@@ -8,7 +8,8 @@ class Task(Activity):
 
     def __init__(self, element: Element):
         super().__init__(element)
-        self.cycle_time = element.cycleTime
+        self.cycle_time = element.cycleTime if hasattr(
+            element, "cycleTime") else 0
         self.unit_cost = 0
 
 

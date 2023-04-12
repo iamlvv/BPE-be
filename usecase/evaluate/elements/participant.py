@@ -14,7 +14,8 @@ class Lane(BaseElement):
         self.node = []
         self.number_of_tasks = element.numberOfTasks if hasattr(
             element, "numberOfTasks") else 0
-        self.unit_cost = element.unitCost
+        self.unit_cost = element.unitCost if hasattr(
+            element, "unitCost") else 0
 
     def accept(self, t, c, r):
         return t.visit_for_Lane(self, c, r)

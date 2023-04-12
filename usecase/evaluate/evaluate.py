@@ -116,10 +116,12 @@ class ProcessDirector:
 class Collaboration:
     participants: list
     result: list
+    node: list
 
     def __init__(self, element: Element):
         self.participants = []
         self.result = []
+        self.node = []
 
 
 class Evaluate:
