@@ -75,3 +75,27 @@ class WorkOn(models.Model):
             return result.role == Role.OWNER.value
         except Exception:
             return False
+
+    @classmethod
+    def can_edit(self, user_id, project_id):
+        try:
+            result = self.objects.get(user_id=user_id, project_id=project_id)
+            return result.role in [Role.OWNER.value, Role.CAN_EDIT.value]
+        except Exception:
+            return False
+
+    @classmethod
+    def can_share(self, user_id, project_id):
+        try:
+            result = self.objects.get(user_id=user_id, project_id=project_id)
+            return result.role in [Role.OWNER.value, Role.CAN_EDIT.value, Role.CAN_SHARE.value]
+        except Exception:
+            return False
+
+    @classmethod
+    def can_view(self, user_id, project_id):
+        try:
+            result = self.objects.get(user_id=user_id, project_id=project_id)
+            return result.role in [Role.OWNER.value, Role.CAN_EDIT.value, Role.CAN_SHARE.value, Role.CAN_VIEW.value]
+        except Exception:
+            return False
