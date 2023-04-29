@@ -66,3 +66,61 @@ class BPMNFileView:
             return JsonResponse(versions, safe=False)
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['POST'])
+    def comment(request):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            body = load_request_body(request)
+            BPMNFileUsecase.comment(
+                user_id, body['projectID'], body['xmlFileLink'], body['content'])
+            return HttpResponse("Comment successfully")
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['PUT'])
+    def edit_comment(request):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            body = load_request_body(request)
+            BPMNFileUsecase.edit_comment(
+                user_id, body['projectID'], body['xmlFileLink'], body['id'], body['content'])
+            return HttpResponse("Edit successfully")
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['DELETE'])
+    def delete_comment(request):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            body = load_request_body(request)
+            BPMNFileUsecase.delete_comment(
+                user_id, body['projectID'], body['xmlFileLink'], body['id'])
+            return HttpResponse("Delete successfully")
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['POST'])
+    def get_comment_by_bpmn_file(request):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            body = load_request_body(request)
+            data = BPMNFileUsecase.get_comment_by_bpmn_file(
+                user_id, body['projectID'], body['xmlFileLink'])
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['POST'])
+    def get_comment_by_user(request):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            data = BPMNFileUsecase.get_comment_by_user(user_id)
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")

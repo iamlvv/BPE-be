@@ -13,6 +13,11 @@ urlpatterns_bpmn_file = [
          BPMNFileView.delete_version),
     path('bpmnfile/<int:project_id>/<str:version>/delete_oldest',
          BPMNFileView.delete_oldest_version),
+    path('bpmnfile/comment', BPMNFileView.get_comment_by_bpmn_file),
+    path('bpmnfile/comment/add', BPMNFileView.comment),
+    path('bpmnfile/comment/edit', BPMNFileView.edit_comment),
+    path('bpmnfile/comment/delete', BPMNFileView.delete_comment),
+    path('bpmnfile/comment/user', BPMNFileView.get_comment_by_user),
 ]
 
 urlpatterns_bpmn_file = format_suffix_patterns(urlpatterns_bpmn_file)

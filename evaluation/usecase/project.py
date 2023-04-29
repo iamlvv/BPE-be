@@ -6,7 +6,7 @@ from evaluation.models.user import User
 class ProjectUsecase:
     @classmethod
     def create(cls, document, name, user_id):
-        project_id = Project.create(document, name, user_id)
+        project_id = Project.create(document, name)
         WorkOn.insert(user_id, project_id, 0)
 
     @classmethod
@@ -38,8 +38,8 @@ class ProjectUsecase:
 
     @classmethod
     def get_all_user_by_project_id(self, project_id):
-        user_ids = WorkOn.get_all_user_id_by_project_id(project_id)
-        return list(User.objects.filter(id__in=user_ids).values('name', 'phone', 'avatar'))
+        users = WorkOn.get_all_user_id_by_project_id(project_id)
+        return users
 
     @classmethod
     def grant_permission(self, current_id, user_id, project_id, role):

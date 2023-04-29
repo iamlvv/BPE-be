@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS public.comment_on
     xml_file_link character varying(255) COLLATE pg_catalog."default" NOT NULL,
     content       character varying COLLATE pg_catalog."default" NOT NULL,
     create_at     timestamp without time zone,
-    CONSTRAINT    comment_on_pkey PRIMARY KEY (user_id, project_id, xml_file_link)
+    CONSTRAINT    comment_on_pkey PRIMARY KEY (id, user_id, project_id, xml_file_link)
 )
     TABLESPACE pg_default;
 
