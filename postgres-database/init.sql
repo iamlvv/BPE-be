@@ -4,12 +4,13 @@
 
 CREATE TABLE IF NOT EXISTS public.bpe_user
 (
-    id       serial,
-    password character varying(100) COLLATE pg_catalog."default",
-    email    character varying(25) COLLATE pg_catalog."default" NOT NULL,
-    name     character varying(25) COLLATE pg_catalog."default" NOT NULL,
-    phone    character(10) COLLATE pg_catalog."default",
-    avatar   character varying(50) COLLATE pg_catalog."default",
+    id        serial,
+    password  character varying(100) COLLATE pg_catalog."default",
+    email     character varying(25) COLLATE pg_catalog."default" NOT NULL,
+    name      character varying(25) COLLATE pg_catalog."default" NOT NULL,
+    phone     character(10) COLLATE pg_catalog."default",
+    avatar    character varying(50) COLLATE pg_catalog."default",
+    verified  boolean,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email),
     CONSTRAINT users_phone_key UNIQUE (phone)

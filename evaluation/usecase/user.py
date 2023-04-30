@@ -1,4 +1,6 @@
 from evaluation.models.user import User
+from evaluation.email.email import Email
+from threading import Thread
 from evaluation.auth.jwt import *
 from .utils import *
 
@@ -6,7 +8,7 @@ from .utils import *
 class UserUsecase:
     @classmethod
     def create(self, password, email, name, phone, avatar):
-        User.create(hash_password(password), email, name, phone, avatar)
+        return User.create(hash_password(password), email, name, phone, avatar)
 
     @classmethod
     def signin(self, email, password):
@@ -20,10 +22,19 @@ class UserUsecase:
     @classmethod
     def signup(self, password, email, name, phone, avatar):
         if not UserUsecase.check_exist(email):
-            UserUsecase.create(password, email, name, phone, avatar)
+            id = UserUsecase.create(password, email, name, phone, avatar)
+            Thread(target=Email.verify_account, args=(email, name, encode({
+                "id": id,
+                "email": email,
+                "password": password
+            }))).start()
             return "Signup successfully"
         else:
             return "Account exist"
+
+    @classmethod
+    def verify(self, email):
+        User.verify(email)
 
     @classmethod
     def get(self, token):

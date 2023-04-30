@@ -14,3 +14,9 @@ def get_id_from_token(jwt_string):
     result = jwt.decode(jwt_string, os.environ.get(
         "SECRET"), algorithms="HS256")
     return result["id"]
+
+
+def get_email_from_token(jwt_string):
+    result = jwt.decode(jwt_string, os.environ.get(
+        "SECRET"), algorithms="HS256")
+    return result["email"]

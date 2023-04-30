@@ -8,6 +8,7 @@ class User(models.Model):
     name = models.CharField(max_length=25)
     phone = models.CharField(max_length=10, unique=True, null=True)
     avatar = models.CharField(max_length=50)
+    verified = models.BooleanField()
 
     class Meta:
         db_table = "bpe_user"
@@ -15,12 +16,26 @@ class User(models.Model):
     @classmethod
     def create(self, hash_password, email, name, phone, avatar):
         user = self(password=hash_password, email=email,
-                    name=name, phone=phone, avatar=avatar)
+                    name=name, phone=phone, avatar=avatar, verified=False)
         user.save()
+        return user.id
+
+    @classmethod
+    def verify(self, email):
+        obj = self.objects.filter(email=email)
+        if len(obj) == 0:
+            raise Exception("Email doesn't exist")
+        obj.update(verified=True)
 
     @classmethod
     def get(self, email, hash_password):
-        result = self.objects.get(email=email, password=hash_password)
+        try:
+            result = self.objects.get(
+                email=email, password=hash_password)
+        except:
+            raise Exception('Email or password is incorrect')
+        if result.verified == False:
+            raise Exception('Your account has not been verified')
         return result
 
     @classmethod

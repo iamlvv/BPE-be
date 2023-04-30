@@ -5,6 +5,7 @@ from evaluation.views.user import UserView
 
 urlpatterns_user = [
     path('user', UserView.get),
+    path('user/verify/<str:token>', UserView.verify),
     path('user/signup', UserView.signup),
     path('user/all', UserView.get_all),
     path('user/signin', UserView.signin),
