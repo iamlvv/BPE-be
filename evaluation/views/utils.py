@@ -8,6 +8,7 @@ from evaluation.usecase.project import ProjectUsecase
 from evaluation.usecase.user import UserUsecase
 from evaluation.usecase.bpmn_file import BPMNFileUsecase
 from evaluation.usecase.evaluate_result import EvaluatedResultUsercase
+from evaluation.usecase.image import ImageUsecase
 from django.core.files.storage import FileSystemStorage
 from rest_framework import status
 from django.core import serializers

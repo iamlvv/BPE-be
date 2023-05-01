@@ -18,6 +18,8 @@ urlpatterns_bpmn_file = [
     path('bpmnfile/comment/edit', BPMNFileView.edit_comment),
     path('bpmnfile/comment/delete', BPMNFileView.delete_comment),
     path('bpmnfile/comment/user', BPMNFileView.get_comment_by_user),
+    path('bpmnfile/image', BPMNFileView.get_image_by_bpmn_file),
+    path('bpmnfile/image/add', BPMNFileView.add_image),
 ]
 
 urlpatterns_bpmn_file = format_suffix_patterns(urlpatterns_bpmn_file)

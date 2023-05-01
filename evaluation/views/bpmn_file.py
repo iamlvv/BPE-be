@@ -8,7 +8,7 @@ class BPMNFileView:
         try:
             user_id = get_id_from_token(get_token(request))
             file = request.FILES['file']
-            xml_file_link = request.POST['xml_file_link']
+            xml_file_link = request.POST['xmlFileLink']
             BPMNFileUsecase.save(xml_file_link, file,
                                  user_id, project_id, version)
             return HttpResponse("Save successfully")
@@ -122,5 +122,34 @@ class BPMNFileView:
             user_id = get_id_from_token(get_token(request))
             data = BPMNFileUsecase.get_comment_by_user(user_id)
             return JsonResponse(data, safe=False)
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['POST'])
+    def get_image_by_bpmn_file(request):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            body = load_request_body(request)
+            for i in ["projectID", "xmlFileLink"]:
+                if i not in body:
+                    raise Exception("projectID and xmlFileLink are required")
+            data = ImageUsecase.get_image_by_bpmn_file(
+                user_id, body["projectID"], body["xmlFileLink"])
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['POST'])
+    def add_image(request):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            file = request.FILES['file']
+            project_id = request.POST['projectID']
+            xml_file_link = request.POST['xmlFileLink']
+            ImageUsecase.insert_image(
+                user_id, project_id, xml_file_link, file)
+            return HttpResponse("Create successfully")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")

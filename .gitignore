@@ -11,4 +11,4 @@ venv
 
 .idea/
 
-static/*.bpmn
+static/*/

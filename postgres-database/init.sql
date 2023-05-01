@@ -110,8 +110,7 @@ CREATE TABLE IF NOT EXISTS public.evaluated_result
     base_time_unit     double precision NOT NULL,
     base_currency_unit character varying(10) COLLATE pg_catalog."default" NOT NULL,
     create_at          timestamp without time zone,
-    CONSTRAINT evaluated_result_pkey PRIMARY KEY (xml_file_link, project_id, name),
-    CONSTRAINT evaluated_result_xml_file_link_key UNIQUE (xml_file_link)
+    CONSTRAINT evaluated_result_pkey PRIMARY KEY (xml_file_link, project_id, name)
 )
     TABLESPACE pg_default;
 
@@ -129,9 +128,7 @@ CREATE TABLE IF NOT EXISTS public.history_image
     project_id    integer                                             NOT NULL,
     save_at       timestamp without time zone                         NOT NULL,
     image_link    character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT history_image_pkey PRIMARY KEY (xml_file_link, project_id, save_at, image_link),
-    CONSTRAINT history_image_project_id_key UNIQUE (project_id),
-    CONSTRAINT history_image_xml_file_link_key UNIQUE (xml_file_link)
+    CONSTRAINT history_image_pkey PRIMARY KEY (id, xml_file_link, project_id, save_at)
 )
     TABLESPACE pg_default;
 

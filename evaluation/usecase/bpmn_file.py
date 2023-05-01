@@ -11,7 +11,7 @@ class BPMNFileUsecase:
     def save(self, xml_file_link, file, user_id, project_id, version):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
-        FileIO.save(xml_file_link, file)
+        FileIO.save_bpmn_file(xml_file_link, file)
         BPMNFile.update_version(project_id, version)
 
     @classmethod
@@ -21,7 +21,8 @@ class BPMNFileUsecase:
         if len(BPMNFile.get_by_project(project_id)) == 5:
             raise Exception("current number of versions is equal to 5")
         version = str(uuid.uuid1())[:8]
-        xml_file_link = FileIO.create(file, version + '_' + file.name)
+        xml_file_link = FileIO.create_bpmn_file(
+            file, version + '_' + file.name)
 
         BPMNFile.create(xml_file_link, project_id, version)
 
@@ -62,7 +63,7 @@ class BPMNFileUsecase:
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
         xml_link = BPMNFile.delete(project_id, version)
-        FileIO.delete(xml_link)
+        FileIO.delete_bpmn_file(xml_link)
 
     @classmethod
     def delete_oldest_version(self, user_id, project_id):
