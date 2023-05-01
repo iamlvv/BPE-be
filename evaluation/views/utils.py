@@ -28,7 +28,10 @@ class BPEResponse:
 
 
 def load_request_body(request):
-    body_unicode = request.body.decode('utf-8')
+    try:
+        body_unicode = request.body.decode('utf-8')
+    except:
+        raise Exception('body required')
     body = json.loads(body_unicode)
     return body
 
