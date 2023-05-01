@@ -9,7 +9,7 @@ class UserView:
             body = load_request_body(request)
             for i in ["email", "password", "name"]:
                 if i not in body:
-                    raise Exception('Email, password and name are required')
+                    raise Exception(i + " required")
             email = body["email"]
             password = body["password"]
             name = body["name"]
@@ -36,7 +36,8 @@ class UserView:
             body = load_request_body(request)
             if "email" not in body:
                 raise Exception('email required')
-            UserUsecase.resend_email(body["email"])
+            email = body['email']
+            UserUsecase.resend_email(email)
             return HttpResponse("Resend successfully")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
@@ -61,6 +62,9 @@ class UserView:
     def signin(request):
         try:
             body = load_request_body(request)
+            for i in ["email", "password"]:
+                if i not in body:
+                    raise Exception(i + " required")
             password = body["password"]
             email = body["email"]
             result = UserUsecase.signin(email, password)

@@ -8,7 +8,11 @@ class ProjectView:
         try:
             body = load_request_body(request)
             user_id = get_id_from_token(get_token(request))
-            ProjectUsecase.create(body["document"], body["name"], user_id)
+            if "name" not in body:
+                raise Exception('name required')
+            name = body["name"]
+            document = body["document"] if "document" in body else ""
+            ProjectUsecase.create(document, name, user_id)
             return HttpResponse("Insert successfully")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
@@ -52,7 +56,10 @@ class ProjectView:
         try:
             user_id = get_id_from_token(get_token(request))
             body = load_request_body(request)
-            return HttpResponse(ProjectUsecase.update_document(user_id, project_id, body['document']), status=status.HTTP_200_OK, content_type="text")
+            if "document" not in body:
+                raise Exception("document required")
+            document = body["document"]
+            return HttpResponse(ProjectUsecase.update_document(user_id, project_id, document), status=status.HTTP_200_OK, content_type="text")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
 
@@ -70,9 +77,12 @@ class ProjectView:
         try:
             user_id = get_id_from_token(get_token(request))
             body = load_request_body(request)
-            if "user_id" not in body or "role" not in body:
-                return HttpResponse("bad request", status=status.HTTP_400_BAD_REQUEST, content_type="text")
-            return HttpResponse(ProjectUsecase.update_permission(user_id, body["user_id"], project_id, body["role"]), status=status.HTTP_200_OK, content_type="text")
+            for i in ["user_id", "role"]:
+                if i not in body:
+                    raise Exception(i + " required")
+            user_ids = body["user_id"]
+            role = body["role"]
+            return HttpResponse(ProjectUsecase.update_permission(user_id, user_ids, project_id, role), status=status.HTTP_200_OK, content_type="text")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
 
@@ -94,8 +104,12 @@ class ProjectView:
         try:
             user_id = get_id_from_token(get_token(request))
             body = load_request_body(request)
-            if "user_id" not in body or "role" not in body:
-                return HttpResponse("bad request", status=status.HTTP_400_BAD_REQUEST, content_type="text")
-            return HttpResponse(ProjectUsecase.grant_permission(user_id, body["user_id"], project_id, body["role"]), status=status.HTTP_200_OK, content_type="text")
+            body = load_request_body(request)
+            for i in ["user_id", "role"]:
+                if i not in body:
+                    raise Exception(i + " required")
+            user_ids = body["user_id"]
+            role = body["role"]
+            return HttpResponse(ProjectUsecase.grant_permission(user_id, user_ids, project_id, role), status=status.HTTP_200_OK, content_type="text")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
