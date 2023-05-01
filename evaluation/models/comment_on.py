@@ -5,7 +5,7 @@ class CommentOn(models.Model):
     id = models.BigAutoField(primary_key=True)
     user_id = models.BigIntegerField()
     project_id = models.BigIntegerField()
-    xml_file_link = models.CharField(max_length=255)
+    xml_file_link = models.TextField()
     content = models.TextField()
     create_at = models.DateTimeField(auto_now_add=True)
 

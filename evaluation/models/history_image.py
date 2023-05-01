@@ -5,9 +5,9 @@ from django.db.models import Min, Max
 class HistoryImage(models.Model):
     id = models.BigAutoField(primary_key=True)
     project_id = models.BigIntegerField()
-    xml_file_link = models.CharField(max_length=255)
+    xml_file_link = models.TextField()
     save_at = models.DateTimeField(auto_now_add=True)
-    image_link = models.CharField(max_length=255)
+    image_link = models.TextField()
 
     class Meta:
         db_table = "history_image"

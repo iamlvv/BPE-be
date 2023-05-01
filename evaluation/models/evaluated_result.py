@@ -2,9 +2,9 @@ from .utils import *
 
 
 class EvaluatedResult(models.Model):
-    xml_file_link = models.CharField(max_length=255)
+    xml_file_link = models.TextField()
     project_id = models.BigIntegerField()
-    name = models.CharField(max_length=100, null=False, primary_key=True)
+    name = models.CharField(max_length=200, null=False, primary_key=True)
     result = models.JSONField()
     description = models.TextField()
     project_start_time = models.DateTimeField()

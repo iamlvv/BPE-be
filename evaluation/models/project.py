@@ -5,7 +5,7 @@ from .work_on import WorkOn
 class Project(models.Model):
     id = models.BigAutoField(primary_key=True)
     document = models.TextField()
-    name = models.CharField(max_length=25)
+    name = models.CharField(max_length=200)
     is_delete = models.BooleanField(default=False)
     create_at = models.DateTimeField(auto_now_add=True)
 

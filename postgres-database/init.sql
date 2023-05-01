@@ -5,11 +5,11 @@
 CREATE TABLE IF NOT EXISTS public.bpe_user
 (
     id        serial,
-    password  character varying(100) COLLATE pg_catalog."default",
-    email     character varying(25) COLLATE pg_catalog."default" NOT NULL,
-    name      character varying(25) COLLATE pg_catalog."default" NOT NULL,
+    password  character varying(200) COLLATE pg_catalog."default",
+    email     character varying COLLATE pg_catalog."default" NOT NULL,
+    name      character varying(200) COLLATE pg_catalog."default" NOT NULL,
     phone     character(10) COLLATE pg_catalog."default",
-    avatar    character varying(50) COLLATE pg_catalog."default",
+    avatar    character varying COLLATE pg_catalog."default",
     verified  boolean,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email),
@@ -28,11 +28,10 @@ CREATE TABLE IF NOT EXISTS public.project
 (
     id        serial,
     document  character varying COLLATE pg_catalog."default",
-    name      character varying(25) COLLATE pg_catalog."default" NOT NULL,
+    name      character varying(200) COLLATE pg_catalog."default" NOT NULL,
     is_delete boolean,
     create_at timestamp without time zone,
     CONSTRAINT project_pkey PRIMARY KEY (id),
-    CONSTRAINT project_name_key UNIQUE (name)
 )
     TABLESPACE pg_default;
 
@@ -63,7 +62,7 @@ ALTER TABLE IF EXISTS public.work_on
 CREATE TABLE IF NOT EXISTS public.bpmn_file
 (
     id            serial,
-    xml_file_link character varying(255) COLLATE pg_catalog."default" NOT NULL UNIQUE,
+    xml_file_link character varying COLLATE pg_catalog."default" NOT NULL UNIQUE,
     project_id    integer                                             NOT NULL,
     version       varchar(10),
     last_saved    timestamp without time zone,
@@ -84,7 +83,7 @@ CREATE TABLE IF NOT EXISTS public.comment_on
     id            serial,
     user_id       integer NOT NULL,
     project_id    integer NOT NULL,
-    xml_file_link character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    xml_file_link character varying COLLATE pg_catalog."default" NOT NULL,
     content       character varying COLLATE pg_catalog."default" NOT NULL,
     create_at     timestamp without time zone,
     CONSTRAINT    comment_on_pkey PRIMARY KEY (id, user_id, project_id, xml_file_link)
@@ -101,9 +100,9 @@ ALTER TABLE IF EXISTS public.comment_on
 CREATE TABLE IF NOT EXISTS public.evaluated_result
 (
     id                 serial,
-    xml_file_link      character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    xml_file_link      character varying COLLATE pg_catalog."default" NOT NULL,
     project_id         integer                                             NOT NULL,
-    name               character varying(100) COLLATE pg_catalog."default" NOT NULL UNIQUE,
+    name               character varying(200) COLLATE pg_catalog."default" NOT NULL UNIQUE,
     result             jsonb,
     description        character varying COLLATE pg_catalog."default",
     project_start_time timestamp without time zone NOT NULL,
@@ -124,10 +123,10 @@ ALTER TABLE IF EXISTS public.evaluated_result
 CREATE TABLE IF NOT EXISTS public.history_image
 (
     id            serial,
-    xml_file_link character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    xml_file_link character varying COLLATE pg_catalog."default" NOT NULL,
     project_id    integer                                             NOT NULL,
     save_at       timestamp without time zone                         NOT NULL,
-    image_link    character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    image_link    character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT history_image_pkey PRIMARY KEY (id, xml_file_link, project_id, save_at)
 )
     TABLESPACE pg_default;

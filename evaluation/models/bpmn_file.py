@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class BPMNFile(models.Model):
-    xml_file_link = models.CharField(max_length=255)
+    xml_file_link = models.TextField()
     project_id = models.BigIntegerField()
     version = models.CharField(max_length=10)
     last_saved = models.DateTimeField(auto_now_add=True)

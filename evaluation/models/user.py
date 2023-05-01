@@ -3,15 +3,17 @@ from .utils import *
 
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
-    password = models.CharField(max_length=100, null=False)
-    email = models.CharField(max_length=25, unique=True)
-    name = models.CharField(max_length=25)
+    password = models.CharField(max_length=200, null=False)
+    email = models.TextField()
+    name = models.CharField(max_length=200)
     phone = models.CharField(max_length=10, unique=True, null=True)
-    avatar = models.CharField(max_length=50)
+    avatar = models.TextField()
     verified = models.BooleanField()
 
     class Meta:
         db_table = "bpe_user"
+        unique_together = (
+            ('email', 'phone'),)
 
     @classmethod
     def create(self, hash_password, email, name, phone, avatar):
