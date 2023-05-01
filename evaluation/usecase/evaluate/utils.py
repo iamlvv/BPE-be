@@ -72,6 +72,8 @@ class Result:
     handledTasks: int
     unHandledTasks: int
     exceptionHandling: float
+    steps: list
+
 
     def __init__(self):
         self.name = ""
@@ -88,21 +90,6 @@ class Result:
         self.handledTasks = 0
         self.unHandledTasks = 0
         self.exceptionHandling = 0.0
+        self.steps = []
 
 
-class EventType(Enum):
-    START_EVENT = 0
-    END_EVENT = 1
-    IMPLICIT_THROW_EVENT = 2
-    INTERMIDIATE_THROW_EVENT = 3
-    INTERMIDIATE_CATCH_EVENT = 4
-    BOUNDARY_EVENT = 5
-
-
-class TaskType(Enum):
-    NONE_TASK = 0
-    SERVICE_TASK = 1
-    MANUAL_TASK = 2
-    SCRIPT_TASK = 3
-    BUSINESS_TASK = 4
-    USER_TASK = 5

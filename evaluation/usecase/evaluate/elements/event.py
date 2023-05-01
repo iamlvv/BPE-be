@@ -1,6 +1,6 @@
 from .node import Node
-from ..utils import Element, EventType
-
+from ..constant import EventType
+from ..utils import Element
 
 class Event(Node):
     event_type: EventType
