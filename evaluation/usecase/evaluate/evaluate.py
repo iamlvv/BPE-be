@@ -137,8 +137,8 @@ class Evaluate:
             p.accept(t, c, r)
             if r.handledTasks + r.unHandledTasks > 0:
                 r.exceptionHandling = r.handledTasks / \
-                    (r.handledTasks +
-                     r.unHandledTasks)
+                                      (r.handledTasks +
+                                       r.unHandledTasks)
             if r.totalTasks > 0:
                 r.flexibility = r.numberOfOptionalTasks / r.totalTasks
             if r.total_loop == 0:

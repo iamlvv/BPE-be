@@ -7,6 +7,8 @@ class Lane(BaseElement):
     node: list
     number_of_tasks: int
     unit_cost: float
+    is_visited: bool
+
 
     def __init__(self, element: Element):
         super().__init__(element)
@@ -16,6 +18,7 @@ class Lane(BaseElement):
             element, "numberOfTasks") else 0
         self.unit_cost = element.unitCost if hasattr(
             element, "unitCost") else 0
+        self.is_visited = False
 
     def accept(self, t, c, r):
         return t.visit_for_Lane(self, c, r)

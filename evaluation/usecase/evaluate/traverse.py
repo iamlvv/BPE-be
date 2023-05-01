@@ -274,6 +274,17 @@ class Traverse:
 
     def visit_for_Lane(self, e: Lane, c: Context, r: Result):
         print("Visit lane", e.name)
+
+        # Add unit cost of each lane to final result
+        if not e.is_visited:
+            r.unitCost.append(
+                {
+                    "lane": e.name,
+                    "cost": e.unit_cost
+                }
+            )
+            e.is_visited = True
+
         for esp in e.event_sub_process:
             self.visit(esp, c, r)
         r.totalCycleTime = 0
@@ -299,6 +310,13 @@ class Traverse:
                 self.visit(esp, c, r)
             for n in e.node:
                 self.visit(n, c, r)
+
+            r.unitCost.append(
+                {
+                    "lane": e.name,
+                    "cost": e.unit_cost
+                }
+            )
 
             r.transparency[e.id] = {
                 "view": e.name,
