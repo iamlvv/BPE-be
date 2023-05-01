@@ -4,16 +4,14 @@ from .utils import *
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
     password = models.CharField(max_length=200, null=False)
-    email = models.TextField()
+    email = models.TextField(unique=True)
     name = models.CharField(max_length=200)
-    phone = models.CharField(max_length=10, unique=True, null=True)
+    phone = models.CharField(max_length=10, null=True)
     avatar = models.TextField()
     verified = models.BooleanField()
 
     class Meta:
         db_table = "bpe_user"
-        unique_together = (
-            ('email', 'phone'),)
 
     @classmethod
     def create(self, hash_password, email, name, phone, avatar):

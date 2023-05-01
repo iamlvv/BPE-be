@@ -12,8 +12,7 @@ CREATE TABLE IF NOT EXISTS public.bpe_user
     avatar    character varying COLLATE pg_catalog."default",
     verified  boolean,
     CONSTRAINT users_pkey PRIMARY KEY (id),
-    CONSTRAINT users_email_key UNIQUE (email),
-    CONSTRAINT users_phone_key UNIQUE (phone)
+    CONSTRAINT users_email_key UNIQUE (email)
 )
     TABLESPACE pg_default;
 
