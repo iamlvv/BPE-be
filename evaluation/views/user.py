@@ -25,7 +25,7 @@ class UserView:
         try:
             email = get_email_from_token(token)
             UserUsecase.verify(email)
-            return HttpResponse('Verify successfully<br>Please <a href="http://localhost:5173/login">login</a> to use BPSky')
+            return HttpResponseRedirect("http://localhost:5173/login")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
 

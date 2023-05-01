@@ -13,6 +13,7 @@ from django.core.files.storage import FileSystemStorage
 from rest_framework import status
 from django.core import serializers
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.forms.models import model_to_dict
 from evaluation.auth.jwt import *
 
