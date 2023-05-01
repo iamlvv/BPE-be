@@ -30,6 +30,18 @@ class UserView:
             return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
 
     @staticmethod
+    @api_view(['POST'])
+    def resend_email(request):
+        try:
+            body = load_request_body(request)
+            if "email" not in body:
+                raise Exception('email required')
+            UserUsecase.resend_email(body["email"])
+            return HttpResponse("Resend successfully")
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
+
+    @staticmethod
     @api_view(['GET'])
     def get_all(request):
         data = UserUsecase.get_all()

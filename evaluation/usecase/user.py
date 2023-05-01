@@ -33,6 +33,16 @@ class UserUsecase:
             return "Account exist"
 
     @classmethod
+    def resend_email(self, email):
+        user = User.get_by_email(email)
+        Thread(target=Email.verify_account, args=(email, user.name, encode({
+            "id": user.id,
+            "email": email,
+            "password": user.password
+        }))).start()
+        return "Resend successfully"
+
+    @classmethod
     def verify(self, email):
         User.verify(email)
 

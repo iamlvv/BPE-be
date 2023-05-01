@@ -30,6 +30,17 @@ class User(models.Model):
         obj.update(verified=True)
 
     @classmethod
+    def get_by_email(self, email):
+        try:
+            result = self.objects.get(
+                email=email)
+        except:
+            raise Exception('Email is incorrect')
+        if result.verified:
+            raise Exception('Your account was verified')
+        return result
+
+    @classmethod
     def get(self, email, hash_password):
         try:
             result = self.objects.get(
