@@ -21,3 +21,11 @@ class DocumentFile(models.Model):
     def update(self, document_link):
         self.objects.filter(document_link=document_link).update(
             last_saved=datetime.now())
+
+    @classmethod
+    def get(self, project_id):
+        obj = self.objects.filter(project_id=project_id).values(
+            'project_id', 'document_link', 'last_saved')
+        if len(obj) == 0:
+            raise Exception('project_id incorrect')
+        return list(obj)[0]

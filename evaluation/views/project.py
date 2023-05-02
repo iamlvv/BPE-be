@@ -87,6 +87,16 @@ class ProjectView:
 
     @staticmethod
     @api_view(['GET'])
+    def get_document(request, project_id):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            data = ProjectUsecase.get_document(user_id, project_id)
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['GET'])
     def get_all_user(request, project_id):
         try:
             return JsonResponse(ProjectUsecase.get_all_user_by_project_id(project_id), status=status.HTTP_200_OK, safe=False)

@@ -14,3 +14,7 @@ class DocumentFileUsecase:
     def save(self, document_link, file):
         FileIO.save_md_file(document_link, file)
         DocumentFile.update(document_link)
+
+    @classmethod
+    def get(self, project_id):
+        return DocumentFile.get(project_id)

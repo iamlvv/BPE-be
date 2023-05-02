@@ -49,6 +49,12 @@ class ProjectUsecase:
             raise Exception('permission denied')
 
     @classmethod
+    def get_document(self, user_id, project_id):
+        if not WorkOn.can_view(user_id, project_id):
+            raise Exception('permisstion denied')
+        return DocumentFileUsecase.get(project_id)
+
+    @classmethod
     def get_all_project_by_user_id(self, user_id):
         project_ids = WorkOn.get_all_project_id(user_id)
         return Project.get_all_project_by_project_ids(project_ids)
