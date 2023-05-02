@@ -6,7 +6,10 @@ from evaluation.views.project import ProjectView
 urlpatterns_project = [
     path('project', ProjectView.insert),
     path('project/<int:project_id>', ProjectView.get_project),
-    # path('project/<int:project_id>/document', ProjectView.get_description),
+    path('project/<int:project_id>/name',
+         ProjectView.update_name),
+    path('project/<int:project_id>/description',
+         ProjectView.update_description),
     path('project/<int:project_id>/document/update', ProjectView.update_document),
     path('project/<int:project_id>/user', ProjectView.get_all_user),
     path('project/<int:project_id>/user/grant', ProjectView.grant_user),

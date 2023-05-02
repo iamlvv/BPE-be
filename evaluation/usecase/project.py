@@ -28,9 +28,17 @@ class ProjectUsecase:
     def get_all(cls):
         return Project.get_all()
 
-    # @classmethod
-    # def get_description(self, project_id):
-    #     return Project.get_description(project_id)
+    @classmethod
+    def update_name(self, user_id, project_id, name):
+        if not WorkOn.is_project_owner(user_id, project_id):
+            raise Exception('permisstion denied')
+        Project.update_name(project_id, name)
+
+    @classmethod
+    def update_description(self, user_id, project_id, description):
+        if not WorkOn.is_project_owner(user_id, project_id):
+            raise Exception('permisstion denied')
+        Project.update_description(project_id, description)
 
     @classmethod
     def update_document(self, user_id, project_id, document_link, file):

@@ -32,13 +32,13 @@ class Project(models.Model):
         data = list(Project.objects.values())
         return data
 
-    # @classmethod
-    # def get_description(self, project_id):
-    #     return self.objects.get(id=project_id).description
+    @classmethod
+    def update_name(self, project_id, name):
+        self.objects.filter(id=project_id).update(name=name)
 
-    # @classmethod
-    # def update_description(self, project_id, description):
-    #     self.objects.filter(id=project_id).update(description=description)
+    @classmethod
+    def update_description(self, project_id, description):
+        self.objects.filter(id=project_id).update(description=description)
 
     @classmethod
     def get_all_project_by_project_ids(self, project_ids):

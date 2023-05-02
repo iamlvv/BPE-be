@@ -42,13 +42,33 @@ class ProjectView:
     def get_all(request):
         return JsonResponse(ProjectUsecase.get_all(), status=status.HTTP_200_OK, safe=False)
 
-    # @staticmethod
-    # @api_view(['GET'])
-    # def get_description(request, project_id):
-    #     try:
-    #         return HttpResponse(ProjectUsecase.get_description(project_id), status=status.HTTP_200_OK, content_type="text")
-    #     except Exception as e:
-    #         return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+    @staticmethod
+    @api_view(['PUT'])
+    def update_name(request, project_id):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            body = load_request_body(request)
+            if "name" not in body:
+                raise Exception("name required")
+            name = body['name']
+            ProjectUsecase.update_name(user_id, project_id, name)
+            return HttpResponse("Update successfully", status=status.HTTP_200_OK, content_type="text")
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
+    @api_view(['PUT'])
+    def update_description(request, project_id):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            body = load_request_body(request)
+            if "description" not in body:
+                raise Exception("description required")
+            description = body['description']
+            ProjectUsecase.update_description(user_id, project_id, description)
+            return HttpResponse("Update successfully", status=status.HTTP_200_OK, content_type="text")
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
 
     @staticmethod
     @api_view(['PUT'])
