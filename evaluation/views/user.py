@@ -84,3 +84,16 @@ class UserView:
             return HttpResponse("Send email successfully")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
+
+    @staticmethod
+    @api_view(['GET'])
+    def search(request):
+        try:
+            get_email_from_token(get_token(request))
+            s = request.GET.get('s', '')
+            if s == '':
+                raise Exception('bad request')
+            data = UserUsecase.search(s)
+            return JsonResponse(data, safe=False)
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")

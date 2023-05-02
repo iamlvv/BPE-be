@@ -61,3 +61,9 @@ class User(models.Model):
     @classmethod
     def check_exist(self, email):
         return len(self.objects.filter(email=email)) > 0
+
+    @classmethod
+    def search(self, s):
+        obj = self.objects.filter(email__contains=s).values(
+            'email', 'name', 'avatar')
+        return list(obj)

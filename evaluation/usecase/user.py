@@ -77,3 +77,7 @@ class UserUsecase:
     @classmethod
     def check_exist(self, email):
         return User.check_exist(email)
+
+    @classmethod
+    def search(self, s):
+        return User.search(s)
