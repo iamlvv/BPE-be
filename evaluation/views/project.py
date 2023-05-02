@@ -12,8 +12,8 @@ class ProjectView:
                 raise Exception('name required')
             name = body["name"]
             document = body["document"] if "document" in body else ""
-            ProjectUsecase.create(document, name, user_id)
-            return HttpResponse("Insert successfully")
+            data = ProjectUsecase.create(document, name, user_id)
+            return JsonResponse(data, status=status.HTTP_200_OK)
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
 
