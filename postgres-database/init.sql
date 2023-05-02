@@ -25,16 +25,33 @@ ALTER TABLE IF EXISTS public.bpe_user
 
 CREATE TABLE IF NOT EXISTS public.project
 (
-    id        serial,
-    document  character varying COLLATE pg_catalog."default",
-    name      character varying(200) COLLATE pg_catalog."default" NOT NULL,
-    is_delete boolean,
-    create_at timestamp without time zone,
+    id          serial,
+    description character varying COLLATE pg_catalog."default",
+    name        character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    is_delete   boolean,
+    create_at   timestamp without time zone,
     CONSTRAINT project_pkey PRIMARY KEY (id)
 )
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.project
+    OWNER to postgres;
+
+-- Table: public.document_file
+
+-- DROP TABLE IF EXISTS public.document_file;
+
+CREATE TABLE IF NOT EXISTS public.document_file
+(
+    id            serial,
+    document_link character varying COLLATE pg_catalog."default" NOT NULL UNIQUE,
+    project_id    integer                                             NOT NULL,
+    last_saved    timestamp without time zone,
+    CONSTRAINT document_file_pkey PRIMARY KEY (document_link, project_id)
+)
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.document_file
     OWNER to postgres;
 
 -- Table: public.work_on
@@ -137,6 +154,12 @@ ALTER TABLE IF EXISTS public.history_image
 
 ALTER TABLE IF EXISTS public.bpmn_file
     ADD CONSTRAINT bpmn_file_project_id_fkey FOREIGN KEY (project_id)
+        REFERENCES public.project (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.document_file
+    ADD CONSTRAINT document_file_project_id_fkey FOREIGN KEY (project_id)
         REFERENCES public.project (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;

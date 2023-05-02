@@ -1,4 +1,5 @@
 from django.core.files.storage import FileSystemStorage
+from django.core.files.base import ContentFile
 import os
 
 
@@ -8,7 +9,7 @@ class FileIO:
         fs = FileSystemStorage()
         f = fs.open(path1, 'r')
         fs1 = FileSystemStorage()
-        file_path = 'static/bpmnfile/' + file_name
+        file_path = 'static/' + file_name
         fs1.save(file_path, f)
         return file_path
 
@@ -19,7 +20,7 @@ class FileIO:
         if file.size > 10*1024*1024:
             raise Exception('File size is larger than 10MB are not allowed')
         fs = FileSystemStorage()
-        self.delete_bpmn_file(xml_file_link)
+        self.delete(xml_file_link)
         fs.save(name=xml_file_link, content=file)
 
     @classmethod
@@ -29,12 +30,12 @@ class FileIO:
         if file.size > 10*1024*1024:
             raise Exception('File size is larger than 10MB are not allowed')
         fs = FileSystemStorage()
-        file_path = 'static/bpmnfile/' + file_name
+        file_path = 'static/' + file_name
         fs.save(file_path, file)
         return file_path
 
     @classmethod
-    def delete_bpmn_file(self, link):
+    def delete(self, link):
         fs = FileSystemStorage()
         fs.delete(link)
 
@@ -45,6 +46,23 @@ class FileIO:
         if file.size > 10*1024*1024:
             raise Exception('File size is larger than 10MB are not allowed')
         fs = FileSystemStorage()
-        file_path = 'static/image/' + file_name
+        file_path = 'static/' + file_name
         fs.save(file_path, file)
         return file_path
+
+    @classmethod
+    def create_default_md_file(self, file_name):
+        fs = FileSystemStorage()
+        file_path = 'static/' + file_name
+        fs.save(name=file_path, content=ContentFile(""))
+        return file_path
+
+    @classmethod
+    def save_md_file(self, file_link, new_file):
+        if os.path.splitext(new_file.name)[1] not in [".md"]:
+            raise Exception('Markdown file format is not supported')
+        if new_file.size > 10*1024*1024:
+            raise Exception('File size is larger than 10MB are not allowed')
+        fs = FileSystemStorage()
+        self.delete(file_link)
+        fs.save(name=file_link, content=new_file)

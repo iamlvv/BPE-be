@@ -11,8 +11,8 @@ class ProjectView:
             if "name" not in body:
                 raise Exception('name required')
             name = body["name"]
-            document = body["document"] if "document" in body else ""
-            data = ProjectUsecase.create(document, name, user_id)
+            description = body["description"] if "description" in body else ""
+            data = ProjectUsecase.create(description, name, user_id)
             return JsonResponse(data, status=status.HTTP_200_OK)
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
@@ -42,24 +42,26 @@ class ProjectView:
     def get_all(request):
         return JsonResponse(ProjectUsecase.get_all(), status=status.HTTP_200_OK, safe=False)
 
-    @staticmethod
-    @api_view(['GET'])
-    def get_document(request, project_id):
-        try:
-            return HttpResponse(ProjectUsecase.get_document(project_id), status=status.HTTP_200_OK, content_type="text")
-        except Exception as e:
-            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+    # @staticmethod
+    # @api_view(['GET'])
+    # def get_description(request, project_id):
+    #     try:
+    #         return HttpResponse(ProjectUsecase.get_description(project_id), status=status.HTTP_200_OK, content_type="text")
+    #     except Exception as e:
+    #         return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
 
     @staticmethod
     @api_view(['PUT'])
     def update_document(request, project_id):
         try:
             user_id = get_id_from_token(get_token(request))
-            body = load_request_body(request)
-            if "document" not in body:
-                raise Exception("document required")
-            document = body["document"]
-            return HttpResponse(ProjectUsecase.update_document(user_id, project_id, document), status=status.HTTP_200_OK, content_type="text")
+            if "file" not in request.FILES:
+                raise Exception("file required")
+            if "document_link" not in request.POST:
+                raise Exception("document_link required")
+            file = request.FILES["file"]
+            document_link = request.POST["document_link"]
+            return HttpResponse(ProjectUsecase.update_document(user_id, project_id, document_link, file), status=status.HTTP_200_OK, content_type="text")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
 

@@ -26,5 +26,6 @@ class ImageUsecase:
         if not HistoryImage.dif_last_saved(project_id, xml_file_link):
             raise Exception("can't save 2 photos in 10s")
         rd = str(uuid.uuid1())[:8]
-        image_link = FileIO.save_img_file(file, rd+file.name)
+        image_link = FileIO.save_img_file(
+            file, f"{project_id}/images/{rd}{file.name}")
         HistoryImage.insert(project_id, xml_file_link, image_link)

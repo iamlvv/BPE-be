@@ -18,7 +18,7 @@ class BPMNFileUsecase:
     def craete_default(self, project_id):
         version = str(uuid.uuid1())[:8]
         xml_file_link = FileIO.copy_file(
-            "static/diagram.bpmn", f"{version}.bpmn")
+            "static/diagram.bpmn", f"{project_id}/{version}.bpmn")
 
         BPMNFile.create(xml_file_link, project_id, version)
 
@@ -30,7 +30,7 @@ class BPMNFileUsecase:
             raise Exception("current number of versions is equal to 5")
         version = str(uuid.uuid1())[:8]
         xml_file_link = FileIO.create_bpmn_file(
-            file, version + '_' + file.name)
+            file, f"{project_id}/{version}_{file.name}")
 
         BPMNFile.create(xml_file_link, project_id, version)
 
@@ -71,7 +71,7 @@ class BPMNFileUsecase:
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
         xml_link = BPMNFile.delete(project_id, version)
-        FileIO.delete_bpmn_file(xml_link)
+        FileIO.delete(xml_link)
 
     @classmethod
     def delete_oldest_version(self, user_id, project_id):

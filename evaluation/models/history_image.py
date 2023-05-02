@@ -3,7 +3,7 @@ from django.db.models import Min, Max
 
 
 class HistoryImage(models.Model):
-    id = models.BigAutoField(primary_key=True)
+    # id = models.BigAutoField(primary_key=True)
     project_id = models.BigIntegerField()
     xml_file_link = models.TextField()
     save_at = models.DateTimeField(auto_now_add=True)

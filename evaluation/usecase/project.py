@@ -1,19 +1,21 @@
 from evaluation.models.project import Project
 from evaluation.models.work_on import WorkOn, Role
 from .bpmn_file import BPMNFileUsecase
+from .document_file import DocumentFileUsecase
 from evaluation.fileIO.file import FileIO
 
 
 class ProjectUsecase:
     @classmethod
-    def create(cls, document, name, user_id):
-        project = Project.create(document, name)
+    def create(cls, description, name, user_id):
+        project = Project.create(description, name)
         BPMNFileUsecase.craete_default(project.id)
+        DocumentFileUsecase.create_default(project.id)
         WorkOn.insert(user_id, project.id, Role.OWNER.value)
         return {
             'id': project.id,
             'name': project.name,
-            'document': project.document
+            'description': project.description
         }
 
     @classmethod
@@ -26,14 +28,14 @@ class ProjectUsecase:
     def get_all(cls):
         return Project.get_all()
 
-    @classmethod
-    def get_document(self, project_id):
-        return Project.get_document(project_id)
+    # @classmethod
+    # def get_description(self, project_id):
+    #     return Project.get_description(project_id)
 
     @classmethod
-    def update_document(self, user_id, project_id, document):
+    def update_document(self, user_id, project_id, document_link, file):
         if WorkOn.get_role_by_user_id(user_id, project_id) in [Role.OWNER.value, Role.CAN_EDIT.value]:
-            Project.update_document(project_id, document)
+            DocumentFileUsecase.save(document_link, file)
             return "Success"
         else:
             raise Exception('permission denied')
