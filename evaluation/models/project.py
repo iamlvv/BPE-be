@@ -22,6 +22,7 @@ class Project(models.Model):
     def get(self, project_id):
         project = self.objects.get(project_id=project_id)
         return {
+            'id': project.id,
             'name': project.name,
             'description': project.description,
             'create_at': project.create_at
@@ -44,4 +45,4 @@ class Project(models.Model):
     def get_all_project_by_project_ids(self, project_ids):
         projects = self.objects.filter(
             id__in=project_ids)
-        return list(projects.values('name', 'description', 'create_at'))
+        return list(projects.values('id', 'name', 'description', 'create_at'))
