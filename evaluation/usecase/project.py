@@ -1,13 +1,20 @@
 from evaluation.models.project import Project
 from evaluation.models.work_on import WorkOn, Role
-from evaluation.models.user import User
+from .bpmn_file import BPMNFileUsecase
+from evaluation.fileIO.file import FileIO
 
 
 class ProjectUsecase:
     @classmethod
     def create(cls, document, name, user_id):
-        project_id = Project.create(document, name)
-        WorkOn.insert(user_id, project_id, 0)
+        project = Project.create(document, name)
+        BPMNFileUsecase.craete_default(project.id)
+        WorkOn.insert(user_id, project.id, Role.OWNER.value)
+        return {
+            'id': project.id,
+            'name': project.name,
+            'document': project.document
+        }
 
     @classmethod
     def get(self, project_id, user_id):

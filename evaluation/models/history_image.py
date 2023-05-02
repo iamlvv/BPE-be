@@ -19,6 +19,7 @@ class HistoryImage(models.Model):
         image = self(xml_file_link=xml_file_link, project_id=project_id,
                      save_at=datetime.now(), image_link=image_link)
         image.save()
+        return image
 
     @classmethod
     def get_all_image_by_bpmn_file(self, project_id, xml_file_link):

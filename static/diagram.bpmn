@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="_2022090704555" targetNamespace="http://www.bizagi.com/definitions/_2022090704555">
+  <process id="Process_1y1flrq" />
+  <BPMNDiagram xmlns="http://www.omg.org/spec/BPMN/20100524/DI" id="Diagram_17af96b7-8ed1-4ed7-b170-27382223f4a5">
+    <BPMNPlane id="DiagramElement_95a93ac2-5d16-4ade-87c1-16ee43822b30" bpmnElement="Process_1y1flrq">
+      <extension xmlns="http://www.omg.org/spec/DD/20100524/DI" />
+    </BPMNPlane>
+    <BPMNLabelStyle id="Style_b94f34c8-c6c1-4cc2-a36c-9c7abd0ed921">
+      <Font xmlns="http://www.omg.org/spec/DD/20100524/DC" name="Segoe UI" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" />
+    </BPMNLabelStyle>
+    <BPMNLabelStyle id="Style_2efcd608-d89d-4ba9-8177-5a65e14950cd">
+      <Font xmlns="http://www.omg.org/spec/DD/20100524/DC" name="Segoe UI" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" />
+    </BPMNLabelStyle>
+    <BPMNLabelStyle id="Style_f5a81e61-3702-4c54-9977-fe45bac20302">
+      <Font xmlns="http://www.omg.org/spec/DD/20100524/DC" name="Segoe UI" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" />
+    </BPMNLabelStyle>
+  </BPMNDiagram>
+</definitions>

@@ -4,6 +4,15 @@ import os
 
 class FileIO:
     @classmethod
+    def copy_file(self, path1, file_name):
+        fs = FileSystemStorage()
+        f = fs.open(path1, 'r')
+        fs1 = FileSystemStorage()
+        file_path = 'static/bpmnfile/' + file_name
+        fs1.save(file_path, f)
+        return file_path
+
+    @classmethod
     def save_bpmn_file(self, xml_file_link, file):
         if os.path.splitext(file.name)[1] != ".bpmn":
             raise Exception('File format is not supported')

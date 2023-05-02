@@ -18,6 +18,7 @@ class CommentOn(models.Model):
         cmt = self(user_id=user_id, project_id=project_id,
                    xml_file_link=xml_file_link, content=content)
         cmt.save()
+        return cmt
 
     @classmethod
     def update(self, id, content):

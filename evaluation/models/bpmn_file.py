@@ -18,6 +18,7 @@ class BPMNFile(models.Model):
         bpmn_file = cls(xml_file_link=xml_file_link, project_id=project_id,
                         version=version, last_saved=datetime.now())
         bpmn_file.save()
+        return bpmn_file
 
     @classmethod
     def update_version(self, project_id, version):

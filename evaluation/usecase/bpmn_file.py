@@ -15,6 +15,14 @@ class BPMNFileUsecase:
         BPMNFile.update_version(project_id, version)
 
     @classmethod
+    def craete_default(self, project_id):
+        version = str(uuid.uuid1())[:8]
+        xml_file_link = FileIO.copy_file(
+            "static/diagram.bpmn", f"{version}.bpmn")
+
+        BPMNFile.create(xml_file_link, project_id, version)
+
+    @classmethod
     def create_new_version(self, user_id, file, project_id):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")

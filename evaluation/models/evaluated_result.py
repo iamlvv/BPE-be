@@ -30,6 +30,7 @@ class EvaluatedResult(models.Model):
             create_at=datetime.now()
         )
         result.save()
+        return result
 
     @classmethod
     def get_result_by_bpmn_file(self, xml_file_link, project_id):

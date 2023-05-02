@@ -1,5 +1,4 @@
 from .utils import *
-from .work_on import WorkOn
 
 
 class Project(models.Model):
@@ -17,7 +16,7 @@ class Project(models.Model):
         project = cls(document=document, name=name,
                       is_delete=False, create_at=datetime.now())
         project.save()
-        return project.id
+        return project
 
     @classmethod
     def get(self, project_id):
