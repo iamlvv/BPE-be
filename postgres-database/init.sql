@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.project
     name      character varying(200) COLLATE pg_catalog."default" NOT NULL,
     is_delete boolean,
     create_at timestamp without time zone,
-    CONSTRAINT project_pkey PRIMARY KEY (id),
+    CONSTRAINT project_pkey PRIMARY KEY (id)
 )
     TABLESPACE pg_default;
 
