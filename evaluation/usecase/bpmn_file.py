@@ -1,3 +1,4 @@
+import os
 import uuid
 from datetime import datetime
 from evaluation.models.bpmn_file import BPMNFile
@@ -29,8 +30,9 @@ class BPMNFileUsecase:
         if len(BPMNFile.get_by_project(project_id)) == 5:
             raise Exception("current number of versions is equal to 5")
         version = str(uuid.uuid1())[:8]
+        extension_name = os.path.splitext(file.name)[1]
         xml_file_link = FileIO.create_bpmn_file(
-            file, f"{project_id}/{version}_{file.name}")
+            file, f"{project_id}/{version}{extension_name}")
 
         BPMNFile.create(xml_file_link, project_id, version)
 

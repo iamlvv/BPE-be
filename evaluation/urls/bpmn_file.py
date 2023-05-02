@@ -13,7 +13,7 @@ urlpatterns_bpmn_file = [
          BPMNFileView.get_content_by_version),
     path('bpmnfile/<int:project_id>/<str:version>/delete',
          BPMNFileView.delete_version),
-    path('bpmnfile/<int:project_id>/<str:version>/delete_oldest',
+    path('bpmnfile/delete_oldest/<int:project_id>',
          BPMNFileView.delete_oldest_version),
     path('bpmnfile/comment', BPMNFileView.get_comment_by_bpmn_file),
     path('bpmnfile/comment/add', BPMNFileView.comment),

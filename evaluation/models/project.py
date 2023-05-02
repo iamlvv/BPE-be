@@ -44,5 +44,5 @@ class Project(models.Model):
     @classmethod
     def get_all_project_by_project_ids(self, project_ids):
         projects = self.objects.filter(
-            id__in=project_ids)
+            id__in=project_ids).order_by('create_at')
         return list(projects.values('id', 'name', 'description', 'create_at'))
