@@ -27,7 +27,7 @@ class UserView:
             UserUsecase.verify(email)
             return HttpResponseRedirect("http://localhost:5173/login")
         except Exception as e:
-            return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
+            return HttpResponseRedirect("http://localhost:5173/login")
 
     @staticmethod
     @api_view(['POST'])
@@ -69,5 +69,18 @@ class UserView:
             email = body["email"]
             result = UserUsecase.signin(email, password)
             return HttpResponse(result, content_type='text')
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
+
+    @staticmethod
+    @api_view(['POST'])
+    def reset_password(request):
+        try:
+            body = load_request_body(request)
+            if "email" not in body:
+                raise Exception('email required')
+            email = body['email']
+            UserUsecase.reset_password(email)
+            return HttpResponse("Send email successfully")
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")

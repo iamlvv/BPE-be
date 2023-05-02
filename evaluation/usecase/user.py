@@ -43,6 +43,15 @@ class UserUsecase:
         return "Resend successfully"
 
     @classmethod
+    def reset_password(self, email):
+        user = User.get_by_email(email)
+        Thread(target=Email.reset_password, args=(email, user.name, encode({
+            "id": user.id,
+            "email": email,
+            "password": user.password
+        }))).start()
+
+    @classmethod
     def verify(self, email):
         User.verify(email)
 

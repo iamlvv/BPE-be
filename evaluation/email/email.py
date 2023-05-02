@@ -7,14 +7,27 @@ from email.mime.multipart import MIMEMultipart
 
 class Email:
     @classmethod
+    def send(self, sender_email, password, receiver_email, subject, content):
+        message = MIMEMultipart("alternative")
+        message["Subject"] = subject
+        message["From"] = sender_email
+        message["To"] = receiver_email
+
+        part = MIMEText(content, "html")
+        message.attach(part)
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(
+                sender_email, receiver_email, message.as_string()
+            )
+
+    @classmethod
     def verify_account(self, receiver_email, name, token):
         sender_email = os.environ.get("EMAIL")
         password = os.environ.get("PASSWORD")
-
-        message = MIMEMultipart("alternative")
-        message["Subject"] = "Verify your email"
-        message["From"] = sender_email
-        message["To"] = receiver_email
+        subject = "Verify your email"
 
         # Create the plain-text and HTML version of your message
         html = f"""\
@@ -29,18 +42,25 @@ class Email:
         </body>
         </html>
         """
+        self.send(sender_email, password, receiver_email, subject, html)
 
-        # Turn these into plain/html MIMEText objects
-        part2 = MIMEText(html, "html")
+    @classmethod
+    def reset_password(self, receiver_email, name, token):
+        sender_email = os.environ.get("EMAIL")
+        password = os.environ.get("PASSWORD")
+        subject = "Reset password"
 
-        # Add HTML/plain-text parts to MIMEMultipart message
-        # The email client will try to render the last part first
-        message.attach(part2)
-
-        # Create secure connection with server and send email
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(sender_email, password)
-            server.sendmail(
-                sender_email, receiver_email, message.as_string()
-            )
+        # Create the plain-text and HTML version of your message
+        html = f"""\
+        <html>
+        <body>
+            <p>Hi {name},<br>
+            Please click <a href="http://localhost:5173/reset-password?token={token}">here</a> to reset password or access this bellow link:<br>
+            [http://localhost:5173/reset-password?token={token}]<br>
+            Thank you so much,<br>
+            BPSky
+            </p>
+        </body>
+        </html>
+        """
+        self.send(sender_email, password, receiver_email, subject, html)
