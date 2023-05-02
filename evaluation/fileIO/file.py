@@ -1,5 +1,6 @@
 from django.core.files.storage import FileSystemStorage
 from django.core.files.base import ContentFile
+from django.core.files import File
 import os
 
 
@@ -66,3 +67,9 @@ class FileIO:
         fs = FileSystemStorage()
         self.delete(file_link)
         fs.save(name=file_link, content=new_file)
+
+    @classmethod
+    def get_content(self, file_link):
+        f = open(file_link, 'r')
+        content = f.read()
+        return content

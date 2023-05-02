@@ -55,9 +55,16 @@ class BPMNFileUsecase:
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
         bpmn_files = BPMNFile.get_by_version(project_id, version)
-        if len(bpmn_files) == 0:
-            raise Exception("version doesn't exist")
-        return bpmn_files[0]
+        return bpmn_files
+
+    @classmethod
+    def get_content_by_version(self, user_id, project_id, version):
+        if not WorkOn.can_view(user_id, project_id):
+            raise Exception("permission denied")
+        file_link = BPMNFile.get_by_version(
+            project_id, version)['xml_file_link']
+        content = FileIO.get_content(file_link)
+        return content
 
     @classmethod
     def get_by_project(self, user_id, project_id):

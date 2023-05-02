@@ -55,6 +55,13 @@ class ProjectUsecase:
         return DocumentFileUsecase.get(project_id)
 
     @classmethod
+    def get_document_content(self, user_id, project_id):
+        if not WorkOn.can_view(user_id, project_id):
+            raise Exception('permisstion denied')
+        file_link = f"static/{project_id}/readme.md"
+        return FileIO.get_content(file_link)
+
+    @classmethod
     def get_all_project_by_user_id(self, user_id):
         project_ids = WorkOn.get_all_project_id(user_id)
         return Project.get_all_project_by_project_ids(project_ids)

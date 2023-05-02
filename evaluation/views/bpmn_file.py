@@ -74,6 +74,17 @@ class BPMNFileView:
             return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
 
     @staticmethod
+    @api_view(['GET'])
+    def get_content_by_version(request, project_id, version):
+        try:
+            user_id = get_id_from_token(get_token(request))
+            versions = BPMNFileUsecase.get_content_by_version(
+                user_id, project_id, version)
+            return HttpResponse(versions, content_type="xml")
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_500_INTERNAL_SERVER_ERROR, content_type="text")
+
+    @staticmethod
     @api_view(['POST'])
     def comment(request):
         try:

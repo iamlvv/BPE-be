@@ -11,6 +11,8 @@ urlpatterns_project = [
     path('project/<int:project_id>/description',
          ProjectView.update_description),
     path('project/<int:project_id>/document', ProjectView.get_document),
+    path('project/<int:project_id>/document/text',
+         ProjectView.get_document_content),
     path('project/<int:project_id>/document/update', ProjectView.update_document),
     path('project/<int:project_id>/user', ProjectView.get_all_user),
     path('project/<int:project_id>/user/grant', ProjectView.grant_user),

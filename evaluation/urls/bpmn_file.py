@@ -9,6 +9,8 @@ urlpatterns_bpmn_file = [
     path('bpmnfile/<int:project_id>/<str:version>/save', BPMNFileView.save),
     path('bpmnfile/<int:project_id>/<str:version>',
          BPMNFileView.get_by_version),
+    path('bpmnfile/<int:project_id>/<str:version>/text',
+         BPMNFileView.get_content_by_version),
     path('bpmnfile/<int:project_id>/<str:version>/delete',
          BPMNFileView.delete_version),
     path('bpmnfile/<int:project_id>/<str:version>/delete_oldest',

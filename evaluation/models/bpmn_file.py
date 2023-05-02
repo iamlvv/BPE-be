@@ -34,7 +34,9 @@ class BPMNFile(models.Model):
     def get_by_version(cls, project_id, version):
         bpmn_files = list(BPMNFile.objects.filter(
             project_id=project_id, version=version).values('xml_file_link', 'version', 'last_saved'))
-        return bpmn_files
+        if len(bpmn_files) == 0:
+            raise Exception("version doesn't exist")
+        return bpmn_files[0]
 
     @classmethod
     def get_by_project(cls, project_id):
