@@ -1,4 +1,5 @@
 from .utils import *
+from evaluation.oauth2.google import LoginWithGoogle
 
 
 class UserView:
@@ -22,12 +23,13 @@ class UserView:
     @staticmethod
     @api_view(['GET'])
     def verify(request, token):
+        host = os.environ.get("HOST")
         try:
             email = get_email_from_token(token)
             UserUsecase.verify(email)
-            return HttpResponseRedirect("http://localhost:5173/login")
+            return HttpResponseRedirect(f"{host}/login")
         except Exception as e:
-            return HttpResponseRedirect("http://localhost:5173/login")
+            return HttpResponseRedirect(f"{host}/login")
 
     @staticmethod
     @api_view(['POST'])
@@ -97,3 +99,24 @@ class UserView:
             return JsonResponse(data, safe=False)
         except Exception as e:
             return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
+
+    @staticmethod
+    @api_view(['GET'])
+    def auth_with_google(request):
+        try:
+            request_uri = LoginWithGoogle.login()
+            return HttpResponseRedirect(request_uri)
+        except Exception as e:
+            return HttpResponse(e.__str__(), status=status.HTTP_501_NOT_IMPLEMENTED, content_type="text")
+
+    @staticmethod
+    @api_view(['GET'])
+    def callback(request):
+        host = os.environ.get("HOST")
+        try:
+            code = request.GET.get("code")
+            data = LoginWithGoogle.get(request, code)
+            token = UserUsecase.auth_with_google(data[1], data[2], data[3])
+            return HttpResponseRedirect(f"{host}?token={token}")
+        except Exception as e:
+            return HttpResponseRedirect(f"{host}/login")

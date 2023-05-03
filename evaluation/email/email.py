@@ -48,6 +48,7 @@ class Email:
     def reset_password(self, receiver_email, name, token):
         sender_email = os.environ.get("EMAIL")
         password = os.environ.get("PASSWORD")
+        host = os.environ.get("HOST")
         subject = "Reset password"
 
         # Create the plain-text and HTML version of your message
@@ -55,8 +56,8 @@ class Email:
         <html>
         <body>
             <p>Hi {name},<br>
-            Please click <a href="http://localhost:5173/reset-password?token={token}">here</a> to reset password or access this bellow link:<br>
-            [http://localhost:5173/reset-password?token={token}]<br>
+            Please click <a href="{host}/reset-password?token={token}">here</a> to reset password or access this bellow link:<br>
+            [{host}/reset-password?token={token}]<br>
             Thank you so much,<br>
             BPSky
             </p>

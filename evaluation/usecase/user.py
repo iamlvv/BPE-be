@@ -1,6 +1,7 @@
 from evaluation.models.user import User
 from evaluation.email.email import Email
 from threading import Thread
+import uuid
 from evaluation.auth.jwt import *
 from .utils import *
 
@@ -81,3 +82,18 @@ class UserUsecase:
     @classmethod
     def search(self, s):
         return User.search(s)
+
+    @classmethod
+    def auth_with_google(self, email, picture, name):
+        if self.check_exist(email):
+            User.verify(email)
+            result = User.get_by_email_permanently(email)
+        else:
+            password = str(uuid.uuid1())[:10]
+            result = self.create(hash_password(password),
+                                 email, name, "", picture, True)
+        return encode({
+            "id": result.id,
+            "email": result.email,
+            "password": result.password
+        })

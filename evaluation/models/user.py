@@ -14,9 +14,9 @@ class User(models.Model):
         db_table = "bpe_user"
 
     @classmethod
-    def create(self, hash_password, email, name, phone, avatar):
+    def create(self, hash_password, email, name, phone, avatar, verified=False):
         user = self(password=hash_password, email=email,
-                    name=name, phone=phone, avatar=avatar, verified=False)
+                    name=name, phone=phone, avatar=avatar, verified=verified)
         user.save()
         return user.id
 
@@ -36,6 +36,15 @@ class User(models.Model):
             raise Exception('Email is incorrect')
         if result.verified:
             raise Exception('Your account was verified')
+        return result
+
+    @classmethod
+    def get_by_email_permanently(self, email):
+        try:
+            result = self.objects.get(
+                email=email)
+        except:
+            raise Exception('Email is incorrect')
         return result
 
     @classmethod
