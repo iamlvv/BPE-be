@@ -1,6 +1,5 @@
 from .constant import *
 from .utils import *
-from .constant import EventType
 from .elements.gateway import *
 from .elements.task import *
 from .elements.event import *
@@ -13,7 +12,7 @@ class Traverse:
         e.accept(self, c, r)
 
     def visit_for_NormalTask(self, e: NormalTask, c: Context, r: Result):
-        print("Visit task", e.name, e.cycle_time, "In xor block", c.in_xor_block)
+        print("Visit task", e.name, e.cycle_time)
         r.steps.append(
             {
                 "activity": e.id,
@@ -52,7 +51,39 @@ class Traverse:
         r.totalCost = total_cost
 
     def visit_for_SendTask(self, e: SendTask, c: Context, r: Result):
-        print(3)
+        print("Visit send task", e.name, e.cycle_time)
+        r.steps.append(
+            {
+                "activity": e.id,
+                "cycleTime": e.cycle_time,
+                "cost": e.unit_cost * e.cycle_time,
+                "label": e.name if e.name else "",
+            }
+        )
+
+        r.totalTasks += 1
+        r.totalNumberExplicitTasks += 1
+        if c.in_xor_block > 0:
+            r.numberOfOptionalTasks += 1
+
+        total_cycle_time = e.cycle_time
+        total_cost = e.cycle_time * e.unit_cost
+
+        if c.in_loop:
+            if isinstance(e.next[0], MessageEvent) and e.next[0].event_type == EventType.INTERMIDIATE_CATCH_EVENT.value:
+                self.visit(e.outgoing_messageflow[0], c, r)
+            else:
+                c.stack_next_send_task.append(e.outgoing_messageflow[0])
+                self.visit(e.next[0], c, r)
+        else:
+            if len(e.outgoing_messageflow) > 0:
+
+                self.visit(e.outgoing_messageflow[0], c, r)
+            else:
+                self.visit(e.next[0], c, r)
+
+        r.totalCycleTime += total_cycle_time
+        r.totalCost += total_cost
 
     def visit_for_ReceiveTask(self, e: ReceiveTask, c: Context, r: Result):
         print(7)
@@ -69,33 +100,27 @@ class Traverse:
             return
 
     def visit_for_MessageEvent(self, e: MessageEvent, c: Context, r: Result):
-        print("Visit message event")
+        print("Visit message event", e.id)
         if e.event_type == EventType.INTERMIDIATE_THROW_EVENT.value:
-            if e.is_start:  # send and start a messsage
-                self.visit(e.next[0], c, r)
-                next_time = r.totalCycleTime
-                next_cost = r.totalCost
-                new_result = Result()
-                self.visit(e.outgoing_messageflow[0], c, new_result)
-                message_time = new_result.totalCycleTime
-                message_cost = new_result.totalCost
-                total_cycle_time = max(next_time, message_time)
-                total_cost = max(next_cost, message_cost)
-                next_node = c.stack_next_message.pop()
-                self.visit(next_node, c, r)
-                r.totalCycleTime += total_cycle_time
-                r.totalCost += total_cost
-            else:  # receive and stop a message
-                r.totalCycleTime = 0
-                r.totalCost = 0
-                return
+            if isinstance(e.next[0], ExclusiveGateway) and e.next[0].is_split_gateway():
+                c.list_gateway_traveled[e.next[0].id] = e.next[0]
+
+            self.visit(e.outgoing_messageflow[0], c, r)
+            if c.in_xor_block > 0:
+                next_node = e.next[0]
+                if isinstance(next_node, ExclusiveGateway) and next_node.is_join_gateway():
+                    gateway_traveled, pre = self.check_exclusive_gateway_traveled(next_node.previous, c)
+                    if gateway_traveled:
+                        self.visit(e.next[0], c, r)
+                    else:
+                        return
         elif e.event_type == EventType.INTERMIDIATE_CATCH_EVENT.value:
-            if e.is_start:  # receive and start a message
+            if c.in_xor_block > 0 and isinstance(e.next[0], ExclusiveGateway) and e.next[0].is_join_gateway():
+                c.stack_next_gateway.append(e.next[0])
+                return
+            else:
                 self.visit(e.next[0], c, r)
-            else:  # receive and stop a message
-                r.totalCycleTime = 0
-                r.totalCost = 0
-                c.stack_next_message.append(e.next[0])
+
         elif e.event_type == EventType.END_EVENT.value:
             if e.code in c.list_event_subprocess:
                 # end event triggers a event subprocess
@@ -108,11 +133,6 @@ class Traverse:
                 # end event triggers a boundary event
                 r.totalCycleTime = 0
                 r.totalCost = 0
-            # if e.is_interrupting:
-            #     r.current_cycle_time = cycletime_event_subprocess
-            # else:
-            #     r.current_cycle_time = max(
-            #         next_time, cycletime_event_subprocess)
         elif e.event_type == EventType.START_EVENT.value:
             r.totalCycleTime = 0
             r.totalCost = 0
@@ -229,8 +249,7 @@ class Traverse:
             if e.id in c.list_gateway:
                 c.list_gateway[e.id] += 1
             else:
-                c.list_gateway[e.id] = 1 + \
-                                       self.number_of_gateway_in_nodes(e.previous)
+                c.list_gateway[e.id] = 1 + self.number_of_gateway_in_nodes(e.previous)
             # check so lan da duyet cua cong join
             if c.list_gateway[e.id] < len(e.previous):
                 r.totalCycleTime = 0
@@ -342,7 +361,8 @@ class Traverse:
             r.transparency[e.id] = {
                 "view": e.name,
                 "numberOfExplicitTask": e.number_of_tasks,
-                "transparency": e.number_of_tasks / r.totalNumberExplicitTasks
+                "transparency": (
+                        e.number_of_tasks / r.totalNumberExplicitTasks) if r.totalNumberExplicitTasks > 0 else 1
             }
             return
 
@@ -355,7 +375,8 @@ class Traverse:
             r.transparency[l.id] = {
                 "view": l.name,
                 "numberOfExplicitTask": l.number_of_tasks,
-                "transparency": l.number_of_tasks / r.totalNumberExplicitTasks
+                "transparency": (
+                        l.number_of_tasks / r.totalNumberExplicitTasks) if r.totalNumberExplicitTasks != 0 else 1
             }
 
         r.totalCycleTime = total_cycle_time
@@ -491,13 +512,15 @@ class Traverse:
         return count
 
     def check_exclusive_gateway_traveled(self, node, c: Context):
+        # print("Checking ------->", c.list_gateway_traveled)
         for n in node:
             if type(n) is ExclusiveGateway:
                 if n.id not in c.list_gateway_traveled and n.is_split_gateway():
                     return False, n
         return True, None
 
-    def handle_for_loop(self, start: ExclusiveGateway, end: ExclusiveGateway, reloop: float, next_node, c: Context, r: Result):
+    def handle_for_loop(self, start: ExclusiveGateway, end: ExclusiveGateway, reloop: float, next_node, c: Context,
+                        r: Result):
         self.visit(start.next[0], c, r)
 
         total_cycle_time = r.totalCycleTime / (1 - reloop)
@@ -506,7 +529,10 @@ class Traverse:
         if c.in_loop == 0:
             r.total_loop_probability += reloop
             r.total_loop += 1
-        self.visit(next_node, c, r)
+        if len(c.stack_next_send_task) > 0:
+            self.visit(c.stack_next_send_task.pop(), c, r)
+        else:
+            self.visit(next_node, c, r)
 
         r.totalCycleTime += total_cycle_time
         r.totalCost += total_cost
@@ -638,9 +664,8 @@ class Traverse:
             r.totalCost = 0
             return
 
-        # Check
-        check, pre = self.check_exclusive_gateway_traveled(e.previous, c)
-        if not check:
+        gateway_traveled, pre = self.check_exclusive_gateway_traveled(e.previous, c)
+        if not gateway_traveled:
             print("Start loop")
 
             for i, n in enumerate(pre.next):
@@ -663,14 +688,17 @@ class Traverse:
             self.handle_for_loop(e, pre, reloop, next_node, c, r)
             return
 
-        print("End gateway")
+        print("End exclusive gateway", e.id)
         r.steps.append(
             {
                 "event": END_EXCLUSIVE_GATEWAY,
                 "gateWay": e.id,
             }
         )
-        c.stack_next_gateway.append(e)
+
+        if not (len(e.next) > 0 and isinstance(e.next[0], MessageEvent) and e.next[
+            0].event_type == EventType.INTERMIDIATE_CATCH_EVENT.value):
+            c.stack_next_gateway.append(e)
         r.totalCycleTime = 0
         r.totalCost = 0
         return
@@ -678,8 +706,8 @@ class Traverse:
     def handle_for_split_exclusive_gateway(self, e: ExclusiveGateway, c: Context, r: Result):
         total_cycle_time = 0.0
         total_cost = 0.0
-        next_node = None
         if len(c.stack_end_loop) > 0 and len(e.next) == 2 and c.stack_end_loop[-1] == e:
+            # If this gateway is an end gateway of a loop
             print("End loop")
             r.steps.append(
                 {
@@ -692,39 +720,39 @@ class Traverse:
             r.totalCycleTime = 0
             r.totalCost = 0
             return
-        print("Start exclusive gateway")
-        r.steps.append(
-            {
-                "event": START_EXCLUSIVE_GATEWAY,
-                "gateway": e.id,
-                "branchingProbability": e.branching_probabilities
-            }
-        )
-
-        # if isinstance(e, ExclusiveGateway):
-        c.in_xor_block += 1
-
-        for i, branch in enumerate(e.next):
-            r.totalCycleTime = 0
-            r.totalCost = 0
-            self.visit(branch, c, r)
-            total_cycle_time += e.branching_probabilities[i] * \
-                                r.totalCycleTime
-            total_cost += e.branching_probabilities[i] * \
-                          r.totalCost
-
-        # if isinstance(e, ExclusiveGateway):
-        c.in_xor_block -= 1
-
-        if len(c.stack_next_gateway) > 0:
-            next_node = c.stack_next_gateway.pop().next[0]
         else:
-            r.totalCycleTime = total_cycle_time
-            r.totalCost = total_cost
+            # If this gateway start an exclusive block
+            print("Start exclusive gateway")
+            r.steps.append(
+                {
+                    "event": START_EXCLUSIVE_GATEWAY,
+                    "gateway": e.id,
+                    "branchingProbability": e.branching_probabilities
+                }
+            )
+
+            # if isinstance(e, ExclusiveGateway):
+            c.in_xor_block += 1
+
+            for i, branch in enumerate(e.next):
+                r.totalCycleTime = 0
+                r.totalCost = 0
+                self.visit(branch, c, r)
+                total_cycle_time += e.branching_probabilities[i] * \
+                                    r.totalCycleTime
+                total_cost += e.branching_probabilities[i] * \
+                              r.totalCost
+
+            # if isinstance(e, ExclusiveGateway):
+            c.in_xor_block -= 1
+            if len(c.stack_next_gateway) > 0:
+                next_node = c.stack_next_gateway.pop().next[0]
+            else:
+                r.totalCycleTime = total_cycle_time
+                r.totalCost = total_cost
+                return
+
+            self.visit(next_node, c, r)
+            r.totalCycleTime += total_cycle_time
+            r.totalCost += total_cost
             return
-        self.visit(next_node, c, r)
-        r.totalCycleTime += total_cycle_time
-        r.totalCost += total_cost
-        return
-
-
