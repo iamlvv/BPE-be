@@ -34,6 +34,8 @@ class Context:
     list_gateway_traveled: dict
     stack_next_gateway: list
     stack_next_message: list
+    stack_next_send_task: list
+    # stack_next_msg_xor_block: list
     stack_end_loop: list
     in_xor_block: int
     in_loop: int
@@ -54,6 +56,7 @@ class Context:
         self.number_of_exception_events = {}
         self.list_event_subprocess = {}
         self.list_boundary_event = {}
+        self.stack_next_send_task = []
 
 
 class Result:
@@ -74,7 +77,6 @@ class Result:
     exceptionHandling: float
     steps: list
 
-
     def __init__(self):
         self.name = ""
         self.totalCycleTime = 0.0
@@ -91,5 +93,3 @@ class Result:
         self.unHandledTasks = 0
         self.exceptionHandling = 0.0
         self.steps = []
-
-
