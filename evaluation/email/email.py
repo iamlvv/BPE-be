@@ -27,6 +27,7 @@ class Email:
     def verify_account(self, receiver_email, name, token):
         sender_email = os.environ.get("EMAIL")
         password = os.environ.get("PASSWORD")
+        host = os.environ.get("HOST_BE")
         subject = "Verify your email"
 
         # Create the plain-text and HTML version of your message
@@ -34,8 +35,8 @@ class Email:
         <html>
         <body>
             <p>Hi {name},<br>
-            Please click <a href="http://localhost:8000/api/v1/user/verify/{token}">here</a> to verify your account or access this bellow link:<br>
-            [http://localhost:8000/api/v1/user/verify/{token}]<br>
+            Please click <a href="{host}/api/v1/user/verify/{token}">here</a> to verify your account or access this bellow link:<br>
+            [{host}/api/v1/user/verify/{token}]<br>
             Thank you so much,<br>
             BPSky
             </p>

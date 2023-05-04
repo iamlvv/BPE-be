@@ -28,6 +28,15 @@ class User(models.Model):
         obj.update(verified=True)
 
     @classmethod
+    def verify_token(self, id, email):
+        try:
+            result = self.objects.get(
+                email=email, id=id)
+        except:
+            raise Exception('Token invalid')
+        return result
+
+    @classmethod
     def get_by_email(self, email):
         try:
             result = self.objects.get(
