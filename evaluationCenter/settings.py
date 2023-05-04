@@ -13,7 +13,7 @@ SECRET_KEY = "django-insecure-5yeb#w8l$&29h#t4klg8r=u7xz)mtyif*2xruyda4jpz*6ep0+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["14.225.205.199", "bpsky.online"]
 
 # Application definition
 
