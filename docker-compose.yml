@@ -5,7 +5,7 @@ services:
     build:
       context: .
       target: bpe-be
-    container_name: bpe-be
+    container_name: bpe-be-dev
     image: python:alpine3.16
     volumes:
       - ./:/python/src/bpe
@@ -19,7 +19,7 @@ services:
     tty: true
 
   db:
-    container_name: bpe-db
+    container_name: bpe-db-dev
     image: postgres:15.1-alpine
     restart: unless-stopped
     environment:

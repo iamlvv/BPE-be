@@ -137,14 +137,15 @@ class Evaluate:
             p.accept(t, c, r)
             if r.handledTasks + r.unHandledTasks > 0:
                 r.exceptionHandling = r.handledTasks / \
-                                      (r.handledTasks +
-                                       r.unHandledTasks)
+                    (r.handledTasks +
+                     r.unHandledTasks)
             if r.totalTasks > 0:
                 r.flexibility = r.numberOfOptionalTasks / r.totalTasks
             if r.total_loop == 0:
                 r.quality = 1
             else:
                 r.quality = 1 - (r.total_loop_probability / r.total_loop)
-            collaboration.result.append(r)
+            if r.totalCycleTime != 0:
+                collaboration.result.append(r)
 
         return collaboration.result
