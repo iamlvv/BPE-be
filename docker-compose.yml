@@ -4,22 +4,22 @@ services:
   web:
     build:
       context: .
-      target: bpe-be
-    container_name: bpe-be-dev
-    image: python:alpine3.16
+      target: bpsky-be-image
+    container_name: bpe-be-ctn-dev
+    image: bpsky-be-image
     volumes:
       - ./:/python/src/bpe
     ports:
       - "8000:8000"
     working_dir: /python/src/bpe
-    command: sh -c "pip install -r ./requirements.txt && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python run.py"
     depends_on:
       - db
     restart: unless-stopped
     tty: true
 
   db:
-    container_name: bpe-db-dev
+    container_name: bpsky-db-ctn-dev
     image: postgres:15.1-alpine
     restart: unless-stopped
     environment:
@@ -31,10 +31,10 @@ services:
       - '5432:5432'
     volumes:
       - postgres:/var/lib/postgresql/data
-      - ./postgres-database/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./postgres-database/load_data.sql:/docker-entrypoint-initdb.d/load_data.sql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/load_data.sql:/docker-entrypoint-initdb.d/load_data.sql
 
 volumes:
   postgres:
-    name: postgres
+    name: postgres-dev
     driver: local
