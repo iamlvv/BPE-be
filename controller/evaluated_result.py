@@ -1,7 +1,7 @@
 from .utils import *
 
 
-@bpsky.route("/result/all", methods=["POST"])
+@bpsky.route("/api/v1/result/all", methods=["POST"])
 def evaluated_result_get_result_by_bpmn_file():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -25,7 +25,7 @@ def evaluated_result_get_result_by_bpmn_file():
         )
 
 
-@bpsky.route("/result/<int:project_id>/save", methods=["POST"])
+@bpsky.route("/api/v1/result/<int:project_id>/save", methods=["POST"])
 def evaluated_result_save(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -50,7 +50,7 @@ def evaluated_result_save(project_id):
         )
 
 
-@bpsky.route("/result", methods=["POST"])
+@bpsky.route("/api/v1/result", methods=["POST"])
 def evaluated_result_get():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -75,7 +75,7 @@ def evaluated_result_get():
         )
 
 
-@bpsky.route("/result/delete", methods=["DELETE"])
+@bpsky.route("/api/v1/result/delete", methods=["DELETE"])
 def evaluated_result_delete():
     try:
         user_id = get_id_from_token(get_token(request))

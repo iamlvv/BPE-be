@@ -1,6 +1,6 @@
 from .utils import *
 
 
-@bpsky.route("/", methods=["GET"])
+@bpsky.route("/api/v1/", methods=["GET"])
 def main():
     return "Welcome to BPSky"

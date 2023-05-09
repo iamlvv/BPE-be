@@ -1,7 +1,7 @@
 from .utils import *
 
 
-@bpsky.route("/evaluate", methods=["POST"])
+@bpsky.route("/api/v1/evaluate", methods=["POST"])
 def evaluate_evaluate():
     try:
         body = load_request_body(request)
@@ -19,7 +19,7 @@ def evaluate_evaluate():
         )
 
 
-@bpsky.route("/evaluate/compare", methods=["POST"])
+@bpsky.route("/api/v1/evaluate/compare", methods=["POST"])
 def evaluate_compare():
     try:
         body = load_request_body(request)

@@ -2,7 +2,7 @@ from .utils import *
 from oauth2.google import LoginWithGoogle
 
 
-@bpsky.route("/user/signup", methods=["POST"])
+@bpsky.route("/api/v1/user/signup", methods=["POST"])
 def user_signup():
     try:
         body = load_request_body(request)
@@ -22,7 +22,7 @@ def user_signup():
         )
 
 
-@bpsky.route("/user/verify/<string:token>", methods=["GET"])
+@bpsky.route("/api/v1/user/verify/<string:token>", methods=["GET"])
 def user_verify(token):
     host = os.environ.get("HOST")
     try:
@@ -33,7 +33,7 @@ def user_verify(token):
         return redirect(f"{host}/login")
 
 
-@bpsky.route("/user/resend", methods=["POST"])
+@bpsky.route("/api/v1/user/resend", methods=["POST"])
 def user_resend_email():
     try:
         body = load_request_body(request)
@@ -49,7 +49,7 @@ def user_resend_email():
         )
 
 
-@bpsky.route("/user/all", methods=["GET"])
+@bpsky.route("/api/v1/user/all", methods=["GET"])
 def user_get_all():
     data = UserUsecase.get_all()
     return bpsky.response_class(
@@ -59,7 +59,7 @@ def user_get_all():
     )
 
 
-@bpsky.route("/user", methods=["GET"])
+@bpsky.route("/api/v1/user", methods=["GET"])
 def user_get():
     try:
         user = UserUsecase.get(get_token(request))
@@ -75,7 +75,7 @@ def user_get():
         )
 
 
-@bpsky.route("/user/signin", methods=["POST"])
+@bpsky.route("/api/v1/user/signin", methods=["POST"])
 def user_signin():
     try:
         body = load_request_body(request)
@@ -93,7 +93,7 @@ def user_signin():
         )
 
 
-@bpsky.route("/user/reset", methods=["POST"])
+@bpsky.route("/api/v1/user/reset", methods=["POST"])
 def user_reset_password():
     try:
         body = load_request_body(request)
@@ -109,7 +109,7 @@ def user_reset_password():
         )
 
 
-@bpsky.route("/user/search", methods=["GET"])
+@bpsky.route("/api/v1/user/search", methods=["GET"])
 def user_search():
     try:
         get_email_from_token(get_token(request))
@@ -129,7 +129,7 @@ def user_search():
         )
 
 
-@bpsky.route("/auth/login/google", methods=["GET"])
+@bpsky.route("/api/v1/auth/login/google", methods=["GET"])
 def user_auth_with_google():
     try:
         request_uri = LoginWithGoogle.login()
@@ -141,7 +141,7 @@ def user_auth_with_google():
         )
 
 
-@bpsky.route("/auth/login/google/callback", methods=["GET"])
+@bpsky.route("/api/v1/auth/login/google/callback", methods=["GET"])
 def user_callback():
     host = os.environ.get("HOST")
     try:

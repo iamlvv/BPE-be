@@ -1,7 +1,7 @@
 from .utils import *
 
 
-@bpsky.route("/project", methods=["POST"])
+@bpsky.route("/api/v1/project", methods=["POST"])
 def project_insert():
     try:
         body = load_request_body(request)
@@ -23,7 +23,7 @@ def project_insert():
         )
 
 
-@bpsky.route("/project/<int:project_id>", methods=["GET"])
+@bpsky.route("/api/v1/project/<int:project_id>", methods=["GET"])
 def project_get_project(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -40,7 +40,7 @@ def project_get_project(project_id):
         )
 
 
-@bpsky.route("/project/all", methods=["GET"])
+@bpsky.route("/api/v1/project/all", methods=["GET"])
 def project_get_all_project_by_user_id():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -57,12 +57,12 @@ def project_get_all_project_by_user_id():
         )
 
 
-# @bpsky.route("/")
+# @bpsky.route("/api/v1/")
 # def project_get_all(request):
 #     return JsonResponse(ProjectUsecase.get_all(), status=status.HTTP_200_OK, safe=False)
 
 
-@bpsky.route("/project/<int:project_id>/name", methods=["PUT"])
+@bpsky.route("/api/v1/project/<int:project_id>/name", methods=["PUT"])
 def project_update_name(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -79,7 +79,7 @@ def project_update_name(project_id):
         )
 
 
-@bpsky.route("/project/<int:project_id>/description", methods=["PUT"])
+@bpsky.route("/api/v1/project/<int:project_id>/description", methods=["PUT"])
 def project_update_description(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -96,7 +96,7 @@ def project_update_description(project_id):
         )
 
 
-@bpsky.route("/project/<int:project_id>/document/update", methods=["PUT"])
+@bpsky.route("/api/v1/project/<int:project_id>/document/update", methods=["PUT"])
 def project_update_document(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -114,7 +114,7 @@ def project_update_document(project_id):
         )
 
 
-@bpsky.route("/project/<int:project_id>/document", methods=["GET"])
+@bpsky.route("/api/v1/project/<int:project_id>/document", methods=["GET"])
 def project_get_document(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -131,7 +131,7 @@ def project_get_document(project_id):
         )
 
 
-@bpsky.route("/project/<int:project_id>/document/text", methods=["GET"])
+@bpsky.route("/api/v1/project/<int:project_id>/document/text", methods=["GET"])
 def project_get_document_content(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -145,7 +145,7 @@ def project_get_document_content(project_id):
         )
 
 
-@bpsky.route("/project/<int:project_id>/user", methods=["GET"])
+@bpsky.route("/api/v1/project/<int:project_id>/user", methods=["GET"])
 def project_get_all_user(project_id):
     try:
         data = ProjectUsecase.get_all_user_by_project_id(project_id)
@@ -161,7 +161,7 @@ def project_get_all_user(project_id):
         )
 
 
-@bpsky.route("/project/<int:project_id>/user/update", methods=["PUT"])
+@bpsky.route("/api/v1/project/<int:project_id>/user/update", methods=["PUT"])
 def project_update_all_user(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -179,7 +179,7 @@ def project_update_all_user(project_id):
         )
 
 
-@bpsky.route("/project/<int:project_id>/user/revoke", methods=["DELETE"])
+@bpsky.route("/api/v1/project/<int:project_id>/user/revoke", methods=["DELETE"])
 def project_revoke_user(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -197,7 +197,7 @@ def project_revoke_user(project_id):
         )
 
 
-@bpsky.route("/project/<int:project_id>/user/grant", methods=["POST"])
+@bpsky.route("/api/v1/project/<int:project_id>/user/grant", methods=["POST"])
 def project_grant_user(project_id):
     try:
         user_id = get_id_from_token(get_token(request))

@@ -1,7 +1,7 @@
 from .utils import *
 
 
-@bpsky.route("/bpmnfile/<int:project_id>/<string:version>/save", methods=["PUT"])
+@bpsky.route("/api/v1/bpmnfile/<int:project_id>/<string:version>/save", methods=["PUT"])
 def bpmn_file_save(project_id, version):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -21,7 +21,7 @@ def bpmn_file_save(project_id, version):
         )
 
 
-@bpsky.route("/bpmnfile/<int:project_id>/create", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/<int:project_id>/create", methods=["POST"])
 def bpmn_file_create_new_version(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -37,7 +37,7 @@ def bpmn_file_create_new_version(project_id):
         )
 
 
-@bpsky.route("/bpmnfile/delete_oldest/<int:project_id>", methods=["DELETE"])
+@bpsky.route("/api/v1/bpmnfile/delete_oldest/<int:project_id>", methods=["DELETE"])
 def bpmn_file_delete_oldest_version(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -50,7 +50,7 @@ def bpmn_file_delete_oldest_version(project_id):
         )
 
 
-@bpsky.route("/bpmnfile/<int:project_id>/<string:version>/delete", methods=["DELETE"])
+@bpsky.route("/api/v1/bpmnfile/<int:project_id>/<string:version>/delete", methods=["DELETE"])
 def bpmn_file_delete_version(project_id, version):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -63,7 +63,7 @@ def bpmn_file_delete_version(project_id, version):
         )
 
 
-@bpsky.route("/bpmnfile/<int:project_id>", methods=["GET"])
+@bpsky.route("/api/v1/bpmnfile/<int:project_id>", methods=["GET"])
 def bpmn_file_get_by_project(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -76,7 +76,7 @@ def bpmn_file_get_by_project(project_id):
         )
 
 
-@bpsky.route("/bpmnfile/<int:project_id>/<string:version>", methods=["GET"])
+@bpsky.route("/api/v1/bpmnfile/<int:project_id>/<string:version>", methods=["GET"])
 def bpmn_file_get_by_version(project_id, version):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -90,7 +90,7 @@ def bpmn_file_get_by_version(project_id, version):
         )
 
 
-@bpsky.route("/bpmnfile/<int:project_id>/<string:version>/text", methods=["GET"])
+@bpsky.route("/api/v1/bpmnfile/<int:project_id>/<string:version>/text", methods=["GET"])
 def bpmn_file_get_content_by_version(project_id, version):
     try:
         user_id = get_id_from_token(get_token(request))
@@ -108,7 +108,7 @@ def bpmn_file_get_content_by_version(project_id, version):
         )
 
 
-@bpsky.route("/bpmnfile/comment/add", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/comment/add", methods=["POST"])
 def bpmn_file_comment():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -129,7 +129,7 @@ def bpmn_file_comment():
         )
 
 
-@bpsky.route("/bpmnfile/comment/edit", methods=["PUT"])
+@bpsky.route("/api/v1/bpmnfile/comment/edit", methods=["PUT"])
 def bpmn_file_edit_comment():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -151,7 +151,7 @@ def bpmn_file_edit_comment():
         )
 
 
-@bpsky.route("/bpmnfile/comment/delete", methods=["DELETE"])
+@bpsky.route("/api/v1/bpmnfile/comment/delete", methods=["DELETE"])
 def bpmn_file_delete_comment():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -172,7 +172,7 @@ def bpmn_file_delete_comment():
         )
 
 
-@bpsky.route("/bpmnfile/comment", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/comment", methods=["POST"])
 def bpmn_file_get_comment_by_bpmn_file():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -192,7 +192,7 @@ def bpmn_file_get_comment_by_bpmn_file():
         )
 
 
-@bpsky.route("/bpmnfile/comment/user", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/comment/user", methods=["POST"])
 def bpmn_file_get_comment_by_user():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -205,7 +205,7 @@ def bpmn_file_get_comment_by_user():
         )
 
 
-@bpsky.route("/bpmnfile/image", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/image", methods=["POST"])
 def bpmn_file_get_image_by_bpmn_file():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -229,7 +229,7 @@ def bpmn_file_get_image_by_bpmn_file():
         )
 
 
-@bpsky.route("/bpmnfile/image/add", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/image/add", methods=["POST"])
 def bpmn_file_add_image():
     try:
         user_id = get_id_from_token(get_token(request))
