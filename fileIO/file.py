@@ -40,7 +40,6 @@ class FileIO:
         # if file.size > 10*1024*1024:
         #     raise Exception('File size is larger than 10MB are not allowed')
         file_path = 'static/' + file_name
-        print(file, file_path)
         file.save(file_path)
         return file_path
 

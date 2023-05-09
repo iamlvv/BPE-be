@@ -14,7 +14,11 @@ def user_signup():
         name = body["name"]
         phone = body["phone"] if "phone" in body else ""
         avatar = body["avatar"] if "avatar" in body else ""
-        return UserUsecase.signup(password, email, name, phone, avatar)
+        return bpsky.response_class(
+            response=UserUsecase.signup(password, email, name, phone, avatar),
+            content_type="text",
+            status=200
+        )
     except Exception as e:
         return bpsky.response_class(
             response=e.__str__(),
@@ -84,8 +88,12 @@ def user_signin():
                 raise Exception(i + " required")
         password = body["password"]
         email = body["email"]
-        msg = UserUsecase.signin(email, password)
-        return msg
+        token = UserUsecase.signin(email, password)
+        return bpsky.response_class(
+            response=token,
+            content_type="text",
+            status=200
+        )
     except Exception as e:
         return bpsky.response_class(
             response=e.__str__(),
