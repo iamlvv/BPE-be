@@ -10,9 +10,9 @@ class ProjectUsecase:
     @classmethod
     def create(cls, description, name, user_id):
         project = Project.create(description, name)
-        if os.path.isdir(f'static/{project.id}'):
+        if not os.path.isdir(f'static/{project.id}'):
             os.makedirs(f"static/{project.id}")
-            if os.path.isdir(f'static/{project.id}/images'):
+            if not os.path.isdir(f'static/{project.id}/images'):
                 os.makedirs(f"static/{project.id}/images")
         BPMNFileUsecase.craete_default(project.id)
         DocumentFileUsecase.create_default(project.id)
