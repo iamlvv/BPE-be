@@ -50,9 +50,9 @@ class User:
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
             cursor.execute(query, (email,))
-            updated_row = cursor.rowcount
-            if updated_row == 0:
-                raise Exception("Email doesn't exist")
+            # updated_row = cursor.rowcount
+            # if updated_row == 0:
+            #     raise Exception("Email doesn't exist")
             connection.commit()
 
     @classmethod
