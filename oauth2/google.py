@@ -33,14 +33,14 @@ class LoginWithGoogle:
         return request_uri
 
     @classmethod
-    def get(self, request, code):
+    def get(self, request_url, code):
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
         google_provider_cfg = get_google_provider_cfg()
         token_endpoint = google_provider_cfg["token_endpoint"]
 
         token_url, headers, body = client.prepare_token_request(
             token_endpoint,
-            authorization_response=request.build_absolute_uri(),
+            authorization_response=request_url,
             # authorization_response="http://localhost:5173",
             redirect_url=GOOGLE_REDIRECT_URI,
             code=code

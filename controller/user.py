@@ -146,7 +146,7 @@ def user_callback():
     host = os.environ.get("HOST")
     try:
         code = request.args.get("code")
-        data = LoginWithGoogle.get(request, code)
+        data = LoginWithGoogle.get(request.url, code)
         token = UserUsecase.auth_with_google(data[1], data[2], data[3])
         return redirect(f"{host}?token={token}")
     except Exception as e:

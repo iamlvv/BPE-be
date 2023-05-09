@@ -12,7 +12,7 @@ services:
     ports:
       - "8000:8000"
     working_dir: /python/src/bpe
-    command: sh -c "python run.py"
+    # command: sh -c "python run.py"
     depends_on:
       - db
     restart: unless-stopped
