@@ -163,7 +163,7 @@ class User:
 
     @classmethod
     def search(self, s):
-        query = f"""SELECT id, name, phone, avatar
+        query = f"""SELECT id, email, name, phone, avatar
                     FROM public.bpe_user
                     WHERE email LIKE '%{s}%';
                 """
@@ -171,4 +171,4 @@ class User:
         with connection.cursor() as cursor:
             cursor.execute(query)
             result = cursor.fetchall()
-            return list_tuple_to_dict(('id', 'name', 'phone', 'avatar'), result)
+            return list_tuple_to_dict(('id', 'email', 'name', 'phone', 'avatar'), result)
