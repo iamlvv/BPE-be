@@ -23,9 +23,9 @@ class UserUsecase:
     @classmethod
     def signup(self, password, email, name, phone, avatar):
         if not UserUsecase.check_exist(email):
-            id = UserUsecase.create(password, email, name, phone, avatar)
+            result = UserUsecase.create(password, email, name, phone, avatar)
             Thread(target=Email.verify_account, args=(email, name, encode({
-                "id": id,
+                "id": result.id,
                 "email": email,
                 "password": password
             }))).start()

@@ -39,7 +39,7 @@ class User:
                                    name, phone, avatar, str(verified),))
             connection.commit()
             result = cursor.fetchone()
-            return result
+            return User(id=result[0], email=result[1], password=result[2])
 
     @classmethod
     def verify(self, email):
