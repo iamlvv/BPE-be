@@ -10,8 +10,10 @@ class ProjectUsecase:
     @classmethod
     def create(cls, description, name, user_id):
         project = Project.create(description, name)
-        os.makedirs(f"static/{project.id}")
-        os.makedirs(f"static/{project.id}/images")
+        if os.path.isdir(f'static/{project.id}'):
+            os.makedirs(f"static/{project.id}")
+            if os.path.isdir(f'static/{project.id}/images'):
+                os.makedirs(f"static/{project.id}/images")
         BPMNFileUsecase.craete_default(project.id)
         DocumentFileUsecase.create_default(project.id)
         WorkOn.insert(user_id, project.id, Role.OWNER.value)

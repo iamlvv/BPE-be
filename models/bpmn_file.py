@@ -37,7 +37,7 @@ class BPMNFile:
 
     @classmethod
     def get_all(cls):
-        query = f"""SELECT id, xml_file_link, project_id, "version", last_saved
+        query = f"""SELECT xml_file_link, project_id, "version", last_saved
                     FROM public.bpmn_file;
                 """
         connection = DatabaseConnector.get_connection()
@@ -62,7 +62,7 @@ class BPMNFile:
 
     @classmethod
     def get_by_project(cls, project_id):
-        query = f"""SELECT id, xml_file_link, "version", last_saved
+        query = f"""SELECT xml_file_link, "version", last_saved
                     FROM public.bpmn_file
                     WHERE project_id={project_id};
                 """
