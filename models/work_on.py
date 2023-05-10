@@ -68,7 +68,7 @@ class WorkOn:
         query = f"""SELECT project.id, project.description, project."name", project.create_at
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id = project.id
-                    WHERE user_id={user_id};
+                    WHERE user_id={user_id} AND project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
@@ -81,7 +81,7 @@ class WorkOn:
         query = f"""SELECT project.id, project.description, project."name", project.create_at
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id = project.id
-                    WHERE user_id={user_id} AND work_on.role=0;
+                    WHERE user_id={user_id} AND project.is_delete=false AND work_on.role=0;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
@@ -94,7 +94,7 @@ class WorkOn:
         query = f"""SELECT project.id, project.description, project."name", project.create_at
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id = project.id
-                    WHERE user_id={user_id} AND work_on.role!=0;
+                    WHERE user_id={user_id} AND project.is_delete=false AND work_on.role!=0;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
@@ -141,9 +141,10 @@ class WorkOn:
 
     @classmethod
     def is_project_owner(self, user_id, project_id):
-        query = f"""SELECT id
+        query = f"""SELECT work_on.id
                     FROM public.work_on
-                    WHERE project_id={project_id} AND user_id={user_id} AND role={Role.OWNER.value};
+                        JOIN public.project ON work_on.project_id=project.id
+                    WHERE project_id={project_id} AND user_id={user_id} AND role={Role.OWNER.value} AND project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
@@ -153,10 +154,11 @@ class WorkOn:
 
     @classmethod
     def can_edit(self, user_id, project_id):
-        query = f"""SELECT id
+        query = f"""SELECT work_on.id
                     FROM public.work_on
+                        JOIN public.project ON work_on.project_id=project.id
                     WHERE project_id={project_id} AND user_id={user_id}
-                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value});
+                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value}) AND project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
@@ -166,10 +168,11 @@ class WorkOn:
 
     @classmethod
     def can_share(self, user_id, project_id):
-        query = f"""SELECT id
+        query = f"""SELECT work_on.id
                     FROM public.work_on
+                        JOIN public.project ON work_on.project_id=project.id
                     WHERE project_id={project_id} AND user_id={user_id}
-                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value}, {Role.CAN_SHARE.value});
+                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value}, {Role.CAN_SHARE.value}) AND project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
@@ -179,10 +182,11 @@ class WorkOn:
 
     @classmethod
     def can_view(self, user_id, project_id):
-        query = f"""SELECT id
+        query = f"""SELECT work_on.id
                     FROM public.work_on
+                        JOIN public.project ON work_on.project_id=project.id
                     WHERE project_id={project_id} AND user_id={user_id}
-                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value}, {Role.CAN_SHARE.value}, {Role.CAN_VIEW.value});
+                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value}, {Role.CAN_SHARE.value}, {Role.CAN_VIEW.value}) AND project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:

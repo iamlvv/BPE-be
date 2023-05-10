@@ -47,6 +47,17 @@ class Project:
             }
 
     @classmethod
+    def delete(self, project_id):
+        query = """UPDATE public.project
+                    SET is_delete=true
+                    WHERE id=%s;
+                """
+        connection = DatabaseConnector.get_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(query, (project_id,))
+            connection.commit()
+
+    @classmethod
     def get_all(cls):
         query = """SELECT id, description, "name", create_at
                     FROM public.project
@@ -91,7 +102,7 @@ class Project:
     def get_all_project_by_project_ids(self, project_ids):
         query = f"""SELECT id, description, "name", create_at
                     FROM public.project
-                    WHERE id IN ({",".join(str(project_id) for project_id in project_ids)})
+                    WHERE id IN ({",".join(str(project_id) for project_id in project_ids)}) AND is_delete=false
                     ORDER BY create_at;
                 """
         connection = DatabaseConnector.get_connection()

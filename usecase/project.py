@@ -30,6 +30,12 @@ class ProjectUsecase:
         return Project.get(project_id)
 
     @classmethod
+    def delete(self, project_id, user_id):
+        if not WorkOn.is_project_owner(user_id, project_id):
+            raise Exception('permission denied')
+        return Project.delete(project_id)
+
+    @classmethod
     def get_all(cls):
         return Project.get_all()
 

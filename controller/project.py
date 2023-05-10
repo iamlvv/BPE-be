@@ -40,6 +40,19 @@ def project_get_project(project_id):
         )
 
 
+@bpsky.route("/api/v1/project/<int:project_id>/delete", methods=["DELETE"])
+def project_delete_project(project_id):
+    try:
+        user_id = get_id_from_token(get_token(request))
+        ProjectUsecase.delete(project_id, user_id)
+        return "Delete successfully"
+    except Exception as e:
+        return bpsky.response_class(
+            response=e.__str__(),
+            status=500
+        )
+
+
 @bpsky.route("/api/v1/project/all", methods=["GET"])
 def project_get_all_project_by_user_id():
     try:

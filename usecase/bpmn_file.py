@@ -97,12 +97,16 @@ class BPMNFileUsecase:
 
     @classmethod
     def edit_comment(self, user_id, project_id, xml_file_link, id, content):
+        if not WorkOn.can_view(user_id, project_id):
+            raise Exception("permission denied")
         if not CommentOn.owner(user_id, project_id, xml_file_link, id):
             raise Exception("permission denied")
         CommentOn.update(id, content)
 
     @classmethod
     def delete_comment(self, user_id, project_id, xml_file_link, id):
+        if not WorkOn.can_view(user_id, project_id):
+            raise Exception("permission denied")
         if not CommentOn.owner(user_id, project_id, xml_file_link, id):
             raise Exception("permission denied")
         CommentOn.delete(id)
