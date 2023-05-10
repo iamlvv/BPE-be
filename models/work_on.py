@@ -77,6 +77,32 @@ class WorkOn:
             return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
 
     @classmethod
+    def get_all_owned_project_by_user_id(self, user_id):
+        query = f"""SELECT project.id, project.description, project."name", project.create_at
+                    FROM public.work_on
+                        JOIN public.project ON work_on.project_id = project.id
+                    WHERE user_id={user_id} AND work_on.role=0;
+                """
+        connection = DatabaseConnector.get_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
+
+    @classmethod
+    def get_all_shared_project_by_user_id(self, user_id):
+        query = f"""SELECT project.id, project.description, project."name", project.create_at
+                    FROM public.work_on
+                        JOIN public.project ON work_on.project_id = project.id
+                    WHERE user_id={user_id} AND work_on.role!=0;
+                """
+        connection = DatabaseConnector.get_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
+
+    @classmethod
     def get_all_user_by_project_id(self, project_id):
         query = f"""SELECT name, phone, avatar
                     FROM public.work_on

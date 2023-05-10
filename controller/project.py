@@ -57,6 +57,40 @@ def project_get_all_project_by_user_id():
         )
 
 
+@bpsky.route("/api/v1/project/all/owned", methods=["GET"])
+def project_get_all_owned_project_by_user_id():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        result = ProjectUsecase.get_all_owned_project_by_user_id(user_id)
+        return bpsky.response_class(
+            response=json.dumps(result, default=json_serial),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        return bpsky.response_class(
+            response=e.__str__(),
+            status=500
+        )
+
+
+@bpsky.route("/api/v1/project/all/shared", methods=["GET"])
+def project_get_all_shared_project_by_user_id():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        result = ProjectUsecase.get_all_shared_project_by_user_id(user_id)
+        return bpsky.response_class(
+            response=json.dumps(result, default=json_serial),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        return bpsky.response_class(
+            response=e.__str__(),
+            status=500
+        )
+
+
 # @bpsky.route("/api/v1/")
 # def project_get_all(request):
 #     return JsonResponse(ProjectUsecase.get_all(), status=status.HTTP_200_OK, safe=False)
