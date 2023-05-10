@@ -2,21 +2,18 @@ version: "2.3"
 
 services:
   web:
-    container_name: bpe-be-ctn-dev
-    image: python:3.9-slim
-    volumes:
-      - ./:/python/src/bpe
+    build:
+      context: .
+      target: bpsky-be-image
+    container_name: bpe-be-ctn-prod
+    image: bpsky-be-image
     ports:
       - "8000:8000"
-    working_dir: /python/src/bpe
-    command: sh -c "pip install -r ./requirements.txt && python run.py"
     depends_on:
       - db
-    restart: unless-stopped
-    tty: true
 
   db:
-    container_name: bpsky-db-ctn-dev
+    container_name: bpsky-db-ctn-prod
     image: postgres:15.1-alpine
     restart: unless-stopped
     environment:

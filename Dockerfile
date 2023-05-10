@@ -1,7 +1,13 @@
-FROM python:alpine3.16 as bpsky-be-image
+FROM python:3.9-slim as bpsky-be-image
+
+WORKDIR /bpe
 
 COPY requirements.txt .
 
 RUN pip install -r ./requirements.txt
 
-RUN pip install Flask twilio
+RUN pip install gunicorn
+
+COPY . .
+
+CMD gunicorn --bind 0.0.0.0:8000 run:bpsky
