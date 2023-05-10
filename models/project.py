@@ -30,9 +30,9 @@ class Project:
 
     @classmethod
     def get(self, project_id):
-        query = """SELECT id, description, "name", create_at
-                    FROM public.project
-                    WHERE id=%s AND is_delete=false;
+        query = """SELECT id, description, "name", create_at, work_on.user_id
+                    FROM public.project, public.work_on
+                    WHERE id=%s AND is_delete=false AND project.id=work_on.project_id;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
@@ -43,7 +43,8 @@ class Project:
                 'id': result[0],
                 'name': result[1],
                 'description': result[2],
-                'create_at': result[3]
+                'create_at': result[3],
+                'user_id': result[4]
             }
 
     @classmethod

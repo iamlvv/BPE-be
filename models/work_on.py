@@ -104,7 +104,7 @@ class WorkOn:
 
     @classmethod
     def get_all_user_by_project_id(self, project_id):
-        query = f"""SELECT name, phone, avatar
+        query = f"""SELECT name, phone, avatar, role
                     FROM public.work_on
                         JOIN public.bpe_user ON work_on.user_id = bpe_user.id
                     WHERE project_id={project_id};
@@ -113,7 +113,7 @@ class WorkOn:
         with connection.cursor() as cursor:
             cursor.execute(query)
             result = cursor.fetchall()
-            return list_tuple_to_dict(["name", "phone", "avatar"], result)
+            return list_tuple_to_dict(["name", "phone", "avatar", "role"], result)
 
     @classmethod
     def is_not_exists(self, user_ids, project_id):
