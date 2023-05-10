@@ -148,7 +148,8 @@ def project_get_document_content(project_id):
 @bpsky.route("/api/v1/project/<int:project_id>/user", methods=["GET"])
 def project_get_all_user(project_id):
     try:
-        data = ProjectUsecase.get_all_user_by_project_id(project_id)
+        user_id = get_id_from_token(get_token(request))
+        data = ProjectUsecase.get_all_user_by_project_id(user_id, project_id)
         return bpsky.response_class(
             response=json.dumps(data, default=json_serial),
             status=200,

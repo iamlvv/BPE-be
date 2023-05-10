@@ -12,9 +12,13 @@ def decode(jwt_string):
 
 
 def verify_token(inp):
+    for i in ["id", "email", "password"]:
+        if i not in inp:
+            raise Exception("token invalid")
     id = inp["id"]
     email = inp["email"]
-    User.verify_token(id, email)
+    password = inp["password"]
+    User.verify_token(id, email, password)
 
 
 def get_id_from_token(jwt_string):

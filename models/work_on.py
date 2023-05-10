@@ -1,5 +1,4 @@
 from .utils import *
-from .user import User
 from .constant import Role
 
 

@@ -71,7 +71,9 @@ class ProjectUsecase:
         return WorkOn.get_all_project_by_user_id(user_id)
 
     @classmethod
-    def get_all_user_by_project_id(self, project_id):
+    def get_all_user_by_project_id(self, user_id, project_id):
+        if not WorkOn.can_view(user_id, project_id):
+            raise Exception('permission denied')
         users = WorkOn.get_all_user_by_project_id(project_id)
         return users
 

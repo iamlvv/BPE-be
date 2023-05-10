@@ -66,7 +66,8 @@ def user_get_all():
 @bpsky.route("/api/v1/user", methods=["GET"])
 def user_get():
     try:
-        user = UserUsecase.get(get_token(request))
+        id = get_id_from_token(get_token(request))
+        user = UserUsecase.get(id)
         return bpsky.response_class(
             response=json.dumps(user),
             status=200,
@@ -101,6 +102,23 @@ def user_signin():
         )
 
 
+@bpsky.route("/api/v1/user/password/change", methods=["POST"])
+def user_change_password():
+    try:
+        email = get_email_from_token(get_token(request))
+        body = load_request_body(request)
+        if "newPassword" not in body:
+            raise Exception('new password required')
+        new_password = body['newPassword']
+        UserUsecase.change_password(email, new_password)
+        return "Change successfully"
+    except Exception as e:
+        return bpsky.response_class(
+            response=e.__str__(),
+            status=500
+        )
+
+
 @bpsky.route("/api/v1/user/reset", methods=["POST"])
 def user_reset_password():
     try:
@@ -120,11 +138,11 @@ def user_reset_password():
 @bpsky.route("/api/v1/user/search", methods=["GET"])
 def user_search():
     try:
-        get_email_from_token(get_token(request))
+        email = get_email_from_token(get_token(request))
         s = request.args.get('s', '')
         if s == '':
             raise Exception('bad request')
-        data = UserUsecase.search(s)
+        data = UserUsecase.search(s, email)
         return bpsky.response_class(
             response=json.dumps(data),
             status=200,

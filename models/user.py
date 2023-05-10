@@ -42,6 +42,17 @@ class User:
             return User(id=result[0], email=result[1], password=result[2])
 
     @classmethod
+    def change_password(self, email, new_hash_password):
+        query = """UPDATE public.bpe_user
+                    SET "password"=%s
+                    WHERE email=%s;
+                """
+        connection = DatabaseConnector.get_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(query, (new_hash_password, email,))
+            connection.commit()
+
+    @classmethod
     def verify(self, email):
         query = """UPDATE public.bpe_user
                     SET verified=true
@@ -56,14 +67,14 @@ class User:
             connection.commit()
 
     @classmethod
-    def verify_token(self, id, email):
+    def verify_token(self, id, email, hash_password):
         query = """SELECT id
                     FROM public.bpe_user
-                    WHERE email=%s and id=%s;
+                    WHERE email=%s and id=%s and password=%s;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
-            cursor.execute(query, (email, id,))
+            cursor.execute(query, (email, id, hash_password,))
             result = cursor.fetchall()
             if len(result) == 0:
                 raise Exception('Token invalid')
@@ -162,10 +173,10 @@ class User:
             return result != None
 
     @classmethod
-    def search(self, s):
+    def search(self, s, email):
         query = f"""SELECT id, email, name, phone, avatar
                     FROM public.bpe_user
-                    WHERE email LIKE '%{s}%';
+                    WHERE email LIKE '%{s}%' AND email!='{email}';
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:

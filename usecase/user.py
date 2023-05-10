@@ -2,7 +2,7 @@ from models.user import User
 from smtp.email import Email
 from threading import Thread
 import uuid
-from auth.jwt import *
+from auth.jwt import encode
 from .utils import *
 
 
@@ -13,6 +13,7 @@ class UserUsecase:
 
     @classmethod
     def signin(self, email, password):
+        print("hihi")
         result = User.get(email, hash_password(password))
         return encode({
             "id": result.id,
@@ -34,6 +35,10 @@ class UserUsecase:
             return "Account exist"
 
     @classmethod
+    def verify_token(self, id, email, password):
+        User.verify_token(id, email, hash_password(password))
+
+    @classmethod
     def resend_email(self, email):
         user = User.get_by_email(email)
         Thread(target=Email.verify_account, args=(email, user.name, encode({
@@ -42,6 +47,10 @@ class UserUsecase:
             "password": user.password
         }))).start()
         return "Resend successfully"
+
+    @classmethod
+    def change_password(self, email, new_password):
+        User.change_password(email, hash_password(new_password))
 
     @classmethod
     def reset_password(self, email):
@@ -57,8 +66,7 @@ class UserUsecase:
         User.verify(email)
 
     @classmethod
-    def get(self, token):
-        id = get_id_from_token(token)
+    def get(self, id):
         user = User.get_by_id(id)
         return {
             'name': user.name,
@@ -80,8 +88,8 @@ class UserUsecase:
         return User.check_exist(email)
 
     @classmethod
-    def search(self, s):
-        return User.search(s)
+    def search(self, s, email):
+        return User.search(s, email)
 
     @classmethod
     def auth_with_google(self, email, picture, name):
