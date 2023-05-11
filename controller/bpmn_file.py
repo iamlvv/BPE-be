@@ -119,9 +119,13 @@ def bpmn_file_comment():
         project_id = body['projectID']
         xml_file_link = body['xmlFileLink']
         content = body['content']
-        BPMNFileUsecase.comment(
+        data = BPMNFileUsecase.comment(
             user_id, project_id, xml_file_link, content)
-        return "Comment successfully"
+        return bpsky.response_class(
+            response=json.dumps(data, default=json_serial),
+            content_type="json",
+            status=200
+        )
     except Exception as e:
         return bpsky.response_class(
             response=e.__str__(),
@@ -184,7 +188,11 @@ def bpmn_file_get_comment_by_bpmn_file():
         xml_file_link = body['xmlFileLink']
         data = BPMNFileUsecase.get_comment_by_bpmn_file(
             user_id, project_id, xml_file_link)
-        return data
+        return bpsky.response_class(
+            response=json.dumps(data, default=json_serial),
+            content_type="json",
+            status=200
+        )
     except Exception as e:
         return bpsky.response_class(
             response=e.__str__(),
@@ -197,7 +205,11 @@ def bpmn_file_get_comment_by_user():
     try:
         user_id = get_id_from_token(get_token(request))
         data = BPMNFileUsecase.get_comment_by_user(user_id)
-        return data
+        return bpsky.response_class(
+            response=json.dumps(data, default=json_serial),
+            content_type="json",
+            status=200
+        )
     except Exception as e:
         return bpsky.response_class(
             response=e.__str__(),

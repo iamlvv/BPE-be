@@ -19,9 +19,9 @@ class WorkOn:
             connection.commit()
 
     @classmethod
-    def insert_many(self, user_ids, project_id, role):
+    def insert_many(self, users, project_id):
         values = ",".join("(%s, %s, %s)" %
-                          (id, project_id, role) for id in user_ids)
+                          (user["user_id"], project_id, user["role"]) for user in users)
         query = f"""INSERT INTO public.work_on
                     (user_id, project_id, "role")
                     VALUES{values};
@@ -43,10 +43,12 @@ class WorkOn:
             connection.commit()
 
     @classmethod
-    def update_many_role(self, user_ids, project_id, new_role):
-        query = f"""UPDATE public.work_on
-                    SET "role"={new_role}
-                    WHERE user_id IN ({",".join(str(user_id) for user_id in user_ids)}) AND project_id={project_id};
+    def update_many_role(self, users, project_id):
+        query = ""
+        for user in users:
+            query += f"""UPDATE public.work_on
+                    SET "role"={user["role"]}
+                    WHERE user_id={user["user_id"]} AND project_id={project_id};
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:

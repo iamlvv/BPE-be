@@ -92,14 +92,25 @@ class ProjectUsecase:
         return users
 
     @classmethod
-    def grant_permission(self, current_id, user_id, project_id, role):
-        if WorkOn.is_project_owner(current_id, project_id):
+    def validate_members(self, users):
+        for user in users:
+            if "user_id" not in user or "role" not in user:
+                raise Exception("bad request")
+            if type(user["user_id"]) != int:
+                raise Exception('type of user_id must be integer')
+            role = user["role"]
             if role == 0:
                 raise Exception('new role must not be project owner')
-            if type(user_id) is not list:
+            if role not in [Role.CAN_EDIT.value, Role.CAN_SHARE.value, Role.CAN_VIEW.value]:
                 raise Exception("bad request")
-            if WorkOn.is_not_exists(user_id, project_id):
-                WorkOn.insert_many(user_id, project_id, role)
+
+    @classmethod
+    def grant_permission(self, current_id, project_id, users):
+        self.validate_members(users)
+        user_ids = [user["user_id"] for user in users]
+        if WorkOn.is_project_owner(current_id, project_id):
+            if WorkOn.is_not_exists(user_ids, project_id):
+                WorkOn.insert_many(users, project_id)
                 return "Success"
             else:
                 raise Exception('member exist')
@@ -122,16 +133,12 @@ class ProjectUsecase:
             raise Exception('permission denied')
 
     @classmethod
-    def update_permission(self, current_id, user_id, project_id, new_role):
+    def update_permission(self, current_id, project_id, users):
+        self.validate_members(users)
+        user_ids = [user["user_id"] for user in users]
         if WorkOn.is_project_owner(current_id, project_id):
-            if type(user_id) is not list:
-                raise Exception("bad request")
-            if current_id in user_id:
-                raise Exception("can't update project owner")
-            if new_role == 0:
-                raise Exception('new role must not be project owner')
-            if WorkOn.is_exists(user_id, project_id):
-                WorkOn.update_many_role(user_id, project_id, new_role)
+            if WorkOn.is_exists(user_ids, project_id):
+                WorkOn.update_many_role(users, project_id)
                 return "Success"
             else:
                 raise Exception("this user isn't project's member")

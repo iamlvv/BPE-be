@@ -93,7 +93,7 @@ class BPMNFileUsecase:
     def comment(self, user_id, project_id, xml_file_link, content):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
-        CommentOn.insert(user_id, project_id, xml_file_link, content)
+        return CommentOn.insert(user_id, project_id, xml_file_link, content)
 
     @classmethod
     def edit_comment(self, user_id, project_id, xml_file_link, id, content):

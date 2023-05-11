@@ -13,13 +13,16 @@ class CommentOn:
     def insert(self, user_id, project_id, xml_file_link, content):
         query = """INSERT INTO public.comment_on
                     (user_id, project_id, xml_file_link, "content", create_at)
-                    VALUES(%s, %s, %s, %s, NOW());
+                    VALUES(%s, %s, %s, %s, NOW())
+                    RETURNING user_id, project_id, xml_file_link, "content", create_at;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
             cursor.execute(
                 query, (user_id, project_id, xml_file_link, content,))
             connection.commit()
+            result = cursor.fetchone()
+            return dict(zip(["user_id", "project_id", "xml_file_link", "content", "create_at"], result))
 
     @classmethod
     def update(self, id, content):
@@ -61,36 +64,58 @@ class CommentOn:
 
     @classmethod
     def get(self, user_id, project_id, xml_file_link):
-        query = """SELECT id, user_id, project_id, xml_file_link, "content", create_at
+        query = """SELECT comment_on.id, comment_on.project_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
+                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.comment_on
-                    WHERE user_id=%s AND project_id=%s AND xml_file_link=%s;
+                        JOIN public.bpe_user ON comment_on.user_id=bpe_user.id
+                    WHERE comment_on.user_id=%s AND comment_on.project_id=%s AND comment_on.xml_file_link=%s;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
             cursor.execute(
                 query, (user_id, project_id, xml_file_link,))
-            return list_tuple_to_dict(["id", "user_id", "project_id", "xml_file_link", "content", "create_at"], cursor.fetchall())
+            return list_tuple_to_dict(["id", "project_id", "xml_file_link", "content", "create_at", "user_id", "email", "phone", "avatar"], cursor.fetchall())
 
     @classmethod
     def get_by_bpmn_file(self, project_id, xml_file_link):
-        query = """SELECT id, user_id, project_id, xml_file_link, "content", create_at
+        query = """SELECT comment_on.id, comment_on.project_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
+                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.comment_on
+                        JOIN public.bpe_user ON comment_on.user_id=bpe_user.id
                     WHERE project_id=%s AND xml_file_link=%s;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
             cursor.execute(
                 query, (project_id, xml_file_link,))
-            return list_tuple_to_dict(["id", "user_id", "project_id", "xml_file_link", "content", "create_at"], cursor.fetchall())
+            result = []
+            for record in cursor.fetchall():
+                cmt = dict(
+                    zip(["id", "project_id", "xml_file_link", "content", "create_at"], record[:5]))
+                user = dict(
+                    zip(["id", "email", "phone", "avatar"], record[5:]))
+                cmt["author"] = user
+                result.append(cmt)
+            return result
 
     @classmethod
     def get_by_user(self, user_id):
-        query = """SELECT id, user_id, project_id, xml_file_link, "content", create_at
+        query = """SELECT comment_on.id, comment_on.project_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
+                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.comment_on
+                        JOIN public.bpe_user ON comment_on.user_id=bpe_user.id
                     WHERE user_id=%s;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
             cursor.execute(
                 query, (user_id,))
-            return list_tuple_to_dict(["id", "user_id", "project_id", "xml_file_link", "content", "create_at"], cursor.fetchall())
+            result = []
+            for record in cursor.fetchall():
+                cmt = dict(
+                    zip(["id", "project_id", "xml_file_link", "content", "create_at"], record[:5]))
+                user = dict(
+                    zip(["id", "email", "phone", "avatar"], record[5:]))
+                cmt["author"] = user
+                result.append(cmt)
+            return result

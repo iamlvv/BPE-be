@@ -214,12 +214,7 @@ def project_update_all_user(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
         body = load_request_body(request)
-        for i in ["user_id", "role"]:
-            if i not in body:
-                raise Exception(i + " required")
-        user_ids = body["user_id"]
-        role = body["role"]
-        return ProjectUsecase.update_permission(user_id, user_ids, project_id, role)
+        return ProjectUsecase.update_permission(user_id, project_id, body)
     except Exception as e:
         return bpsky.response_class(
             response=e.__str__(),
@@ -250,13 +245,7 @@ def project_grant_user(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
         body = load_request_body(request)
-        body = load_request_body(request)
-        for i in ["user_id", "role"]:
-            if i not in body:
-                raise Exception(i + " required")
-        user_ids = body["user_id"]
-        role = body["role"]
-        return ProjectUsecase.grant_permission(user_id, user_ids, project_id, role)
+        return ProjectUsecase.grant_permission(user_id, project_id, body)
     except Exception as e:
         return bpsky.response_class(
             response=e.__str__(),
