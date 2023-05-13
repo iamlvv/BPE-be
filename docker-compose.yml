@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"
     working_dir: /python/src/bpe
-    command: sh -c "pip install -r ./requirements.txt && python run.py"
+    # command: sh -c "pip install -r ./requirements.txt && python run.py"
     depends_on:
       - db
     restart: unless-stopped

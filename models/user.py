@@ -39,7 +39,7 @@ class User:
                                    name, phone, avatar, str(verified),))
             connection.commit()
             result = cursor.fetchone()
-            return User(id=result[0], email=result[1], password=result[2])
+            return User(id=result[0], email=result[2], password=result[1])
 
     @classmethod
     def change_password(self, email, new_hash_password):
