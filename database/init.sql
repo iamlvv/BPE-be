@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS public.bpmn_file
     xml_file_link character varying COLLATE pg_catalog."default" NOT NULL UNIQUE,
     project_id    integer                                             NOT NULL,
     version       varchar(10),
+    name          character varying(200) COLLATE pg_catalog."default" NOT NULL,
     last_saved    timestamp without time zone,
     CONSTRAINT bpmn_file_pkey PRIMARY KEY (xml_file_link, project_id),
     CONSTRAINT bpmn_file_version_key UNIQUE (version)
@@ -121,9 +122,6 @@ CREATE TABLE IF NOT EXISTS public.evaluated_result
     name               character varying(200) COLLATE pg_catalog."default" NOT NULL UNIQUE,
     result             jsonb,
     description        character varying COLLATE pg_catalog."default",
-    project_start_time timestamp without time zone NOT NULL,
-    base_time_unit     double precision NOT NULL,
-    base_currency_unit character varying(10) COLLATE pg_catalog."default" NOT NULL,
     create_at          timestamp without time zone,
     CONSTRAINT evaluated_result_pkey PRIMARY KEY (xml_file_link, project_id, name)
 )

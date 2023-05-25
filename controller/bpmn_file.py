@@ -37,6 +37,23 @@ def bpmn_file_create_new_version(project_id):
         )
 
 
+@bpsky.route("/api/v1/bpmnfile/<int:project_id>/<string:version>/name", methods=["PUT"])
+def bpmn_file_update_name(project_id, version):
+    try:
+        user_id = get_id_from_token(get_token(request))
+        body = load_request_body(request)
+        for i in ["name"]:
+            if i not in body:
+                raise Exception(i + " required")
+        BPMNFileUsecase.update_name(user_id, project_id, version, body["name"])
+        return "Update successfully"
+    except Exception as e:
+        return bpsky.response_class(
+            response=e.__str__(),
+            status=500
+        )
+
+
 @bpsky.route("/api/v1/bpmnfile/delete_oldest/<int:project_id>", methods=["DELETE"])
 def bpmn_file_delete_oldest_version(project_id):
     try:

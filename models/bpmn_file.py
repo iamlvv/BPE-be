@@ -5,6 +5,7 @@ class BPMNFile:
     xml_file_link = ""
     project_id = 0
     version = ""
+    name = ""
     last_saved = datetime.now()
 
     def __init__(self, **kwargs):
@@ -14,10 +15,10 @@ class BPMNFile:
         vars(self).update(kwargs)
 
     @classmethod
-    def create(cls, xml_file_link, project_id, version):
+    def create(cls, xml_file_link, project_id, version, name):
         query = f"""INSERT INTO public.bpmn_file
-                    (xml_file_link, project_id, "version", last_saved)
-                    VALUES('{xml_file_link}', {project_id}, '{version}', NOW());
+                    (xml_file_link, project_id, "version", "name", last_saved)
+                    VALUES('{xml_file_link}', {project_id}, '{version}', '{name}', NOW());
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
@@ -36,19 +37,30 @@ class BPMNFile:
             connection.commit()
 
     @classmethod
+    def update_name(self, project_id, version, name):
+        query = f"""UPDATE public.bpmn_file
+                    SET "name"='{name}'
+                    WHERE project_id={project_id} AND version='{version}';
+                """
+        connection = DatabaseConnector.get_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            connection.commit()
+
+    @classmethod
     def get_all(cls):
-        query = f"""SELECT xml_file_link, project_id, "version", last_saved
+        query = f"""SELECT xml_file_link, project_id, "version", "name", last_saved
                     FROM public.bpmn_file;
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
             cursor.execute(query)
             result = cursor.fetchall()
-            return list_tuple_to_dict(["xml_file_link", "project_id", "version", "last_saved"], result)
+            return list_tuple_to_dict(["xml_file_link", "project_id", "version", "name", "last_saved"], result)
 
     @classmethod
     def get_by_version(cls, project_id, version):
-        query = f"""SELECT xml_file_link, "version", last_saved
+        query = f"""SELECT xml_file_link, "version", "name", last_saved
                     FROM public.bpmn_file
                     WHERE project_id={project_id} AND version='{version}';
                 """
@@ -58,11 +70,11 @@ class BPMNFile:
             result = cursor.fetchone()
             if result == None:
                 raise Exception("version doesn't exist")
-            return dict(zip(["xml_file_link", "version", "last_saved"], result))
+            return dict(zip(["xml_file_link", "version", "name", "last_saved"], result))
 
     @classmethod
     def get_by_project(cls, project_id):
-        query = f"""SELECT xml_file_link, "version", last_saved
+        query = f"""SELECT xml_file_link, "version", "name", last_saved
                     FROM public.bpmn_file
                     WHERE project_id={project_id};
                 """
@@ -70,7 +82,7 @@ class BPMNFile:
         with connection.cursor() as cursor:
             cursor.execute(query)
             result = cursor.fetchall()
-            return list_tuple_to_dict(["xml_file_link", "version", "last_saved"], result)
+            return list_tuple_to_dict(["xml_file_link", "version", "name", "last_saved"], result)
 
     @classmethod
     def delete(self, project_id, version):

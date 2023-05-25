@@ -30,18 +30,15 @@ def evaluated_result_save(project_id):
     try:
         user_id = get_id_from_token(get_token(request))
         body = load_request_body(request)
-        for i in ["xmlFileLink", "name", "result", "projectStartTime", "baseTimeUnit", "baseCurrencyUnit"]:
+        for i in ["xmlFileLink", "name", "result"]:
             if i not in body:
                 raise Exception(i + " required")
         xml_file_link = body['xmlFileLink']
         name = body['name']
         result = body['result']
         description = body['description'] if 'description' in body else ""
-        project_start_time = body['projectStartTime']
-        base_time_unit = body['baseTimeUnit']
-        base_currency_unit = body['baseCurrencyUnit']
         EvaluatedResultUsercase.save(user_id, xml_file_link, project_id, name, result,
-                                     description, project_start_time, base_time_unit, base_currency_unit)
+                                     description)
         return "Create successfully"
     except Exception as e:
         return bpsky.response_class(

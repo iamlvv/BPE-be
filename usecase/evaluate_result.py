@@ -4,11 +4,11 @@ from models.work_on import WorkOn
 
 class EvaluatedResultUsercase:
     @classmethod
-    def save(self, user_id, xml_file_link, project_id, name, result, description, project_start_time, base_time_unit, base_currency_unit):
+    def save(self, user_id, xml_file_link, project_id, name, result, description):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
-        EvaluatedResult.insert(xml_file_link, project_id, name, result, description,
-                               project_start_time, base_time_unit, base_currency_unit)
+        EvaluatedResult.insert(xml_file_link, project_id,
+                               name, result, description)
 
     @classmethod
     def get_all_result_by_bpmn_file(self, user_id, project_id, xml_file_link):
