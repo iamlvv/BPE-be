@@ -14,7 +14,7 @@ class EvaluatedResult:
     def insert(self, xml_file_link, project_id, name, result, description):
         query = """INSERT INTO public.evaluated_result
                     (xml_file_link, project_id, "name", "result", description, create_at)
-                    VALUES(%s, %s, %s, %s::jsonb, %s, %s, %s, %s, NOW());
+                    VALUES(%s, %s, %s, %s::jsonb, %s, NOW());
                 """
         connection = DatabaseConnector.get_connection()
         with connection.cursor() as cursor:
