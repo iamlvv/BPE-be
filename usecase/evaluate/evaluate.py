@@ -130,8 +130,8 @@ class Evaluate:
     def evaluate(cls, map_element: dict):
         collaboration = ProcessDirector(map_element).build_graph()
         t = Traverse()
-        c = Context()
         for p in collaboration.participants:
+            c = Context()
             r = Result()
             r.name = p.name
             p.accept(t, c, r)
