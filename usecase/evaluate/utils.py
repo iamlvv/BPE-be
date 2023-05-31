@@ -65,7 +65,7 @@ class Result:
     totalCost: float
     unitCost: list
     transparency: dict
-    totalNumberExplicitTasks: list
+    totalNumberExplicitTasks: int
     numberOfOptionalTasks: int
     totalTasks: int
     flexibility: float

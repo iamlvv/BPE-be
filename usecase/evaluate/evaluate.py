@@ -123,6 +123,16 @@ class Collaboration:
         self.result = []
         self.node = []
 
+    def get_total_number_explicit_tasks(self):
+        total_number_explicit_tasks = 0
+        for p in self.participants:
+            if not len(p.lane):
+                total_number_explicit_tasks += p.number_of_tasks
+            else:
+                for l in p.lane:
+                    total_number_explicit_tasks += l.number_of_tasks
+        return total_number_explicit_tasks
+
 
 class Evaluate:
 
@@ -134,6 +144,7 @@ class Evaluate:
             c = Context()
             r = Result()
             r.name = p.name
+            r.totalNumberExplicitTasks = collaboration.get_total_number_explicit_tasks()
             p.accept(t, c, r)
             if r.handledTasks + r.unHandledTasks > 0:
                 r.exceptionHandling = r.handledTasks / \

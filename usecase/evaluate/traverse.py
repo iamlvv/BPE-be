@@ -23,7 +23,7 @@ class Traverse:
         )
 
         r.totalTasks += 1
-        r.totalNumberExplicitTasks += 1
+        # r.totalNumberExplicitTasks += 1
         if c.in_xor_block > 0:
             r.numberOfOptionalTasks += 1
 
@@ -62,7 +62,7 @@ class Traverse:
         )
 
         r.totalTasks += 1
-        r.totalNumberExplicitTasks += 1
+        # r.totalNumberExplicitTasks += 1
         if c.in_xor_block > 0:
             r.numberOfOptionalTasks += 1
 
