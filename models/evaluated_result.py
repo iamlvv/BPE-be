@@ -44,7 +44,11 @@ class EvaluatedResult:
         with connection.cursor() as cursor:
             cursor.execute(
                 query, (xml_file_link, project_id, name,))
-            return list_tuple_to_dict(["name", "result", "description", "create_at"], cursor.fetchall())[0]
+            list_result = list_tuple_to_dict(
+                ["name", "result", "description", "create_at"], cursor.fetchall())
+            if len(list_result) == 0:
+                return {}
+            return list_result[0]
 
     @classmethod
     def delete(self, xml_file_link, project_id, name):

@@ -7,10 +7,8 @@ def bpmn_file_save(project_id, version):
         user_id = get_id_from_token(get_token(request))
         if "file" not in request.files:
             raise Exception("file required")
-        if "xmlFileLink" not in request.form:
-            raise Exception("xmlFileLink required")
         file = request.files['file']
-        xml_file_link = request.form['xmlFileLink']
+        xml_file_link = f"static/{project_id}/{version}.bpmn"
         BPMNFileUsecase.save(xml_file_link, file,
                              user_id, project_id, version)
         return "Save successfully"
@@ -130,12 +128,13 @@ def bpmn_file_comment():
     try:
         user_id = get_id_from_token(get_token(request))
         body = load_request_body(request)
-        for i in ["projectID", "xmlFileLink", "content"]:
+        for i in ["projectID", "version", "content"]:
             if i not in body:
                 raise Exception(i + " required")
         project_id = body['projectID']
-        xml_file_link = body['xmlFileLink']
+        version = body['version']
         content = body['content']
+        xml_file_link = f"static/{project_id}/{version}.bpmn"
         data = BPMNFileUsecase.comment(
             user_id, project_id, xml_file_link, content)
         return bpsky.response_class(
@@ -155,13 +154,14 @@ def bpmn_file_edit_comment():
     try:
         user_id = get_id_from_token(get_token(request))
         body = load_request_body(request)
-        for i in ["projectID", "xmlFileLink", "id", "content"]:
+        for i in ["projectID", "version", "id", "content"]:
             if i not in body:
                 raise Exception(i + " required")
         project_id = body['projectID']
-        xml_file_link = body['xmlFileLink']
+        version = body['version']
         id = body['id']
         content = body['content']
+        xml_file_link = f"static/{project_id}/{version}.bpmn"
         BPMNFileUsecase.edit_comment(
             user_id, project_id, xml_file_link, id, content)
         return "Edit successfully"
@@ -177,12 +177,13 @@ def bpmn_file_delete_comment():
     try:
         user_id = get_id_from_token(get_token(request))
         body = load_request_body(request)
-        for i in ["projectID", "xmlFileLink", "id"]:
+        for i in ["projectID", "version", "id"]:
             if i not in body:
                 raise Exception(i + " required")
         project_id = body['projectID']
-        xml_file_link = body['xmlFileLink']
+        version = body['version']
         id = body['id']
+        xml_file_link = f"static/{project_id}/{version}.bpmn"
         BPMNFileUsecase.delete_comment(
             user_id, project_id, xml_file_link, id)
         return "Delete successfully"
@@ -193,16 +194,15 @@ def bpmn_file_delete_comment():
         )
 
 
-@bpsky.route("/api/v1/bpmnfile/comment", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/comment", methods=["GET"])
 def bpmn_file_get_comment_by_bpmn_file():
     try:
         user_id = get_id_from_token(get_token(request))
-        body = load_request_body(request)
-        for i in ["projectID", "xmlFileLink"]:
-            if i not in body:
-                raise Exception(i + " required")
-        project_id = body['projectID']
-        xml_file_link = body['xmlFileLink']
+        project_id = request.args.get('projectID', '')
+        version = request.args.get('version', '')
+        if project_id == "" or version == "":
+            raise Exception("projectID or version required")
+        xml_file_link = f"static/{project_id}/{version}.bpmn"
         data = BPMNFileUsecase.get_comment_by_bpmn_file(
             user_id, project_id, xml_file_link)
         return bpsky.response_class(
@@ -217,7 +217,7 @@ def bpmn_file_get_comment_by_bpmn_file():
         )
 
 
-@bpsky.route("/api/v1/bpmnfile/comment/user", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/comment/user", methods=["GET"])
 def bpmn_file_get_comment_by_user():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -234,16 +234,15 @@ def bpmn_file_get_comment_by_user():
         )
 
 
-@bpsky.route("/api/v1/bpmnfile/image", methods=["POST"])
+@bpsky.route("/api/v1/bpmnfile/image", methods=["GET"])
 def bpmn_file_get_image_by_bpmn_file():
     try:
         user_id = get_id_from_token(get_token(request))
-        body = load_request_body(request)
-        for i in ["projectID", "xmlFileLink"]:
-            if i not in body:
-                raise Exception(i + " required")
-        project_id = body['projectID']
-        xml_file_link = body['xmlFileLink']
+        project_id = request.args.get('projectID', '')
+        version = request.args.get('version', '')
+        if project_id == "" or version == "":
+            raise Exception("projectID or version required")
+        xml_file_link = f"static/{project_id}/{version}.bpmn"
         data = ImageUsecase.get_image_by_bpmn_file(
             user_id, project_id, xml_file_link)
         return bpsky.response_class(
@@ -264,12 +263,13 @@ def bpmn_file_add_image():
         user_id = get_id_from_token(get_token(request))
         if "file" not in request.files:
             raise Exception("file required")
-        for i in ["projectID", "xmlFileLink"]:
+        for i in ["projectID", "version"]:
             if i not in request.form:
                 raise Exception(i + " required")
         file = request.files['file']
         project_id = request.form['projectID']
-        xml_file_link = request.form['xmlFileLink']
+        version = request.form['version']
+        xml_file_link = f"static/{project_id}/{version}.bpmn"
         ImageUsecase.insert_image(
             user_id, project_id, xml_file_link, file)
         return "Create successfully"

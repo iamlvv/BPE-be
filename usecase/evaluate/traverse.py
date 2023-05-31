@@ -109,7 +109,8 @@ class Traverse:
             if c.in_xor_block > 0:
                 next_node = e.next[0]
                 if isinstance(next_node, ExclusiveGateway) and next_node.is_join_gateway():
-                    gateway_traveled, pre = self.check_exclusive_gateway_traveled(next_node.previous, c)
+                    gateway_traveled, pre = self.check_exclusive_gateway_traveled(
+                        next_node.previous, c)
                     if gateway_traveled:
                         self.visit(e.next[0], c, r)
                     else:
@@ -178,7 +179,7 @@ class Traverse:
         elif e.event_type == EventType.END_EVENT.value:
             if len(c.in_subprocess) > 0:
                 c.number_of_exception_events[c.in_subprocess[-1]
-                ]["throwing_event"] += 1
+                                             ]["throwing_event"] += 1
             if e.code in c.list_event_subprocess:
                 # end event triggers a event subprocess
                 cycletime_event_subprocess = c.list_event_subprocess[
@@ -202,10 +203,10 @@ class Traverse:
         if e.event_type == EventType.END_EVENT.value:
             if len(c.in_subprocess) > 0:
                 c.number_of_exception_events[c.in_subprocess[-1]
-                ]["throwing_event"] += 1
+                                             ]["throwing_event"] += 1
             if len(c.in_subprocess) > 0:
                 c.number_of_exception_events[c.in_subprocess[-1]
-                ]["end_event"] += 1
+                                             ]["end_event"] += 1
             r.totalCycleTime = 0
             r.totalCost = 0
             return
@@ -249,7 +250,8 @@ class Traverse:
             if e.id in c.list_gateway:
                 c.list_gateway[e.id] += 1
             else:
-                c.list_gateway[e.id] = 1 + self.number_of_gateway_in_nodes(e.previous)
+                c.list_gateway[e.id] = 1 + \
+                    self.number_of_gateway_in_nodes(e.previous)
             # check so lan da duyet cua cong join
             if c.list_gateway[e.id] < len(e.previous):
                 r.totalCycleTime = 0
@@ -362,7 +364,7 @@ class Traverse:
                 "view": e.name,
                 "numberOfExplicitTask": e.number_of_tasks,
                 "transparency": (
-                        e.number_of_tasks / r.totalNumberExplicitTasks) if r.totalNumberExplicitTasks > 0 else 1
+                    e.number_of_tasks / r.totalNumberExplicitTasks) if r.totalNumberExplicitTasks > 0 else 1
             }
             return
 
@@ -376,7 +378,7 @@ class Traverse:
                 "view": l.name,
                 "numberOfExplicitTask": l.number_of_tasks,
                 "transparency": (
-                        l.number_of_tasks / r.totalNumberExplicitTasks) if r.totalNumberExplicitTasks != 0 else 1
+                    l.number_of_tasks / r.totalNumberExplicitTasks) if r.totalNumberExplicitTasks != 0 else 1
             }
 
         r.totalCycleTime = total_cycle_time
@@ -458,10 +460,10 @@ class Traverse:
             total_cost += r.totalCost
 
         if c.number_of_exception_events[e.id]["catching_event"] > 0 and c.number_of_exception_events[e.id][
-            "throwing_event"] > 0:
+                "throwing_event"] > 0:
             r.handledTasks += 1
         elif c.number_of_exception_events[e.id]["catching_event"] == 0 and c.number_of_exception_events[e.id][
-            "throwing_event"] > 0:
+                "throwing_event"] > 0:
             r.unHandledTasks += 1
 
         r.totalCycleTime = total_cycle_time + next_time
@@ -567,20 +569,20 @@ class Traverse:
 
         if interrupt:
             total_cycle_time += percentage * \
-                                boundary_ct + (1 - percentage) * sequence_ct
+                boundary_ct + (1 - percentage) * sequence_ct
             total_cost += percentage * \
-                          boundary_cost + (1 - percentage) * sequence_cost
+                boundary_cost + (1 - percentage) * sequence_cost
         else:
             total_cycle_time += percentage * max(boundary_ct, sequence_ct) + (
-                    1 - percentage) * sequence_ct
+                1 - percentage) * sequence_ct
             total_cost += percentage * max(boundary_cost, sequence_cost) + (
-                    1 - percentage) * sequence_cost
+                1 - percentage) * sequence_cost
         r.totalCycleTime += total_cycle_time
         r.totalCost += total_cost
         r.numberOfOptionalTasks += boundary_temp_result.numberOfOptionalTasks + \
-                                   seq_temp_result.numberOfOptionalTasks
+            seq_temp_result.numberOfOptionalTasks
         r.totalTasks += boundary_temp_result.totalTasks + \
-                        seq_temp_result.totalTasks
+            seq_temp_result.totalTasks
 
     def handle_for_boundary_timer_event(self, e: NormalTask, c: Context, r: Result, next_time: float, next_cost: float):
         total_cycle_time = 0.0
@@ -656,7 +658,7 @@ class Traverse:
             c.list_gateway[e.id] += 1
         else:
             c.list_gateway[e.id] = 1 + \
-                                   self.number_of_gateway_in_nodes(e.previous)
+                self.number_of_gateway_in_nodes(e.previous)
 
         # Check how many times this join gateway has been visited
         if c.list_gateway[e.id] < len(e.previous):
@@ -664,7 +666,8 @@ class Traverse:
             r.totalCost = 0
             return
 
-        gateway_traveled, pre = self.check_exclusive_gateway_traveled(e.previous, c)
+        gateway_traveled, pre = self.check_exclusive_gateway_traveled(
+            e.previous, c)
         if not gateway_traveled:
             print("Start loop")
 
@@ -697,7 +700,7 @@ class Traverse:
         )
 
         if not (len(e.next) > 0 and isinstance(e.next[0], MessageEvent) and e.next[
-            0].event_type == EventType.INTERMIDIATE_CATCH_EVENT.value):
+                0].event_type == EventType.INTERMIDIATE_CATCH_EVENT.value):
             c.stack_next_gateway.append(e)
         r.totalCycleTime = 0
         r.totalCost = 0
@@ -739,9 +742,9 @@ class Traverse:
                 r.totalCost = 0
                 self.visit(branch, c, r)
                 total_cycle_time += e.branching_probabilities[i] * \
-                                    r.totalCycleTime
+                    r.totalCycleTime
                 total_cost += e.branching_probabilities[i] * \
-                              r.totalCost
+                    r.totalCost
 
             # if isinstance(e, ExclusiveGateway):
             c.in_xor_block -= 1
