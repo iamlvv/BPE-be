@@ -135,8 +135,9 @@ class Traverse:
                 r.totalCycleTime = 0
                 r.totalCost = 0
         elif e.event_type == EventType.START_EVENT.value:
-            r.totalCycleTime = 0
-            r.totalCost = 0
+            if len(e.incoming_messageflow) == 0:
+                r.totalCycleTime = 0
+                r.totalCost = 0
             self.visit(e.next[0], c, r)
         elif e.event_type == EventType.BOUNDARY_EVENT.value:
             self.visit(e.next[0], c, r)
