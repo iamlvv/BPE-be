@@ -14,7 +14,7 @@ class ProjectUsecase:
             os.makedirs(f"static/{project.id}")
             if not os.path.isdir(f'static/{project.id}/images'):
                 os.makedirs(f"static/{project.id}/images")
-        BPMNFileUsecase.craete_default(project.id)
+        BPMNFileUsecase.craete_default(project.id, name)
         DocumentFileUsecase.create_default(project.id)
         WorkOn.insert(user_id, project.id, Role.OWNER.value)
         return {

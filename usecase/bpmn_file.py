@@ -16,12 +16,12 @@ class BPMNFileUsecase:
         BPMNFile.update_version(project_id, version)
 
     @classmethod
-    def craete_default(self, project_id):
+    def craete_default(self, project_id, project_name):
         version = str(uuid.uuid1())[:8]
         xml_file_link = FileIO.copy_file(
             "static/diagram.bpmn", f"{project_id}/{version}.bpmn")
 
-        BPMNFile.create(xml_file_link, project_id, version, version)
+        BPMNFile.create(xml_file_link, project_id, version, project_name)
 
     @classmethod
     def create_new_version(self, user_id, file, project_id):
@@ -30,11 +30,13 @@ class BPMNFileUsecase:
         if len(BPMNFile.get_by_project(project_id)) == 5:
             raise Exception("current number of versions is equal to 5")
         version = str(uuid.uuid1())[:8]
+        file_name = os.path.splitext(file.filename)[0]
         extension_name = os.path.splitext(file.filename)[1]
         xml_file_link = FileIO.create_bpmn_file(
             file, f"{project_id}/{version}{extension_name}")
 
-        BPMNFile.create(xml_file_link, project_id, version, version)
+        BPMNFile.create(xml_file_link, project_id, version,
+                        f"new version of {file_name}")
 
     @classmethod
     def update_name(self, user_id, project_id, version, name):
