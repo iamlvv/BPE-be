@@ -1,128 +1,121 @@
 import os
 import uuid
 from datetime import datetime
-from models.bpmn_file import BPMNFile
+from models.process_version import ProcessVersion
 from models.work_on import WorkOn
 from models.comment_on import CommentOn
 from fileIO.file import FileIO
 
 
-class BPMNFileUsecase:
+class ProcessVersionUsecase:
     @classmethod
-    def save(self, xml_file_link, file, user_id, project_id, version):
+    def save(self, xml_file_link, file, user_id, project_id, process_id, version):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
         FileIO.save_bpmn_file(xml_file_link, file)
-        BPMNFile.update_version(project_id, version)
+        ProcessVersion.update_version(project_id, process_id, version)
 
     @classmethod
-    def craete_default(self, project_id, project_name):
+    def create_default(self, project_id, process_id):
         version = str(uuid.uuid1())[:8]
         xml_file_link = FileIO.copy_file(
-            "static/diagram.bpmn", f"{project_id}/{version}.bpmn")
+            "static/diagram.bpmn", f"{project_id}/{process_id}/{version}.bpmn")
 
-        BPMNFile.create(xml_file_link, project_id, version, project_name)
+        ProcessVersion.create(xml_file_link, project_id, process_id, version)
 
     @classmethod
-    def create_new_version(self, user_id, file, project_id):
+    def create_new_version(self, user_id, file, project_id, process_id):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
-        if len(BPMNFile.get_by_project(project_id)) == 5:
+        if len(ProcessVersion.get_by_process(project_id, process_id)) == 5:
             raise Exception("current number of versions is equal to 5")
         version = str(uuid.uuid1())[:8]
         file_name = os.path.splitext(file.filename)[0]
         extension_name = os.path.splitext(file.filename)[1]
         xml_file_link = FileIO.create_bpmn_file(
-            file, f"{project_id}/{version}{extension_name}")
+            file, f"{project_id}/{process_id}/{version}{extension_name}")
 
-        BPMNFile.create(xml_file_link, project_id, version,
-                        f"new version of {file_name}")
-
-    @classmethod
-    def update_name(self, user_id, project_id, version, name):
-        if not WorkOn.can_edit(user_id, project_id):
-            raise Exception("permission denied")
-        BPMNFile.update_name(project_id, version, name)
+        ProcessVersion.create(xml_file_link, project_id, process_id, version)
 
     @classmethod
-    def create_new_version_permanently(self, user_id, xml_file_link, project_id):
+    def create_new_version_permanently(self, user_id, xml_file_link, project_id, process_id):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
-        if len(BPMNFile.get_by_project(project_id)) == 5:
+        if len(ProcessVersion.get_by_process(project_id, process_id)) == 5:
             self.delete_oldest_version(project_id)
         version = str(uuid.uuid1())[:8]
 
-        BPMNFile.create(xml_file_link, project_id, version, version)
+        ProcessVersion.create(xml_file_link, project_id, process_id, version)
 
     @classmethod
     def get_all(self):
-        bpmn_files = BPMNFile.get_all()
+        bpmn_files = ProcessVersion.get_all()
         return bpmn_files
 
     @classmethod
-    def get_by_version(self, user_id, project_id, version):
+    def get_by_version(self, user_id, project_id, process_id, version):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
-        bpmn_files = BPMNFile.get_by_version(
-            project_id, version)['xml_file_link']
+        bpmn_files = ProcessVersion.get_by_version(
+            project_id, process_id, version)['xml_file_link']
         return bpmn_files
 
     @classmethod
-    def get_content_by_version(self, user_id, project_id, version):
+    def get_content_by_version(self, user_id, project_id, process_id, version):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
-        file_link = BPMNFile.get_by_version(
-            project_id, version)['xml_file_link']
+        file_link = ProcessVersion.get_by_version(
+            project_id, process_id, version)['xml_file_link']
         content = FileIO.get_content(file_link)
         return content
 
     @classmethod
-    def get_by_project(self, user_id, project_id):
+    def get_by_process(self, user_id, project_id, process_id):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
-        bpmn_files = BPMNFile.get_by_project(project_id)
+        bpmn_files = ProcessVersion.get_by_process(project_id, process_id)
         return bpmn_files
 
     @classmethod
-    def delete_version(self, user_id, project_id, version):
+    def delete_version(self, user_id, project_id, process_id, version):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
-        xml_link = BPMNFile.delete(project_id, version)
+        xml_link = ProcessVersion.delete(project_id, process_id, version)
         FileIO.delete(xml_link)
 
     @classmethod
-    def delete_oldest_version(self, user_id, project_id):
+    def delete_oldest_version(self, user_id, project_id, process_id):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
-        BPMNFile.delete_oldest_version(project_id)
+        ProcessVersion.delete_oldest_version(project_id, process_id)
 
     @classmethod
-    def comment(self, user_id, project_id, xml_file_link, content):
+    def comment(self, user_id, project_id, process_id, xml_file_link, content):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
-        return CommentOn.insert(user_id, project_id, xml_file_link, content)
+        return CommentOn.insert(user_id, project_id, process_id, xml_file_link, content)
 
     @classmethod
-    def edit_comment(self, user_id, project_id, xml_file_link, id, content):
+    def edit_comment(self, user_id, project_id, process_id, xml_file_link, id, content):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
-        if not CommentOn.owner(user_id, project_id, xml_file_link, id):
+        if not CommentOn.owner(user_id, project_id, process_id, xml_file_link, id):
             raise Exception("permission denied")
         CommentOn.update(id, content)
 
     @classmethod
-    def delete_comment(self, user_id, project_id, xml_file_link, id):
+    def delete_comment(self, user_id, project_id, process_id, xml_file_link, id):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
-        if not CommentOn.owner(user_id, project_id, xml_file_link, id):
+        if not CommentOn.owner(user_id, project_id, process_id, xml_file_link, id):
             raise Exception("permission denied")
         CommentOn.delete(id)
 
     @classmethod
-    def get_comment_by_bpmn_file(self, user_id, project_id, xml_file_link):
+    def get_comment_by_bpmn_file(self, user_id, project_id, process_id, xml_file_link):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
-        return CommentOn.get_by_bpmn_file(project_id, xml_file_link)
+        return CommentOn.get_by_bpmn_file(project_id, process_id, xml_file_link)
 
     @classmethod
     def get_comment_by_user(self, user_id):

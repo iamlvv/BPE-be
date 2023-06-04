@@ -102,7 +102,7 @@ def user_signin():
         )
 
 
-@bpsky.route("/api/v1/user/password/change", methods=["POST"])
+@bpsky.route("/api/v1/user/password", methods=["PUT"])
 def user_change_password():
     try:
         email = get_email_from_token(get_token(request))

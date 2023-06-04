@@ -7,7 +7,8 @@ from usecase.evaluate.evaluate import Evaluate
 from usecase.evaluate.compare import Compare
 from usecase.project import ProjectUsecase
 from usecase.user import UserUsecase
-from usecase.bpmn_file import BPMNFileUsecase
+from usecase.process_version import ProcessVersionUsecase
+from usecase.process import ProcessUsecase
 from usecase.evaluate_result import EvaluatedResultUsercase
 from usecase.image import ImageUsecase
 
@@ -33,3 +34,7 @@ def json_serial(obj):
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
     raise TypeError("Type %s not serializable" % type(obj))
+
+
+def get_xml_link(project_id, process_id, version):
+    return f"static/{project_id}/{process_id}/{version}.bpmn"

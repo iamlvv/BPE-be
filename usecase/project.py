@@ -1,7 +1,8 @@
 import os
 from models.project import Project
 from models.work_on import WorkOn, Role
-from .bpmn_file import BPMNFileUsecase
+from .process_version import ProcessVersionUsecase
+from .process import ProcessUsecase
 from .document_file import DocumentFileUsecase
 from fileIO.file import FileIO
 
@@ -14,7 +15,7 @@ class ProjectUsecase:
             os.makedirs(f"static/{project.id}")
             if not os.path.isdir(f'static/{project.id}/images'):
                 os.makedirs(f"static/{project.id}/images")
-        BPMNFileUsecase.craete_default(project.id, name)
+        ProcessUsecase.create_default(project.id, name)
         DocumentFileUsecase.create_default(project.id)
         WorkOn.insert(user_id, project.id, Role.OWNER.value)
         return {
