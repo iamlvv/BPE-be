@@ -34,6 +34,11 @@ class FileIO:
         os.remove(link)
 
     @classmethod
+    def bulk_delete(self, links):
+        for link in links:
+            os.remove(link[0])
+
+    @classmethod
     def save_img_file(self, file, file_name):
         if os.path.splitext(file.filename)[1] not in [".jpg", ".png", ".jpeg", ".gif"]:
             raise Exception('Image file format is not supported')

@@ -17,11 +17,11 @@ class EvaluatedResult:
                     (xml_file_link, project_id, process_id, "name", "result", description, create_at)
                     VALUES(%s, %s, %s, %s, %s::jsonb, %s, NOW());
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                query, (xml_file_link, project_id, process_id, name, json.dumps(result), description,))
-            connection.commit()
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query, (xml_file_link, project_id, process_id, name, json.dumps(result), description,))
+                connection.commit()
 
     @classmethod
     def get_result_by_bpmn_file(self, xml_file_link, project_id, process_id):
@@ -29,11 +29,11 @@ class EvaluatedResult:
                     FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND process_id=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                query, (xml_file_link, project_id, process_id,))
-            return list_tuple_to_dict(["name", "result", "description", "create_at"], cursor.fetchall())
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query, (xml_file_link, project_id, process_id,))
+                return list_tuple_to_dict(["name", "result", "description", "create_at"], cursor.fetchall())
 
     @classmethod
     def get(self, xml_file_link, project_id, process_id, name):
@@ -41,25 +41,25 @@ class EvaluatedResult:
                     FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND "name"=%s AND process_id=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                query, (xml_file_link, project_id, name, process_id,))
-            list_result = list_tuple_to_dict(
-                ["name", "result", "description", "create_at"], cursor.fetchall())
-            if len(list_result) == 0:
-                return {}
-            return list_result[0]
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query, (xml_file_link, project_id, name, process_id,))
+                list_result = list_tuple_to_dict(
+                    ["name", "result", "description", "create_at"], cursor.fetchall())
+                if len(list_result) == 0:
+                    return {}
+                return list_result[0]
 
     @classmethod
     def delete(self, xml_file_link, project_id, process_id, name):
         query = """DELETE FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND "name"=%s AND process_id=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                query, (xml_file_link, project_id, name, process_id,))
-            if cursor.rowcount == 0:
-                raise Exception("result doesn't exist")
-            connection.commit()
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query, (xml_file_link, project_id, name, process_id,))
+                if cursor.rowcount == 0:
+                    raise Exception("result doesn't exist")
+                connection.commit()

@@ -1,4 +1,5 @@
 import os
+import shutil
 from models.process import Process
 from models.work_on import WorkOn
 from .process_version import ProcessVersionUsecase
@@ -23,6 +24,13 @@ class ProcessUsecase:
             os.makedirs(f"static/{project_id}/{process.id}")
         ProcessVersionUsecase.create_default(project_id, process.id)
         return process
+
+    @classmethod
+    def delete(self, user_id,  project_id, process_id):
+        if not WorkOn.can_edit(user_id, project_id):
+            raise Exception("permission denied")
+        Process.delete(project_id, process_id)
+        shutil.rmtree(f'static/{project_id}/{process_id}')
 
     @classmethod
     def update_name(self, user_id, project_id, process_id, name):

@@ -12,11 +12,11 @@ class DocumentFile:
                     (document_link, project_id, last_saved)
                     VALUES(%s, %s, NOW());
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                query, (document_link, project_id,))
-            connection.commit()
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query, (document_link, project_id,))
+                connection.commit()
 
     @classmethod
     def update(self, document_link):
@@ -24,11 +24,11 @@ class DocumentFile:
                     SET last_saved=NOW()
                     WHERE document_link=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                query, (document_link,))
-            connection.commit()
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query, (document_link,))
+                connection.commit()
 
     @classmethod
     def get(self, project_id):
@@ -36,15 +36,15 @@ class DocumentFile:
                     FROM public.document_file
                     WHERE project_id=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(
-                query, (project_id,))
-            result = cursor.fetchone()
-            if result == None:
-                raise Exception('project_id incorrect')
-            return {
-                'document_link': result[0],
-                'project_id': result[1],
-                'last_saved': result[2]
-            }
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query, (project_id,))
+                result = cursor.fetchone()
+                if result == None:
+                    raise Exception('project_id incorrect')
+                return {
+                    'document_link': result[0],
+                    'project_id': result[1],
+                    'last_saved': result[2]
+                }

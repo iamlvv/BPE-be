@@ -33,13 +33,13 @@ class User:
                 VALUES(%s, %s, %s, %s, %s, %s)
                 RETURNING id, "password", email, "name", phone, avatar, verified;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (hash_password, email,
-                                   name, phone, avatar, str(verified),))
-            connection.commit()
-            result = cursor.fetchone()
-            return User(id=result[0], email=result[2], password=result[1])
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (hash_password, email,
+                                       name, phone, avatar, str(verified),))
+                connection.commit()
+                result = cursor.fetchone()
+                return User(id=result[0], email=result[2], password=result[1])
 
     @classmethod
     def change_password(self, email, new_hash_password):
@@ -47,10 +47,10 @@ class User:
                     SET "password"=%s
                     WHERE email=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (new_hash_password, email,))
-            connection.commit()
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (new_hash_password, email,))
+                connection.commit()
 
     @classmethod
     def verify(self, email):
@@ -58,13 +58,13 @@ class User:
                     SET verified=true
                     WHERE email=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (email,))
-            # updated_row = cursor.rowcount
-            # if updated_row == 0:
-            #     raise Exception("Email doesn't exist")
-            connection.commit()
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (email,))
+                # updated_row = cursor.rowcount
+                # if updated_row == 0:
+                #     raise Exception("Email doesn't exist")
+                connection.commit()
 
     @classmethod
     def verify_token(self, id, email, hash_password):
@@ -72,12 +72,12 @@ class User:
                     FROM public.bpe_user
                     WHERE email=%s and id=%s and password=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (email, id, hash_password,))
-            result = cursor.fetchall()
-            if len(result) == 0:
-                raise Exception('Token invalid')
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (email, id, hash_password,))
+                result = cursor.fetchall()
+                if len(result) == 0:
+                    raise Exception('Token invalid')
 
     @classmethod
     def get_by_email(self, email):
@@ -85,15 +85,15 @@ class User:
                     FROM public.bpe_user
                     WHERE email=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (email,))
-            result = cursor.fetchone()
-            if result == None:
-                raise Exception('Email is incorrect')
-            if result[-1]:
-                raise Exception('Your account was verified')
-            return User(id=result[0], email=result[1], password=result[2])
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (email,))
+                result = cursor.fetchone()
+                if result == None:
+                    raise Exception('Email is incorrect')
+                if result[-1]:
+                    raise Exception('Your account was verified')
+                return User(id=result[0], email=result[1], password=result[2])
 
     @classmethod
     def get_by_email_permanently(self, email):
@@ -101,13 +101,13 @@ class User:
                     FROM public.bpe_user
                     WHERE email=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (email,))
-            result = cursor.fetchone()
-            if result == None:
-                raise Exception('Email is incorrect')
-            return User(id=result[0], email=result[1], password=result[2])
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (email,))
+                result = cursor.fetchone()
+                if result == None:
+                    raise Exception('Email is incorrect')
+                return User(id=result[0], email=result[1], password=result[2])
 
     @classmethod
     def get(self, email, hash_password):
@@ -115,26 +115,26 @@ class User:
                     FROM public.bpe_user
                     WHERE email=%s and password=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (email, hash_password,))
-            result = cursor.fetchone()
-            if result == None:
-                raise Exception('Email or password is incorrect')
-            if not result[-1]:
-                raise Exception('Your account has not been verified')
-            return User(id=result[0], email=result[1], password=result[2])
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (email, hash_password,))
+                result = cursor.fetchone()
+                if result == None:
+                    raise Exception('Email or password is incorrect')
+                if not result[-1]:
+                    raise Exception('Your account has not been verified')
+                return User(id=result[0], email=result[1], password=result[2])
 
     @classmethod
     def get_all(self):
         query = """SELECT id, email, "name", phone, avatar
                     FROM public.bpe_user;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            return list_tuple_to_dict(["id", "email", "name", "phone", "avatar"], result)
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchall()
+                return list_tuple_to_dict(["id", "email", "name", "phone", "avatar"], result)
 
     @classmethod
     def get_by_id(self, id):
@@ -142,11 +142,11 @@ class User:
                     FROM public.bpe_user
                     WHERE id=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (id,))
-            result = cursor.fetchone()
-            return User(name=result[0], email=result[1], phone=result[2], avatar=result[3])
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (id,))
+                result = cursor.fetchone()
+                return User(name=result[0], email=result[1], phone=result[2], avatar=result[3])
 
     @classmethod
     def get_many(self, user_ids):
@@ -154,11 +154,11 @@ class User:
                     FROM public.bpe_user
                     WHERE id IN ({",".join(str(user_id) for user_id in user_ids)});
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            return list_tuple_to_dict(('name', 'phone', 'avatar'), result)
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchall()
+                return list_tuple_to_dict(('name', 'phone', 'avatar'), result)
 
     @classmethod
     def check_exist(self, email):
@@ -166,11 +166,11 @@ class User:
                     FROM public.bpe_user
                     WHERE email=%s;
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query, (email,))
-            result = cursor.fetchone()
-            return result != None
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (email,))
+                result = cursor.fetchone()
+                return result != None
 
     @classmethod
     def search(self, s, email):
@@ -178,8 +178,8 @@ class User:
                     FROM public.bpe_user
                     WHERE email LIKE '%{s}%' AND email!='{email}';
                 """
-        connection = DatabaseConnector.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            return list_tuple_to_dict(('id', 'email', 'name', 'phone', 'avatar'), result)
+        with DatabaseConnector.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchall()
+                return list_tuple_to_dict(('id', 'email', 'name', 'phone', 'avatar'), result)

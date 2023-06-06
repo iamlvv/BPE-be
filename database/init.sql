@@ -181,7 +181,7 @@ ALTER TABLE IF EXISTS public.process_version
     ADD CONSTRAINT process_version_project_id_fkey FOREIGN KEY (project_id, process_id)
         REFERENCES public.process (project_id, id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION;
+        ON DELETE CASCADE;
 
 ALTER TABLE IF EXISTS public.document_file
     ADD CONSTRAINT document_file_project_id_fkey FOREIGN KEY (project_id)
@@ -211,16 +211,16 @@ ALTER TABLE IF EXISTS public.comment_on
     ADD CONSTRAINT comment_on_project_id_fkey FOREIGN KEY (project_id, process_id, xml_file_link)
         REFERENCES public.process_version (project_id, process_id, xml_file_link) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION;
+        ON DELETE CASCADE;
 
 ALTER TABLE IF EXISTS public.evaluated_result
     ADD CONSTRAINT evaluated_result_project_id_fkey FOREIGN KEY (project_id, process_id, xml_file_link)
         REFERENCES public.process_version (project_id, process_id, xml_file_link) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION;
+        ON DELETE CASCADE;
 
 ALTER TABLE IF EXISTS public.history_image
     ADD CONSTRAINT history_image_xml_file_link_fkey FOREIGN KEY (project_id, process_id, xml_file_link)
         REFERENCES public.process_version (project_id, process_id, xml_file_link) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION;
+        ON DELETE CASCADE;

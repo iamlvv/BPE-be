@@ -1,7 +1,8 @@
 import os
+import shutil
 import uuid
-from datetime import datetime
 from models.process_version import ProcessVersion
+from models.process import Process
 from models.work_on import WorkOn
 from models.comment_on import CommentOn
 from fileIO.file import FileIO
@@ -80,6 +81,10 @@ class ProcessVersionUsecase:
     def delete_version(self, user_id, project_id, process_id, version):
         if not WorkOn.can_edit(user_id, project_id):
             raise Exception("permission denied")
+        if len(ProcessVersion.get_by_process(project_id, process_id)) == 1:
+            Process.delete(project_id, process_id)
+            shutil.rmtree(f'static/{project_id}/{process_id}')
+            return
         xml_link = ProcessVersion.delete(project_id, process_id, version)
         FileIO.delete(xml_link)
 

@@ -62,4 +62,5 @@ def process_update_name(project_id, process_id):
 
 def process_delete_process(project_id, process_id):
     user_id = get_id_from_token(get_token(request))
+    ProcessUsecase.delete(user_id, project_id, process_id)
     return "Delete successfully"
