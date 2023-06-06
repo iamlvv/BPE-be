@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS public.process_version
     project_id    integer                                             NOT NULL,
     process_id    integer                                             NOT NULL,
     version       varchar(10),
+    num           integer                                             NOT NULL,
     last_saved    timestamp without time zone,
     CONSTRAINT process_version_pkey PRIMARY KEY (xml_file_link, project_id, process_id),
     CONSTRAINT process_version_version_key UNIQUE (version)
