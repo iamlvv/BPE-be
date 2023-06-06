@@ -17,6 +17,21 @@ class ProcessVersionUsecase:
         ProcessVersion.update_version(project_id, process_id, version)
 
     @classmethod
+    def bulk_save(self, user_id, files, data):
+        for file in files:
+            project_id = data[file.filename]['project_id']
+            if not WorkOn.can_edit(user_id, project_id):
+                raise Exception("permission denied")
+
+        for file in files:
+            project_id = data[file.filename]['project_id']
+            process_id = data[file.filename]['process_id']
+            version = data[file.filename]['version']
+            xml_link = f"static/{project_id}/{process_id}/{version}.bpmn"
+            FileIO.save_bpmn_file(xml_link, file)
+            ProcessVersion.update_version(project_id, process_id, version)
+
+    @classmethod
     def create_default(self, project_id, process_id):
         version = str(uuid.uuid1())[:8]
         xml_file_link = FileIO.copy_file(

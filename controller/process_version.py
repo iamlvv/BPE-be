@@ -240,3 +240,22 @@ def process_version_add_image():
     ImageUsecase.insert_image(
         user_id, project_id, process_id, xml_file_link, file)
     return "Create successfully"
+
+
+@bpsky.route("/api/v1/autosave", methods=["PUT"])
+def process_autosave():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        files = list(request.files.listvalues())
+        if len(files) == 0:
+            raise Exception('file required')
+        if "data" not in request.form:
+            raise Exception('data required')
+        data = request.form['data']
+        ProcessVersionUsecase.bulk_save(user_id, files[0], json.loads(data))
+        return "Save successfully"
+    except Exception as e:
+        return bpsky.response_class(
+            response=e.__str__(),
+            status=500
+        )
