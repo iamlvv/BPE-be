@@ -25,7 +25,7 @@ def evaluated_result_get_result_by_bpmn_file():
         )
 
 
-@bpsky.route("/api/v1/result/save", methods=["GET", "POST", "DELETE"])
+@bpsky.route("/api/v1/result", methods=["GET", "POST", "DELETE"])
 def evaluated_result():
     try:
         if request.method == "GET":
@@ -47,8 +47,8 @@ def evaluated_result_save():
     for i in ["project_id", "process_id", "version", "name", "result"]:
         if i not in body:
             raise Exception(i + " required")
-    project_id = body['project_id']
-    process_id = body['process_id']
+    project_id = body['projectID']
+    process_id = body['processID']
     version = body['version']
     name = body['name']
     result = body['result']
