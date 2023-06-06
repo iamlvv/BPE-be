@@ -8,8 +8,8 @@ def evaluated_result_get_result_by_bpmn_file():
         project_id = request.args.get('projectID', '')
         version = request.args.get('version', '')
         process_id = request.args.get('processID', '')
-        if project_id == "" or version == "" or process_id:
-            raise Exception("projectID or version or process_id required")
+        if project_id == "" or version == "" or process_id == "":
+            raise Exception("projectID or version or processID required")
         xml_file_link = get_xml_link(project_id, process_id, version)
         data = EvaluatedResultUsercase.get_all_result_by_bpmn_file(
             user_id, project_id, process_id, xml_file_link)
@@ -67,7 +67,7 @@ def evaluated_result_get():
     process_id = request.args.get('processID', '')
     if project_id == "" or version == "" or name == "" or process_id == "":
         raise Exception(
-            "projectID or version or name or process_id required")
+            "projectID or version or name or processID required")
     xml_file_link = get_xml_link(project_id, process_id, version)
     data = EvaluatedResultUsercase.get_result(
         user_id, project_id, process_id,  xml_file_link, name)
