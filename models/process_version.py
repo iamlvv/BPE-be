@@ -26,10 +26,13 @@ class ProcessVersion:
                             AS INT)+1,
                     NOW());
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
+        except:
+            connection.rollback()
 
     @classmethod
     def update_version(self, project_id, process_id, version):
@@ -37,21 +40,27 @@ class ProcessVersion:
                     SET last_saved=NOW()
                     WHERE project_id={project_id} AND process_id={process_id} AND version='{version}';
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
+        except:
+            connection.rollback()
 
     @classmethod
     def get_all(cls):
         query = f"""SELECT xml_file_link, project_id, process_id, "version", num, last_saved
                     FROM public.process_version;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
                 return list_tuple_to_dict(["xml_file_link", "project_id", "process_id", "version", "num", "last_saved"], result)
+        except:
+            connection.rollback()
 
     @classmethod
     def get_by_version(cls, project_id, process_id, version):
@@ -59,13 +68,16 @@ class ProcessVersion:
                     FROM public.process_version
                     WHERE project_id={project_id} AND process_id={process_id} AND version='{version}';
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
                 if result == None:
                     raise Exception("version doesn't exist")
                 return dict(zip(["xml_file_link", "version", "num", "last_saved"], result))
+        except:
+            connection.rollback()
 
     @classmethod
     def get_by_process(self, project_id, process_id):
@@ -74,13 +86,16 @@ class ProcessVersion:
                     WHERE project_id={project_id} AND process_id={process_id}
                     ORDER BY last_saved DESC;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
                 if result == None:
                     raise Exception("version doesn't exist")
                 return list_tuple_to_dict(["xml_file_link", "version", "num", "last_saved"], result)
+        except:
+            connection.rollback()
 
     @classmethod
     def delete(self, project_id, process_id, version):
@@ -88,7 +103,8 @@ class ProcessVersion:
                     WHERE version='{version}' AND project_id={project_id} AND process_id={process_id}
                     RETURNING xml_file_link;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 updated_row = cursor.rowcount
@@ -96,6 +112,8 @@ class ProcessVersion:
                     raise Exception("version doesn't exist")
                 connection.commit()
                 return cursor.fetchone()[0]
+        except:
+            connection.rollback()
 
     @classmethod
     def delete_by_process(self, project_id, process_id):
@@ -103,7 +121,8 @@ class ProcessVersion:
                     WHERE AND project_id={project_id} AND process_id={process_id}
                     RETURNING xml_file_link;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 updated_row = cursor.rowcount
@@ -111,6 +130,8 @@ class ProcessVersion:
                     raise Exception("version doesn't exist")
                 connection.commit()
                 return cursor.fetchall()
+        except:
+            connection.rollback()
 
     @classmethod
     def delete_oldest_version(self, project_id, process_id):
@@ -118,7 +139,10 @@ class ProcessVersion:
                     WHERE project_id={project_id} AND process_id={process_id}
                         AND last_saved=(SELECT MIN(last_saved) FROM public.process_version WHERE project_id={project_id} AND process_id={process_id});
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
+        except:
+            connection.rollback()

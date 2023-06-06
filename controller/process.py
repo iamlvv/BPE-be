@@ -22,8 +22,12 @@ def process_create(project_id):
     if "name" not in body:
         raise Exception("name required")
     name = body["name"]
-    ProcessUsecase.create(user_id, project_id, name)
-    return "Save successfully"
+    data = ProcessUsecase.create(user_id, project_id, name).__dict__()
+    return bpsky.response_class(
+        response=json.dumps(data, default=json_serial),
+        status=200,
+        mimetype='application/json'
+    )
 
 
 def process_get_by_project(project_id):

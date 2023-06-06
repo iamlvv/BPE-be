@@ -20,12 +20,15 @@ class Process:
                     VALUES('{project_id}', '{name}', NOW())
                     RETURNING id, project_id, "name", last_saved;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchone()
                 return Process(id=result[0], project_id=result[1], name=result[2], last_saved=result[3])
+        except:
+            connection.rollback()
 
     @classmethod
     def update_name(self, project_id, id, name):
@@ -33,20 +36,26 @@ class Process:
                     SET "name"='{name}'
                     WHERE project_id={project_id} AND id='{id}';
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
+        except:
+            connection.rollback()
 
     @classmethod
     def delete(self, project_id, id):
         query = f"""DELETE FROM public.process
                     WHERE id={id} AND project_id={project_id};
                     """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
+        except:
+            connection.rollback()
 
     @classmethod
     def get_by_project(cls, project_id):
@@ -54,8 +63,11 @@ class Process:
                     FROM public.process
                     WHERE project_id={project_id};
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
                 return list_tuple_to_dict(["id", "name", "last_saved"], result)
+        except:
+            connection.rollback()

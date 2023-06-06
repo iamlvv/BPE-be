@@ -21,12 +21,15 @@ class Project:
                     VALUES(%s, %s, false, NOW())
                     RETURNING id, description, "name";
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query, (description, name,))
                 connection.commit()
                 result = cursor.fetchone()
                 return Project(id=result[0], description=result[1], name=result[2])
+        except:
+            connection.rollback()
 
     @classmethod
     def get(self, project_id):
@@ -34,7 +37,8 @@ class Project:
                     FROM public.project, public.work_on
                     WHERE project.id=%s AND is_delete=false AND project.id=work_on.project_id;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query, (project_id,))
                 connection.commit()
@@ -46,6 +50,8 @@ class Project:
                     'create_at': result[3],
                     'user_id': result[4]
                 }
+        except:
+            connection.rollback()
 
     @classmethod
     def delete(self, project_id):
@@ -53,10 +59,13 @@ class Project:
                     SET is_delete=true
                     WHERE id=%s;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query, (project_id,))
                 connection.commit()
+        except:
+            connection.rollback()
 
     @classmethod
     def get_all(cls):
@@ -64,12 +73,15 @@ class Project:
                     FROM public.project
                     WHERE is_delete=false;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchall()
                 return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
+        except:
+            connection.rollback()
 
     @classmethod
     def update_name(self, project_id, name):
@@ -77,13 +89,16 @@ class Project:
                     SET "name"=%s
                     WHERE id=%s;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query, (name, project_id,))
                 connection.commit()
                 updated_row = cursor.rowcount
                 if updated_row == 0:
                     raise Exception('project id incorrect')
+        except:
+            connection.rollback()
 
     @classmethod
     def update_description(self, project_id, description):
@@ -91,13 +106,16 @@ class Project:
                     SET description=%s
                     WHERE id=%s;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query, (description, project_id,))
                 connection.commit()
                 updated_row = cursor.rowcount
                 if updated_row == 0:
                     raise Exception('project id incorrect')
+        except:
+            connection.rollback()
 
     @classmethod
     def get_all_project_by_project_ids(self, project_ids):
@@ -106,9 +124,12 @@ class Project:
                     WHERE id IN ({",".join(str(project_id) for project_id in project_ids)}) AND is_delete=false
                     ORDER BY create_at;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchall()
                 return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
+        except:
+            connection.rollback()

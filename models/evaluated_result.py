@@ -17,11 +17,14 @@ class EvaluatedResult:
                     (xml_file_link, project_id, process_id, "name", "result", description, create_at)
                     VALUES(%s, %s, %s, %s, %s::jsonb, %s, NOW());
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(
                     query, (xml_file_link, project_id, process_id, name, json.dumps(result), description,))
                 connection.commit()
+        except:
+            connection.rollback()
 
     @classmethod
     def get_result_by_bpmn_file(self, xml_file_link, project_id, process_id):
@@ -29,11 +32,14 @@ class EvaluatedResult:
                     FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND process_id=%s;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(
                     query, (xml_file_link, project_id, process_id,))
                 return list_tuple_to_dict(["name", "result", "description", "create_at"], cursor.fetchall())
+        except:
+            connection.rollback()
 
     @classmethod
     def get(self, xml_file_link, project_id, process_id, name):
@@ -41,7 +47,8 @@ class EvaluatedResult:
                     FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND "name"=%s AND process_id=%s;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(
                     query, (xml_file_link, project_id, name, process_id,))
@@ -50,16 +57,21 @@ class EvaluatedResult:
                 if len(list_result) == 0:
                     return {}
                 return list_result[0]
+        except:
+            connection.rollback()
 
     @classmethod
     def delete(self, xml_file_link, project_id, process_id, name):
         query = """DELETE FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND "name"=%s AND process_id=%s;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(
                     query, (xml_file_link, project_id, name, process_id,))
                 if cursor.rowcount == 0:
                     raise Exception("result doesn't exist")
                 connection.commit()
+        except:
+            connection.rollback()

@@ -12,11 +12,14 @@ class DocumentFile:
                     (document_link, project_id, last_saved)
                     VALUES(%s, %s, NOW());
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(
                     query, (document_link, project_id,))
                 connection.commit()
+        except:
+            connection.rollback()
 
     @classmethod
     def update(self, document_link):
@@ -24,11 +27,14 @@ class DocumentFile:
                     SET last_saved=NOW()
                     WHERE document_link=%s;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(
                     query, (document_link,))
                 connection.commit()
+        except:
+            connection.rollback()
 
     @classmethod
     def get(self, project_id):
@@ -36,7 +42,8 @@ class DocumentFile:
                     FROM public.document_file
                     WHERE project_id=%s;
                 """
-        with DatabaseConnector.get_connection() as connection:
+        connection = DatabaseConnector.get_connection()
+        try:
             with connection.cursor() as cursor:
                 cursor.execute(
                     query, (project_id,))
@@ -48,3 +55,5 @@ class DocumentFile:
                     'project_id': result[1],
                     'last_saved': result[2]
                 }
+        except:
+            connection.rollback()
