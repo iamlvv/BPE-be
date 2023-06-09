@@ -262,7 +262,7 @@ def process_autosave_file():
 
 
 @bpsky.route("/api/v1/autosave/image", methods=["POST"])
-def process_autosave_file():
+def process_autosave_image():
     try:
         user_id = get_id_from_token(get_token(request))
         files = list(request.files.listvalues())
