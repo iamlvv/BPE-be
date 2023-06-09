@@ -31,3 +31,12 @@ class ImageUsecase:
         image_link = FileIO.save_img_file(
             file, f"{project_id}/images/{rd}{extension_name}")
         HistoryImage.insert(project_id, process_id, xml_file_link, image_link)
+
+    @classmethod
+    def bulk_insert(self, user_id, files, data):
+        for file in files:
+            project_id = data[file.filename]['project_id']
+            process_id = data[file.filename]['process_id']
+            version = data[file.filename]['version']
+            xml_link = f"static/{project_id}/{process_id}/{version}.bpmn"
+            self.insert_image(user_id, project_id, process_id, xml_link, file)

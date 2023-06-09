@@ -242,17 +242,36 @@ def process_version_add_image():
     return "Create successfully"
 
 
-@bpsky.route("/api/v1/autosave", methods=["PUT"])
-def process_autosave():
+@bpsky.route("/api/v1/autosave/file", methods=["PUT"])
+def process_autosave_file():
     try:
         user_id = get_id_from_token(get_token(request))
         files = list(request.files.listvalues())
         if len(files) == 0:
-            raise Exception('file required')
+            raise Exception('files required')
         if "data" not in request.form:
             raise Exception('data required')
         data = request.form['data']
         ProcessVersionUsecase.bulk_save(user_id, files[0], json.loads(data))
+        return "Save successfully"
+    except Exception as e:
+        return bpsky.response_class(
+            response=e.__str__(),
+            status=500
+        )
+
+
+@bpsky.route("/api/v1/autosave/image", methods=["POST"])
+def process_autosave_file():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        files = list(request.files.listvalues())
+        if len(files) == 0:
+            raise Exception('files required')
+        if "data" not in request.form:
+            raise Exception('data required')
+        data = request.form['data']
+        ImageUsecase.bulk_insert(user_id, files[0], json.loads(data))
         return "Save successfully"
     except Exception as e:
         return bpsky.response_class(
