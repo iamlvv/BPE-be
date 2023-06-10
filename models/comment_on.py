@@ -27,6 +27,7 @@ class CommentOn:
                 return dict(zip(["user_id", "project_id", "process_id", "xml_file_link", "content", "create_at"], result))
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def update(self, id, content):
@@ -44,6 +45,7 @@ class CommentOn:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def owner(self, user_id, project_id, process_id, xml_file_link, id):
@@ -59,6 +61,7 @@ class CommentOn:
                 return cursor.fetchone() != None
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete(self, id):
@@ -74,6 +77,7 @@ class CommentOn:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get(self, user_id, project_id, process_id, xml_file_link):
@@ -101,6 +105,7 @@ class CommentOn:
                                           cursor.fetchall())
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_by_bpmn_file(self, project_id, process_id, xml_file_link):
@@ -126,6 +131,7 @@ class CommentOn:
                 return result
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_by_user(self, user_id):
@@ -151,3 +157,4 @@ class CommentOn:
                 return result
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')

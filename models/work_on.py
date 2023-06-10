@@ -20,6 +20,7 @@ class WorkOn:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def insert_many(self, users, project_id):
@@ -36,6 +37,7 @@ class WorkOn:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def update_role(self, user_id, project_id, new_role):
@@ -50,6 +52,7 @@ class WorkOn:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def update_many_role(self, users, project_id):
@@ -66,6 +69,7 @@ class WorkOn:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete_many(self, user_ids, project_id):
@@ -79,6 +83,7 @@ class WorkOn:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all_project_by_user_id(self, user_id):
@@ -95,6 +100,7 @@ class WorkOn:
                 return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all_owned_project_by_user_id(self, user_id):
@@ -111,6 +117,7 @@ class WorkOn:
                 return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all_shared_project_by_user_id(self, user_id):
@@ -127,6 +134,7 @@ class WorkOn:
                 return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all_user_by_project_id(self, project_id):
@@ -143,6 +151,7 @@ class WorkOn:
                 return list_tuple_to_dict(["name", "phone", "avatar", "role"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def is_not_exists(self, user_ids, project_id):
@@ -158,6 +167,7 @@ class WorkOn:
                 return len(result) == 0
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def is_exists(self, user_ids, project_id):
@@ -173,6 +183,7 @@ class WorkOn:
                 return len(result) == len(user_ids)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def is_project_owner(self, user_id, project_id):
@@ -189,6 +200,7 @@ class WorkOn:
                 return result != None
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def can_edit(self, user_id, project_id):
@@ -206,6 +218,7 @@ class WorkOn:
                 return result != None
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def can_share(self, user_id, project_id):
@@ -223,6 +236,7 @@ class WorkOn:
                 return result != None
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def can_view(self, user_id, project_id):
@@ -240,3 +254,4 @@ class WorkOn:
                 return result != None
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')

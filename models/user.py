@@ -43,6 +43,7 @@ class User:
                 return User(id=result[0], email=result[2], password=result[1])
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def change_password(self, email, new_hash_password):
@@ -57,6 +58,7 @@ class User:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def verify(self, email):
@@ -74,6 +76,7 @@ class User:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def verify_token(self, id, email, hash_password):
@@ -90,6 +93,7 @@ class User:
                     raise Exception('Token invalid')
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_by_email(self, email):
@@ -109,6 +113,7 @@ class User:
                 return User(id=result[0], email=result[1], password=result[2])
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_by_email_permanently(self, email):
@@ -126,6 +131,7 @@ class User:
                 return User(id=result[0], email=result[1], password=result[2])
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get(self, email, hash_password):
@@ -145,6 +151,7 @@ class User:
                 return User(id=result[0], email=result[1], password=result[2])
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all(self):
@@ -159,6 +166,7 @@ class User:
                 return list_tuple_to_dict(["id", "email", "name", "phone", "avatar"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_by_id(self, id):
@@ -174,6 +182,7 @@ class User:
                 return User(name=result[0], email=result[1], phone=result[2], avatar=result[3])
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_many(self, user_ids):
@@ -189,6 +198,7 @@ class User:
                 return list_tuple_to_dict(('name', 'phone', 'avatar'), result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def check_exist(self, email):
@@ -204,6 +214,7 @@ class User:
                 return result != None
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def search(self, s, email):
@@ -219,3 +230,4 @@ class User:
                 return list_tuple_to_dict(('id', 'email', 'name', 'phone', 'avatar'), result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')

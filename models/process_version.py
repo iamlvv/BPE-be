@@ -33,6 +33,7 @@ class ProcessVersion:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def update_version(self, project_id, process_id, version):
@@ -47,6 +48,7 @@ class ProcessVersion:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all(cls):
@@ -61,6 +63,7 @@ class ProcessVersion:
                 return list_tuple_to_dict(["xml_file_link", "project_id", "process_id", "version", "num", "last_saved"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_by_version(cls, project_id, process_id, version):
@@ -78,6 +81,7 @@ class ProcessVersion:
                 return dict(zip(["xml_file_link", "version", "num", "last_saved"], result))
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_by_process(self, project_id, process_id):
@@ -96,6 +100,7 @@ class ProcessVersion:
                 return list_tuple_to_dict(["xml_file_link", "version", "num", "last_saved"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete(self, project_id, process_id, version):
@@ -114,6 +119,7 @@ class ProcessVersion:
                 return cursor.fetchone()[0]
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete_by_process(self, project_id, process_id):
@@ -132,6 +138,7 @@ class ProcessVersion:
                 return cursor.fetchall()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete_oldest_version(self, project_id, process_id):
@@ -146,3 +153,4 @@ class ProcessVersion:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')

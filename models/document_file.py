@@ -20,6 +20,7 @@ class DocumentFile:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def update(self, document_link):
@@ -35,6 +36,7 @@ class DocumentFile:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get(self, project_id):
@@ -57,3 +59,4 @@ class DocumentFile:
                 }
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')

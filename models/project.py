@@ -30,6 +30,7 @@ class Project:
                 return Project(id=result[0], description=result[1], name=result[2])
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get(self, project_id):
@@ -52,6 +53,7 @@ class Project:
                 }
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete(self, project_id):
@@ -66,6 +68,7 @@ class Project:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all(cls):
@@ -82,6 +85,7 @@ class Project:
                 return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def update_name(self, project_id, name):
@@ -99,6 +103,7 @@ class Project:
                     raise Exception('project id incorrect')
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def update_description(self, project_id, description):
@@ -116,6 +121,7 @@ class Project:
                     raise Exception('project id incorrect')
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all_project_by_project_ids(self, project_ids):
@@ -133,3 +139,4 @@ class Project:
                 return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')

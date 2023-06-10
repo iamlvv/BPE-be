@@ -25,6 +25,7 @@ class EvaluatedResult:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_result_by_bpmn_file(self, xml_file_link, project_id, process_id):
@@ -40,6 +41,7 @@ class EvaluatedResult:
                 return list_tuple_to_dict(["name", "result", "description", "create_at"], cursor.fetchall())
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get(self, xml_file_link, project_id, process_id, name):
@@ -59,6 +61,7 @@ class EvaluatedResult:
                 return list_result[0]
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete(self, xml_file_link, project_id, process_id, name):
@@ -75,3 +78,4 @@ class EvaluatedResult:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')

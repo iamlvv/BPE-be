@@ -23,6 +23,7 @@ class HistoryImage:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all_image_by_bpmn_file(self, project_id, process_id, xml_file_link):
@@ -37,6 +38,7 @@ class HistoryImage:
                 return list_tuple_to_dict(['image_link', 'save_at'], cursor.fetchall())
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def count_all_image_by_bpmn_file(self, project_id, process_id, xml_file_link):
@@ -51,6 +53,7 @@ class HistoryImage:
                 return len(cursor.fetchall())
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete(self, project_id, process_id, xml_file_link, image_link):
@@ -65,6 +68,7 @@ class HistoryImage:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete_oldest(self, project_id, process_id, xml_file_link):
@@ -80,6 +84,7 @@ class HistoryImage:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def dif_last_saved(self, project_id, process_id, xml_file_link):
@@ -98,3 +103,4 @@ class HistoryImage:
                 return last_saved + timedelta(seconds=10) < datetime.now()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')

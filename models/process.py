@@ -29,6 +29,7 @@ class Process:
                 return Process(id=result[0], project_id=result[1], name=result[2], last_saved=result[3])
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def update_name(self, project_id, id, name):
@@ -43,6 +44,7 @@ class Process:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def delete(self, project_id, id):
@@ -56,6 +58,7 @@ class Process:
                 connection.commit()
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
 
     @classmethod
     def get_by_project(cls, project_id):
@@ -71,3 +74,4 @@ class Process:
                 return list_tuple_to_dict(["id", "name", "last_saved"], result)
         except:
             connection.rollback()
+            raise Exception('oops, something went wrong')
