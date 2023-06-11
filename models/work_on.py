@@ -87,51 +87,78 @@ class WorkOn:
 
     @classmethod
     def get_all_project_by_user_id(self, user_id):
-        query = f"""SELECT project.id, project.description, project."name", project.create_at
+        query = f"""SELECT project.id, project.description, project."name", project.create_at, work_on.role,
+                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id = project.id
+                        JOIN public.bpe_user ON work_on.user_id = bpe_user.id
                     WHERE user_id={user_id} AND project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
-                result = cursor.fetchall()
-                return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
+                result = []
+                for record in cursor.fetchall():
+                    prj = dict(
+                        zip(["id", "description", "name", "create_at", "role"], record[:4]))
+                    user = dict(
+                        zip(["id", "email", "phone", "avatar"], record[4:]))
+                    prj["owner"] = user
+                    result.append(prj)
+                return result
         except:
             connection.rollback()
             raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all_owned_project_by_user_id(self, user_id):
-        query = f"""SELECT project.id, project.description, project."name", project.create_at
+        query = f"""SELECT project.id, project.description, project."name", project.create_at, work_on.role,
+                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id = project.id
+                        JOIN public.bpe_user ON work_on.user_id = bpe_user.id
                     WHERE user_id={user_id} AND project.is_delete=false AND work_on.role=0;
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
-                result = cursor.fetchall()
-                return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
+                result = []
+                for record in cursor.fetchall():
+                    prj = dict(
+                        zip(["id", "description", "name", "create_at", "role"], record[:4]))
+                    user = dict(
+                        zip(["id", "email", "phone", "avatar"], record[4:]))
+                    prj["owner"] = user
+                    result.append(prj)
+                return result
         except:
             connection.rollback()
             raise Exception('oops, something went wrong')
 
     @classmethod
     def get_all_shared_project_by_user_id(self, user_id):
-        query = f"""SELECT project.id, project.description, project."name", project.create_at
+        query = f"""SELECT project.id, project.description, project."name", project.create_at, work_on.role,
+                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id = project.id
+                        JOIN public.bpe_user ON work_on.user_id = bpe_user.id
                     WHERE user_id={user_id} AND project.is_delete=false AND work_on.role!=0;
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
-                result = cursor.fetchall()
-                return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
+                result = []
+                for record in cursor.fetchall():
+                    prj = dict(
+                        zip(["id", "description", "name", "create_at", "role"], record[:4]))
+                    user = dict(
+                        zip(["id", "email", "phone", "avatar"], record[4:]))
+                    prj["owner"] = user
+                    result.append(prj)
+                return result
         except:
             connection.rollback()
             raise Exception('oops, something went wrong')
