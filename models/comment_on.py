@@ -109,7 +109,7 @@ class CommentOn:
 
     @classmethod
     def get_by_bpmn_file(self, project_id, process_id, xml_file_link):
-        query = """SELECT comment_on.id, comment_on.project_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
+        query = """SELECT comment_on.id, comment_on.project_id, comment_on.process_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
                         bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.comment_on
                         JOIN public.bpe_user ON comment_on.user_id=bpe_user.id
@@ -123,9 +123,9 @@ class CommentOn:
                 result = []
                 for record in cursor.fetchall():
                     cmt = dict(
-                        zip(["id", "project_id", "process_id", "xml_file_link", "content", "create_at"], record[:5]))
+                        zip(["id", "project_id", "process_id", "xml_file_link", "content", "create_at"], record[:6]))
                     user = dict(
-                        zip(["id", "email", "phone", "avatar"], record[5:]))
+                        zip(["id", "email", "phone", "avatar"], record[6:]))
                     cmt["author"] = user
                     result.append(cmt)
                 return result
@@ -135,7 +135,7 @@ class CommentOn:
 
     @classmethod
     def get_by_user(self, user_id):
-        query = """SELECT comment_on.id, comment_on.project_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
+        query = """SELECT comment_on.id, comment_on.project_id, comment_on.process_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
                         bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.comment_on
                         JOIN public.bpe_user ON comment_on.user_id=bpe_user.id
@@ -149,9 +149,9 @@ class CommentOn:
                 result = []
                 for record in cursor.fetchall():
                     cmt = dict(
-                        zip(["id", "project_id", "xml_file_link", "content", "create_at"], record[:5]))
+                        zip(["id", "project_id", "process_id", "xml_file_link", "content", "create_at"], record[:6]))
                     user = dict(
-                        zip(["id", "email", "phone", "avatar"], record[5:]))
+                        zip(["id", "email", "phone", "avatar"], record[6:]))
                     cmt["author"] = user
                     result.append(cmt)
                 return result

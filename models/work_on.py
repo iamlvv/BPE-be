@@ -87,12 +87,13 @@ class WorkOn:
 
     @classmethod
     def get_all_project_by_user_id(self, user_id):
-        query = f"""SELECT project.id, project.description, project."name", project.create_at, work_on.role,
-                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
-                    FROM public.work_on
-                        JOIN public.project ON work_on.project_id = project.id
-                        JOIN public.bpe_user ON work_on.user_id = bpe_user.id
-                    WHERE user_id={user_id} AND project.is_delete=false;
+        query = f"""SELECT project.id, project.description, project."name", project.create_at,
+                            wo."role",
+                            bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
+                    FROM work_on wo, work_on wo2, bpe_user, project
+                    WHERE wo.user_id={user_id} AND wo.project_id=wo2.project_id AND
+                        wo2."role"=0 AND bpe_user.id=wo2.user_id AND project.id = wo.project_id
+                        AND project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -101,9 +102,9 @@ class WorkOn:
                 result = []
                 for record in cursor.fetchall():
                     prj = dict(
-                        zip(["id", "description", "name", "create_at", "role"], record[:4]))
+                        zip(["id", "description", "name", "create_at", "role"], record[:5]))
                     user = dict(
-                        zip(["id", "email", "phone", "avatar"], record[4:]))
+                        zip(["id", "email", "name", "phone", "avatar"], record[5:]))
                     prj["owner"] = user
                     result.append(prj)
                 return result
@@ -113,12 +114,13 @@ class WorkOn:
 
     @classmethod
     def get_all_owned_project_by_user_id(self, user_id):
-        query = f"""SELECT project.id, project.description, project."name", project.create_at, work_on.role,
-                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
-                    FROM public.work_on
-                        JOIN public.project ON work_on.project_id = project.id
-                        JOIN public.bpe_user ON work_on.user_id = bpe_user.id
-                    WHERE user_id={user_id} AND project.is_delete=false AND work_on.role=0;
+        query = f"""SELECT project.id, project.description, project."name", project.create_at,
+                            wo."role",
+                            bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
+                    FROM work_on wo, work_on wo2, bpe_user, project
+                    WHERE wo.user_id={user_id} AND wo.project_id=wo2.project_id AND
+                        wo2."role"=0 AND bpe_user.id=wo2.user_id AND project.id = wo.project_id
+                        AND project.is_delete=false AND wo.role=0;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -127,9 +129,9 @@ class WorkOn:
                 result = []
                 for record in cursor.fetchall():
                     prj = dict(
-                        zip(["id", "description", "name", "create_at", "role"], record[:4]))
+                        zip(["id", "description", "name", "create_at", "role"], record[:5]))
                     user = dict(
-                        zip(["id", "email", "phone", "avatar"], record[4:]))
+                        zip(["id", "email", "name", "phone", "avatar"], record[5:]))
                     prj["owner"] = user
                     result.append(prj)
                 return result
@@ -139,12 +141,13 @@ class WorkOn:
 
     @classmethod
     def get_all_shared_project_by_user_id(self, user_id):
-        query = f"""SELECT project.id, project.description, project."name", project.create_at, work_on.role,
-                        bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
-                    FROM public.work_on
-                        JOIN public.project ON work_on.project_id = project.id
-                        JOIN public.bpe_user ON work_on.user_id = bpe_user.id
-                    WHERE user_id={user_id} AND project.is_delete=false AND work_on.role!=0;
+        query = f"""SELECT project.id, project.description, project."name", project.create_at,
+                            wo."role",
+                            bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
+                    FROM work_on wo, work_on wo2, bpe_user, project
+                    WHERE wo.user_id={user_id} AND wo.project_id=wo2.project_id AND
+                        wo2."role"=0 AND bpe_user.id=wo2.user_id AND project.id = wo.project_id
+                        AND project.is_delete=false AND wo.role=!0;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -153,9 +156,9 @@ class WorkOn:
                 result = []
                 for record in cursor.fetchall():
                     prj = dict(
-                        zip(["id", "description", "name", "create_at", "role"], record[:4]))
+                        zip(["id", "description", "name", "create_at", "role"], record[:5]))
                     user = dict(
-                        zip(["id", "email", "phone", "avatar"], record[4:]))
+                        zip(["id", "email", "name", "phone", "avatar"], record[5:]))
                     prj["owner"] = user
                     result.append(prj)
                 return result
