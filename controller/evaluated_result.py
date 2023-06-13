@@ -44,7 +44,7 @@ def evaluated_result():
 def evaluated_result_save():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
-    for i in ["project_id", "process_id", "version", "name", "result"]:
+    for i in ["projectID", "processID", "version", "name", "result"]:
         if i not in body:
             raise Exception(i + " required")
     project_id = body['projectID']

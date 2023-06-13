@@ -54,7 +54,7 @@ class UserUsecase:
 
     @classmethod
     def reset_password(self, email):
-        user = User.get_by_email(email)
+        user = User.get_by_email_permanently(email)
         Thread(target=Email.reset_password, args=(email, user.name, encode({
             "id": user.id,
             "email": email,

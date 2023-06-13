@@ -168,7 +168,7 @@ class WorkOn:
 
     @classmethod
     def get_all_user_by_project_id(self, project_id):
-        query = f"""SELECT name, phone, avatar, role
+        query = f"""SELECT bpe_user.id, bpe_user.email, name, phone, avatar, role
                     FROM public.work_on
                         JOIN public.bpe_user ON work_on.user_id = bpe_user.id
                     WHERE project_id={project_id};
@@ -178,7 +178,7 @@ class WorkOn:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return list_tuple_to_dict(["name", "phone", "avatar", "role"], result)
+                return list_tuple_to_dict(["id", "email", "name", "phone", "avatar", "role"], result)
         except:
             connection.rollback()
             raise Exception('oops, something went wrong')

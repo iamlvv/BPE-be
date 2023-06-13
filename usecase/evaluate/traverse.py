@@ -37,12 +37,28 @@ class Traverse:
             return
 
         if type(e.boundary[0]) is TimerEvent:
+            max_next_time = 0
+            max_next_cost = 0
+            for b in e.boundary:
+                self.visit(b, c, r)
+                max_next_time = max(max_next_time, r.totalCycleTime)
+                max_next_cost = max(max_next_cost, r.totalCost)
+            if e.boundary[0].is_interrupting:
+                r.totalCycleTime = max_next_time
+                r.totalCost = max_next_cost
+                return
+
             self.visit(e.next[0], c, r)
-            next_time = r.totalCycleTime
-            next_cost = r.totalCost
-            self.handle_for_boundary_timer_event(e, c, r, next_time, next_cost)
             total_cycle_time += r.totalCycleTime
             total_cost += r.totalCost
+            r.totalCycleTime = max(total_cycle_time, max_next_time)
+            r.totalCost = max(total_cost, max_next_cost)
+
+            # next_time = r.totalCycleTime
+            # next_cost = r.totalCost
+            # self.handle_for_boundary_timer_event(e, c, r, next_time, next_cost)
+            # total_cycle_time += r.totalCycleTime
+            # total_cost += r.totalCost
         elif type(e.boundary[0]) is ConditionalEvent:
             self.handle_for_boundary_conditional_event(
                 e, e.boundary[0], c, r)
