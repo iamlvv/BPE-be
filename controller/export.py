@@ -5,3 +5,4 @@ from .evaluated_result import *
 from .main import *
 from .project import *
 from .user import *
+from .workspace import *

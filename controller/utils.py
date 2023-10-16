@@ -11,13 +11,14 @@ from usecase.process_version import ProcessVersionUsecase
 from usecase.process import ProcessUsecase
 from usecase.evaluate_result import EvaluatedResultUsercase
 from usecase.image import ImageUsecase
+from usecase.workspace import WorkspaceUseCase
 
 
 def load_request_body(request):
     try:
         body = request.get_json()
     except:
-        raise Exception('body required')
+        raise Exception("body required")
     return body
 
 

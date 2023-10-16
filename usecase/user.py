@@ -9,27 +9,35 @@ from .utils import *
 class UserUsecase:
     @classmethod
     def create(self, password, email, name, phone, avatar, verified=False):
-        return User.create(hash_password(password), email, name, phone, avatar, verified)
+        return User.create(
+            hash_password(password), email, name, phone, avatar, verified
+        )
 
     @classmethod
     def signin(self, email, password):
         print("hihi")
         result = User.get(email, hash_password(password))
-        return encode({
-            "id": result.id,
-            "email": result.email,
-            "password": result.password
-        })
+        print(
+            encode(
+                {"id": result.id, "email": result.email, "password": result.password}
+            )
+        )
+        return encode(
+            {"id": result.id, "email": result.email, "password": result.password}
+        )
 
     @classmethod
     def signup(self, password, email, name, phone, avatar):
         if not UserUsecase.check_exist(email):
             result = UserUsecase.create(password, email, name, phone, avatar)
-            Thread(target=Email.verify_account, args=(email, name, encode({
-                "id": result.id,
-                "email": email,
-                "password": password
-            }))).start()
+            Thread(
+                target=Email.verify_account,
+                args=(
+                    email,
+                    name,
+                    encode({"id": result.id, "email": email, "password": password}),
+                ),
+            ).start()
             return "Signup successfully"
         else:
             return "Account exist"
@@ -41,11 +49,14 @@ class UserUsecase:
     @classmethod
     def resend_email(self, email):
         user = User.get_by_email(email)
-        Thread(target=Email.verify_account, args=(email, user.name, encode({
-            "id": user.id,
-            "email": email,
-            "password": user.password
-        }))).start()
+        Thread(
+            target=Email.verify_account,
+            args=(
+                email,
+                user.name,
+                encode({"id": user.id, "email": email, "password": user.password}),
+            ),
+        ).start()
         return "Resend successfully"
 
     @classmethod
@@ -55,11 +66,14 @@ class UserUsecase:
     @classmethod
     def reset_password(self, email):
         user = User.get_by_email_permanently(email)
-        Thread(target=Email.reset_password, args=(email, user.name, encode({
-            "id": user.id,
-            "email": email,
-            "password": user.password
-        }))).start()
+        Thread(
+            target=Email.reset_password,
+            args=(
+                email,
+                user.name,
+                encode({"id": user.id, "email": email, "password": user.password}),
+            ),
+        ).start()
 
     @classmethod
     def verify(self, email):
@@ -69,10 +83,10 @@ class UserUsecase:
     def get(self, id):
         user = User.get_by_id(id)
         return {
-            'name': user.name,
-            'email': user.email,
-            'phone': user.phone,
-            'avatar': user.avatar
+            "name": user.name,
+            "email": user.email,
+            "phone": user.phone,
+            "avatar": user.avatar,
         }
 
     @classmethod
@@ -98,10 +112,9 @@ class UserUsecase:
             result = User.get_by_email_permanently(email)
         else:
             password = str(uuid.uuid1())[:10]
-            result = self.create(hash_password(password),
-                                 email, name, "", picture, True)
-        return encode({
-            "id": result.id,
-            "email": result.email,
-            "password": result.password
-        })
+            result = self.create(
+                hash_password(password), email, name, "", picture, True
+            )
+        return encode(
+            {"id": result.id, "email": result.email, "password": result.password}
+        )

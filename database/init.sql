@@ -167,6 +167,76 @@ CREATE TABLE IF NOT EXISTS public.history_image
 )
     TABLESPACE pg_default;
 
+-- CREATE NEW WORKSPACE TABLES
+-- Table: public.workspace
+CREATE TABLE IF NOT EXISTS public.workspace (
+    id serial PRIMARY KEY,
+    name varchar(50),
+    description varchar(255),
+    createdAt timestamp without time zone NOT NULL,
+    ownerID serial NOT NULL,
+    background text,
+    icon text,
+    isPersonal boolean,
+    isDeleted boolean 
+)
+    TABLESPACE pg_default;
+
+-- Table: public.join_workspace
+CREATE TABLE IF NOT EXISTS public.join_workspace (
+    memberId serial NOT NULL,
+    workspaceId serial NOT NULL,
+    joinedAt timestamp without time zone NOT NULL,
+    permission text,
+    isDeleted boolean,
+    isWorkspaceDeleted boolean,
+    CONSTRAINT public_join_workspace PRIMARY KEY (memberId, workspaceId)
+)
+    TABLESPACE pg_default;
+
+-- Table: public.request
+CREATE TABLE IF NOT EXISTS public.request (
+    id serial NOT NULL,
+    type text,
+    content text,
+    createdAt timestamp without time zone NOT NULL,
+    status text,
+    isDeleted boolean,
+    isWorkspaceDeleted boolean,
+    workspaceId serial NOT NULL,
+    senderId serial NOT NULL,
+    handlerId serial NOT NULL,
+    recipientId serial NOT NULL,
+    fr_permission text,
+    to_permission text,
+    rcp_permission text,
+    CONSTRAINT public_request PRIMARY KEY (id)
+)
+    TABLE pg_default;
+
+-- Table: public.notification
+CREATE TABLE IF NOT EXISTS public.notification (
+    id serial NOT NULL,
+    userId serial NOT NULL,
+    createdAt timestamp without time zone NOT NULL,
+    content text,
+    isDeleted boolean,
+    isStarred boolean,
+    CONSTRAINT public_notification PRIMARY KEY (id)
+)
+    TABLESPACE pg_default;
+
+-- Table: public.recent_opened_workspace
+CREATE TABLE IF NOT EXISTS public.recent_opened_workspace (
+    userId serial NOT NULL,
+    workspaceId serial NOT NULL,
+    openedAt timestamp without time zone NOT NULL,
+    isHided boolean,
+    isPinned boolean,
+    isWorkspaceDeleted boolean,
+    CONSTRAINT public_recent_opened_workspace PRIMARY KEY (userId, workspaceId)
+)
+    TABLESPACE pg_default;
 -- Add constraint
 
 ALTER TABLE IF EXISTS public.history_image
@@ -225,3 +295,45 @@ ALTER TABLE IF EXISTS public.history_image
         REFERENCES public.process_version (project_id, process_id, xml_file_link) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE;
+
+-- ADD CONSTRAINT FOR WORKSPACE TABLES
+ALTER TABLE IF EXISTS public.join_workspace
+    ADD CONSTRAINT join_workspace_memberId_fkey FOREIGN KEY (memberId)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.request
+    ADD CONSTRAINT request_workspaceId_fkey FOREIGN KEY (workspaceId)
+        REFERENCES public.workspace (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+    ADD CONSTRAINT request_senderId_fkey FOREIGN KEY (senderId)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+    ADD CONSTRAINT request_handlerId_fkey FOREIGN KEY (handlerId)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+    ADD CONSTRAINT request_recipientId_fkey FOREIGN KEY (recipientId)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.notification
+    ADD CONSTRAINT notification_userId_fkey FOREIGN KEY (userId)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.recent_opened_workspace
+    ADD CONSTRAINT fk_recent_opened_workspace_userId FOREIGN KEY (userId)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+    ADD CONSTRAINT fk_recent_opened_workspace_workspaceId FOREIGN KEY (workspaceId)
+        REFERENCES public.workspace (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+    `;
