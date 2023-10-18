@@ -65,90 +65,90 @@ class Workspace:
             raise Exception(e)
 
     @classmethod
-    def deleteWorkspace(cls, id: str) -> bool:
+    def deleteWorkspace(cls, id: str) -> str:
         query = f"""UPDATE public.workspace
-                    SET "isDeleted"=true
-                    WHERE id='{id}';
+                    SET isDeleted=true
+                    WHERE id={id};
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-                return True
+                return "Delete Workspace Success"
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def updateWorkspaceDescription(cls, id: str, description: str) -> str:
+        query = f"""UPDATE public.workspace
+                    SET description='{description}'
+                    WHERE id={id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                return "Update description success"
         except:
             connection.rollback()
             raise Exception("oops, something went wrong")
 
     @classmethod
-    def updateWorkspaceDescriptions(cls, id: str, description: str) -> bool:
+    def updateWorkspaceName(cls, id: str, name: str) -> str:
         query = f"""UPDATE public.workspace
-                    SET "description"='{description}'
-                    WHERE id='{id}';
+                    SET name='{name}'
+                    WHERE id={id};
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-                return True
+                return "Update name success"
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def updateWorkspaceBackground(cls, id: str, background: str) -> str:
+        query = f"""UPDATE public.workspace
+                    SET background='{background}'
+                    WHERE id={id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                return "Update background success"
         except:
             connection.rollback()
             raise Exception("oops, something went wrong")
 
     @classmethod
-    def updateWorkspaceName(cls, id: str, name: str) -> bool:
+    def updateWorkspaceIcon(cls, id: str, icon: str) -> str:
         query = f"""UPDATE public.workspace
-                    SET "name"='{name}'
-                    WHERE id='{id}';
+                    SET icon='{icon}'
+                    WHERE id={id};
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-                return True
-        except:
-            connection.rollback()
-            raise Exception("oops, something went wrong")
-
-    @classmethod
-    def updateWorkspaceBackground(cls, id: str, background: str) -> bool:
-        query = f"""UPDATE public.workspace
-                    SET "background"='{background}'
-                    WHERE id='{id}';
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                return True
-        except:
-            connection.rollback()
-            raise Exception("oops, something went wrong")
-
-    @classmethod
-    def updateWorkspaceIcon(cls, id: str, icon: str) -> bool:
-        query = f"""UPDATE public.workspace
-                    SET "icon"='{icon}'
-                    WHERE id='{id}';
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                return True
+                return "Update icon success"
         except:
             connection.rollback()
             raise Exception("oops, something went wrong")
 
     @classmethod
     def getWorkspace(cls, id: str):
-        query = f"""SELECT id, name, description, createdAt, "ownerId", background, icon, "isPersonal", "isDeleted"
+        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
                     FROM public.workspace
-                    WHERE id='{id}';
+                    WHERE id={id};
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -177,7 +177,7 @@ class Workspace:
     def getWorkspaceByOwnerId(cls, ownerId: str) -> list:
         query = f"""SELECT id, name, description, createdAt, "ownerId", background, icon, "isPersonal", "isDeleted"
                     FROM public.workspace
-                    WHERE "ownerId"='{ownerId}';
+                    WHERE ownerId='{ownerId}';
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -206,7 +206,7 @@ class Workspace:
     def getWorkspaceByOwnerIdAndIsPersonal(cls, ownerId: str, isPersonal: bool) -> list:
         query = f"""SELECT id, name, description, createdAt, "ownerId", background, icon, "isPersonal", "isDeleted"
                     FROM public.workspace
-                    WHERE "ownerId"='{ownerId}' AND "isPersonal"='{isPersonal}';
+                    WHERE ownerId='{ownerId}' AND isPersonal={isPersonal};
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -227,6 +227,22 @@ class Workspace:
                     ],
                     result,
                 )
+        except:
+            connection.rollback()
+            raise Exception("oops, something went wrong")
+
+    @classmethod
+    def updateWorkspaceOwnership(cls, workspaceId: str, newOwnerId: str):
+        query = f"""UPDATE public.workspace
+                    SET ownerId={newOwnerId}
+                    WHERE id={workspaceId};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                return "Update ownership success"
         except:
             connection.rollback()
             raise Exception("oops, something went wrong")

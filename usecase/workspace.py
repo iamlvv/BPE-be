@@ -53,3 +53,27 @@ class WorkspaceUseCase:
         if workspace.ownerId == ownerId:
             return True
         return False
+
+    @classmethod
+    def updateWorkspaceName(cls, workspaceId: str, name: str):
+        workspace = Workspace.getWorkspace(workspaceId)
+        if workspace is None:
+            return None
+        workspace.updateWorkspaceName(workspaceId, name)
+        return workspace
+
+    @classmethod
+    def updateWorkspaceDescription(cls, workspaceId: str, description: str):
+        workspace = Workspace.getWorkspace(workspaceId)
+        if workspace is None:
+            return None
+        workspace.updateWorkspaceDescription(workspaceId, description)
+        return workspace
+
+    @classmethod
+    def changeOwnership(cls, workspaceId: str, newOwnerId: str):
+        workspace = Workspace.getWorkspace(workspaceId)
+        if workspace is None:
+            return None
+        workspace.updateWorkspaceOwnership(workspaceId, newOwnerId)
+        return workspace

@@ -2,6 +2,17 @@ from .utils import *
 import jsonpickle
 
 
+# check if user is owner of workspace
+def checkWorkspaceOwner(workspaceId: str, ownerId: str):
+    check = WorkspaceUseCase.checkWorkspaceOwner(workspaceId, ownerId)
+    if check is None:
+        raise Exception("Workspace not found")
+    if check is False:
+        raise Exception("You are not owner of this workspace")
+    return True
+
+
+# create new workspace
 @bpsky.route("/api/v1/workspace", methods=["POST"])
 def createNewWorkspace():
     try:
@@ -35,28 +46,90 @@ def createNewWorkspace():
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
-@bpsky.route("/api/v1/workspace/<string:workspaceId>", methods=["GET", "DELETE"])
-def workspace_workspace(workspaceId):
+@bpsky.route("/api/v1/workspace/<workspaceId>", methods=["GET"])
+def getWorkspace(workspaceId):
     try:
-        if request.method == "DELETE":
-            return getWorkspace(workspaceId)
+        result = WorkspaceUseCase.getWorkspace(workspaceId)
+        if result is None:
+            raise Exception("Workspace not found")
         else:
-            return deleteWorkspace(workspaceId)
+            return bpsky.response_class(
+                response=jsonpickle.encode(result, unpicklable=False),
+                status=200,
+                mimetype="application/json",
+            )
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
-def getWorkspace(workspaceId):
-    user_id = get_id_from_token(get_token(request))
-    result = WorkspaceUseCase.getWorkspace(workspaceId)
-    return bpsky.response_class(
-        response=json.dumps(result, default=json_serial),
-        status=200,
-        mimetype="application/json",
-    )
+# delete workspace
+@bpsky.route("/api/v1/workspace/deletion", methods=["POST"])
+def deleteWorkspace():
+    try:
+        body = load_request_body(request)
+        user_id = get_id_from_token(get_token(request))
+        workspaceId = body["workspaceId"]
+        # check if user is owner of workspace
+        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        if checkResult is not True:
+            raise Exception(checkResult)
+        # delete workspace
+        data = WorkspaceUseCase.deleteWorkspace(workspaceId)
+        return "Delete Workspace Success"
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
-def deleteWorkspace(workspaceId):
-    user_id = get_id_from_token(get_token(request))
-    WorkspaceUseCase.deleteWorkspace(workspaceId)
-    return "Delete successfully"
+# update name and description
+@bpsky.route("/api/v1/workspace/nameupdation", methods=["POST"])
+def updateWorkspaceName():
+    try:
+        body = load_request_body(request)
+        user_id = get_id_from_token(get_token(request))
+        workspaceId = body["workspaceId"]
+        name = body["name"]
+        # check if user is owner of workspace
+        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        if checkResult is not True:
+            raise Exception(checkResult)
+        # update name
+        data = WorkspaceUseCase.updateWorkspaceName(workspaceId, name)
+        return "Update name success"
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/descriptionupdation", methods=["POST"])
+def updateWorkspaceDescription():
+    try:
+        body = load_request_body(request)
+        user_id = get_id_from_token(get_token(request))
+        workspaceId = body["workspaceId"]
+        description = body["description"]
+        # check if user is owner of workspace
+        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        if checkResult is not True:
+            raise Exception(checkResult)
+        # update description
+        data = WorkspaceUseCase.updateWorkspaceDescription(workspaceId, description)
+        return "Update description success"
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/ownerchange", methods=["POST"])
+def changeOwner():
+    try:
+        body = load_request_body(request)
+        user_id = get_id_from_token(get_token(request))
+        workspaceId = body["workspaceId"]
+        newOwnerId = body["newOwnerId"]
+        # check if user is owner of workspace
+        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        if checkResult is not True:
+            raise Exception(checkResult)
+        # update owner
+        data = WorkspaceUseCase.changeOwnership(workspaceId, newOwnerId)
+        return "Change owner success"
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)

@@ -28,8 +28,12 @@ CREATE TABLE IF NOT EXISTS public.project
     id          serial,
     description character varying COLLATE pg_catalog."default",
     name        character varying(200) COLLATE pg_catalog."default" NOT NULL,
-    is_delete   boolean,
-    create_at   timestamp without time zone,
+    isDeleted   boolean,
+    createdAt   timestamp without time zone,
+    deletedAt timestamp without time zone,
+    ownerId integer NOT NULL,
+    isWorkspaceDeleted boolean,
+    workspaceId integer NOT NULL,
     CONSTRAINT project_pkey PRIMARY KEY (id)
 )
     TABLESPACE pg_default;
@@ -182,7 +186,6 @@ CREATE TABLE IF NOT EXISTS public.workspace (
 )
     TABLESPACE pg_default;
 
--- Table: public.join_workspace
 CREATE TABLE IF NOT EXISTS public.join_workspace (
     memberId serial NOT NULL,
     workspaceId serial NOT NULL,
@@ -190,13 +193,13 @@ CREATE TABLE IF NOT EXISTS public.join_workspace (
     permission text,
     isDeleted boolean,
     isWorkspaceDeleted boolean,
-    CONSTRAINT public_join_workspace PRIMARY KEY (memberId, workspaceId)
+    PRIMARY KEY (memberId, workspaceId)
 )
     TABLESPACE pg_default;
 
 -- Table: public.request
 CREATE TABLE IF NOT EXISTS public.request (
-    id serial NOT NULL,
+    id serial PRIMARY KEY,
     type text,
     content text,
     createdAt timestamp without time zone NOT NULL,
@@ -209,20 +212,18 @@ CREATE TABLE IF NOT EXISTS public.request (
     recipientId serial NOT NULL,
     fr_permission text,
     to_permission text,
-    rcp_permission text,
-    CONSTRAINT public_request PRIMARY KEY (id)
+    rcp_permission text
 )
-    TABLE pg_default;
+    TABLESPACE pg_default;
 
 -- Table: public.notification
 CREATE TABLE IF NOT EXISTS public.notification (
-    id serial NOT NULL,
+    id serial PRIMARY KEY,
     userId serial NOT NULL,
     createdAt timestamp without time zone NOT NULL,
     content text,
     isDeleted boolean,
-    isStarred boolean,
-    CONSTRAINT public_notification PRIMARY KEY (id)
+    isStarred boolean
 )
     TABLESPACE pg_default;
 
@@ -234,9 +235,9 @@ CREATE TABLE IF NOT EXISTS public.recent_opened_workspace (
     isHided boolean,
     isPinned boolean,
     isWorkspaceDeleted boolean,
-    CONSTRAINT public_recent_opened_workspace PRIMARY KEY (userId, workspaceId)
+    PRIMARY KEY (userId, workspaceId)
 )
-    TABLESPACE pg_default;
+	TABLESPACE pg_default;
 -- Add constraint
 
 ALTER TABLE IF EXISTS public.history_image
@@ -308,15 +309,21 @@ ALTER TABLE IF EXISTS public.request
         REFERENCES public.workspace (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.request
     ADD CONSTRAINT request_senderId_fkey FOREIGN KEY (senderId)
         REFERENCES public.bpe_user (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
-    ADD CONSTRAINT request_handlerId_fkey FOREIGN KEY (handlerId)
+
+ALTER TABLE IF EXISTS public.request
+   	ADD CONSTRAINT request_handlerId_fkey FOREIGN KEY (handlerId)
         REFERENCES public.bpe_user (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
-    ADD CONSTRAINT request_recipientId_fkey FOREIGN KEY (recipientId)
+
+ALTER TABLE IF EXISTS public.request
+	ADD CONSTRAINT request_recipientId_fkey FOREIGN KEY (recipientId)
         REFERENCES public.bpe_user (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
@@ -332,8 +339,9 @@ ALTER TABLE IF EXISTS public.recent_opened_workspace
         REFERENCES public.bpe_user (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
-    ADD CONSTRAINT fk_recent_opened_workspace_workspaceId FOREIGN KEY (workspaceId)
+
+ALTER TABLE IF EXISTS public.recent_opened_workspace
+	ADD CONSTRAINT fk_recent_opened_workspace_workspaceId FOREIGN KEY (workspaceId)
         REFERENCES public.workspace (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION;
-    `;
