@@ -1,5 +1,7 @@
 from .utils import *
 import jsonpickle
+import cloudinary
+import cloudinary.uploader
 
 
 # check if user is owner of workspace
@@ -74,7 +76,8 @@ def deleteWorkspace():
         if checkResult is not True:
             raise Exception(checkResult)
         # delete workspace
-        data = WorkspaceUseCase.deleteWorkspace(workspaceId)
+        deletedAt = datetime.now()
+        data = WorkspaceUseCase.deleteWorkspace(workspaceId, deletedAt)
         return "Delete Workspace Success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -131,5 +134,81 @@ def changeOwner():
         # update owner
         data = WorkspaceUseCase.changeOwnership(workspaceId, newOwnerId)
         return "Change owner success"
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/backgrounduploading", methods=["POST"])
+# using form-data to upload file
+# def allowed_file(filename: str):
+#     ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+#     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# def secure_filename(filename: str):
+#     return filename.replace(" ", "_")
+
+
+# upload file using form-data and save to cloudinary
+def uploadBackground():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        workspaceId = request.form["workspaceId"]
+        # check if user is owner of workspace
+        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        if checkResult is not True:
+            raise Exception(checkResult)
+        # upload background
+        if "background" not in request.files:
+            raise Exception("No file part")
+        file = request.files["background"]
+        print(file)
+        if file.filename == "":
+            raise Exception("No selected file")
+        if file:
+            cloudinary.config(
+                cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+                api_key=os.environ.get("CLOUDINARY_API_KEY"),
+                api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+                secure=True,
+            )
+            upload_result = cloudinary.uploader.upload(file)
+            data = WorkspaceUseCase.updateWorkspaceBackground(
+                workspaceId, upload_result["secure_url"]
+            )
+            return "Upload background success"
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/iconuploading", methods=["POST"])
+# upload file using form-data and save to cloudinary
+def uploadIcon():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        workspaceId = request.form["workspaceId"]
+        # check if user is owner of workspace
+        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        if checkResult is not True:
+            raise Exception(checkResult)
+        # upload icon
+        if "icon" not in request.files:
+            raise Exception("No file part")
+        file = request.files["icon"]
+        print(file)
+        if file.filename == "":
+            raise Exception("No selected file")
+        if file:
+            cloudinary.config(
+                cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+                api_key=os.environ.get("CLOUDINARY_API_KEY"),
+                api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+                secure=True,
+            )
+            upload_result = cloudinary.uploader.upload(file)
+            data = WorkspaceUseCase.updateWorkspaceIcon(
+                workspaceId, upload_result["secure_url"]
+            )
+            return "Upload icon success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)

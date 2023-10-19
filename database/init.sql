@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS public.project
     description character varying COLLATE pg_catalog."default",
     name        character varying(200) COLLATE pg_catalog."default" NOT NULL,
     isDeleted   boolean,
-    createdAt   timestamp without time zone,
+    createdAt   timestamp without time zone NOT NULL,
     deletedAt timestamp without time zone,
     ownerId integer NOT NULL,
     isWorkspaceDeleted boolean,
@@ -68,6 +68,8 @@ CREATE TABLE IF NOT EXISTS public.work_on
     user_id    integer NOT NULL,
     project_id integer NOT NULL,
     role       integer NOT NULL,
+    joinedAt  timestamp without time zone,
+    leftAt   timestamp without time zone,
     CONSTRAINT work_on_pkey PRIMARY KEY (user_id, project_id)
 )
     TABLESPACE pg_default;
@@ -178,6 +180,7 @@ CREATE TABLE IF NOT EXISTS public.workspace (
     name varchar(50),
     description varchar(255),
     createdAt timestamp without time zone NOT NULL,
+    deletedAt timestamp without time zone,
     ownerID serial NOT NULL,
     background text,
     icon text,
@@ -190,6 +193,7 @@ CREATE TABLE IF NOT EXISTS public.join_workspace (
     memberId serial NOT NULL,
     workspaceId serial NOT NULL,
     joinedAt timestamp without time zone NOT NULL,
+    leftAt timestamp without time zone,
     permission text,
     isDeleted boolean,
     isWorkspaceDeleted boolean,
@@ -204,6 +208,7 @@ CREATE TABLE IF NOT EXISTS public.request (
     content text,
     createdAt timestamp without time zone NOT NULL,
     status text,
+    deletedAt timestamp without time zone,
     isDeleted boolean,
     isWorkspaceDeleted boolean,
     workspaceId serial NOT NULL,
@@ -221,6 +226,7 @@ CREATE TABLE IF NOT EXISTS public.notification (
     id serial PRIMARY KEY,
     userId serial NOT NULL,
     createdAt timestamp without time zone NOT NULL,
+    deletedAt timestamp without time zone,
     content text,
     isDeleted boolean,
     isStarred boolean
@@ -298,6 +304,18 @@ ALTER TABLE IF EXISTS public.history_image
         ON DELETE CASCADE;
 
 -- ADD CONSTRAINT FOR WORKSPACE TABLES
+ALTER TABLE IF EXISTS public.project
+    ADD CONSTRAINT project_ownerId_fkey FOREIGN KEY (ownerId)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.project
+    ADD CONSTRAINT project_workspaceId_fkey FOREIGN KEY (workspaceId)
+        REFERENCES public.workspace (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
 ALTER TABLE IF EXISTS public.join_workspace
     ADD CONSTRAINT join_workspace_memberId_fkey FOREIGN KEY (memberId)
         REFERENCES public.bpe_user (id) MATCH SIMPLE

@@ -33,8 +33,8 @@ class WorkspaceUseCase:
         return newWorkspace
 
     @classmethod
-    def deleteWorkspace(cls, workspaceId: str):
-        if Workspace.deleteWorkspace(workspaceId):
+    def deleteWorkspace(cls, workspaceId: str, deletedAt: str):
+        if Workspace.deleteWorkspace(workspaceId, deletedAt):
             return True
         return False
 
@@ -76,4 +76,20 @@ class WorkspaceUseCase:
         if workspace is None:
             return None
         workspace.updateWorkspaceOwnership(workspaceId, newOwnerId)
+        return workspace
+
+    @classmethod
+    def updateWorkspaceBackground(cls, workspaceId, newBackground):
+        workspace = Workspace.getWorkspace(workspaceId)
+        if workspace is None:
+            return None
+        workspace.updateWorkspaceBackground(workspaceId, newBackground)
+        return workspace
+
+    @classmethod
+    def updateWorkspaceIcon(cls, workspaceId, newIcon):
+        workspace = Workspace.getWorkspace(workspaceId)
+        if workspace is None:
+            return None
+        workspace.updateWorkspaceIcon(workspaceId, newIcon)
         return workspace
