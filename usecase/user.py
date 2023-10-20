@@ -77,7 +77,8 @@ class UserUsecase:
 
     @classmethod
     def verify(self, email):
-        User.verify(email)
+        user = User.verify(email)
+        return user
 
     @classmethod
     def get(self, id):

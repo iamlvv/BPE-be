@@ -89,9 +89,10 @@ class User:
                 # if updated_row == 0:
                 #     raise Exception("Email doesn't exist")
                 connection.commit()
-        except:
+                return "Verify successfully"
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def verify_token(self, id, email, hash_password):

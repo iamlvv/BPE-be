@@ -17,13 +17,10 @@ def user_signup():
         return bpsky.response_class(
             response=UserUsecase.signup(password, email, name, phone, avatar),
             content_type="text",
-            status=200
+            status=200,
         )
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/user/verify/<string:token>", methods=["GET"])
@@ -31,7 +28,7 @@ def user_verify(token):
     host = os.environ.get("HOST")
     try:
         email = get_email_from_token(token)
-        UserUsecase.verify(email)
+        return UserUsecase.verify(email)
         return redirect(f"{host}/login")
     except Exception as e:
         return redirect(f"{host}/login")
@@ -42,24 +39,19 @@ def user_resend_email():
     try:
         body = load_request_body(request)
         if "email" not in body:
-            raise Exception('email required')
-        email = body['email']
+            raise Exception("email required")
+        email = body["email"]
         UserUsecase.resend_email(email)
         return "Resend successfully"
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/user/all", methods=["GET"])
 def user_get_all():
     data = UserUsecase.get_all()
     return bpsky.response_class(
-        response=json.dumps(data),
-        status=200,
-        mimetype='application/json'
+        response=json.dumps(data), status=200, mimetype="application/json"
     )
 
 
@@ -69,15 +61,10 @@ def user_get():
         id = get_id_from_token(get_token(request))
         user = UserUsecase.get(id)
         return bpsky.response_class(
-            response=json.dumps(user),
-            status=200,
-            mimetype='application/json'
+            response=json.dumps(user), status=200, mimetype="application/json"
         )
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/user/signin", methods=["POST"])
@@ -90,16 +77,9 @@ def user_signin():
         password = body["password"]
         email = body["email"]
         token = UserUsecase.signin(email, password)
-        return bpsky.response_class(
-            response=token,
-            content_type="text",
-            status=200
-        )
+        return bpsky.response_class(response=token, content_type="text", status=200)
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/user/password", methods=["PUT"])
@@ -108,15 +88,12 @@ def user_change_password():
         email = get_email_from_token(get_token(request))
         body = load_request_body(request)
         if "newPassword" not in body:
-            raise Exception('new password required')
-        new_password = body['newPassword']
+            raise Exception("new password required")
+        new_password = body["newPassword"]
         UserUsecase.change_password(email, new_password)
         return "Change successfully"
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/user/reset", methods=["POST"])
@@ -124,35 +101,27 @@ def user_reset_password():
     try:
         body = load_request_body(request)
         if "email" not in body:
-            raise Exception('email required')
-        email = body['email']
+            raise Exception("email required")
+        email = body["email"]
         UserUsecase.reset_password(email)
         return "Send email successfully"
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/user/search", methods=["GET"])
 def user_search():
     try:
         email = get_email_from_token(get_token(request))
-        s = request.args.get('s', '')
-        if s == '':
-            raise Exception('bad request')
+        s = request.args.get("s", "")
+        if s == "":
+            raise Exception("bad request")
         data = UserUsecase.search(s, email)
         return bpsky.response_class(
-            response=json.dumps(data),
-            status=200,
-            mimetype='application/json'
+            response=json.dumps(data), status=200, mimetype="application/json"
         )
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/auth/login/google", methods=["GET"])
@@ -161,10 +130,7 @@ def user_auth_with_google():
         request_uri = LoginWithGoogle.login()
         return redirect(request_uri)
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/auth/login/google/callback", methods=["GET"])

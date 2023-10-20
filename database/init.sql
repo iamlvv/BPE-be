@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS public.project
     id          serial,
     description character varying COLLATE pg_catalog."default",
     name        character varying(200) COLLATE pg_catalog."default" NOT NULL,
-    isDeleted   boolean,
-    createdAt   timestamp without time zone NOT NULL,
+    is_delete   boolean,
+    create_at   timestamp without time zone,
     CONSTRAINT project_pkey PRIMARY KEY (id)
 )
     TABLESPACE pg_default;
