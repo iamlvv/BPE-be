@@ -30,10 +30,6 @@ CREATE TABLE IF NOT EXISTS public.project
     name        character varying(200) COLLATE pg_catalog."default" NOT NULL,
     isDeleted   boolean,
     createdAt   timestamp without time zone NOT NULL,
-    deletedAt timestamp without time zone,
-    ownerId integer NOT NULL,
-    isWorkspaceDeleted boolean,
-    workspaceId integer NOT NULL,
     CONSTRAINT project_pkey PRIMARY KEY (id)
 )
     TABLESPACE pg_default;
@@ -68,8 +64,6 @@ CREATE TABLE IF NOT EXISTS public.work_on
     user_id    integer NOT NULL,
     project_id integer NOT NULL,
     role       integer NOT NULL,
-    joinedAt  timestamp without time zone,
-    leftAt   timestamp without time zone,
     CONSTRAINT work_on_pkey PRIMARY KEY (user_id, project_id)
 )
     TABLESPACE pg_default;
