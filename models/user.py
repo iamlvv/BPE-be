@@ -36,14 +36,23 @@ class User:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (hash_password, email,
-                                       name, phone, avatar, str(verified),))
+                cursor.execute(
+                    query,
+                    (
+                        hash_password,
+                        email,
+                        name,
+                        phone,
+                        avatar,
+                        str(verified),
+                    ),
+                )
                 connection.commit()
                 result = cursor.fetchone()
                 return User(id=result[0], email=result[2], password=result[1])
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def change_password(self, email, new_hash_password):
@@ -54,11 +63,17 @@ class User:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (new_hash_password, email,))
+                cursor.execute(
+                    query,
+                    (
+                        new_hash_password,
+                        email,
+                    ),
+                )
                 connection.commit()
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def verify(self, email):
@@ -76,7 +91,7 @@ class User:
                 connection.commit()
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def verify_token(self, id, email, hash_password):
@@ -87,13 +102,21 @@ class User:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (email, id, hash_password,))
+                cursor.execute(
+                    query,
+                    (
+                        email,
+                        id,
+                        hash_password,
+                    ),
+                )
                 result = cursor.fetchall()
                 if len(result) == 0:
-                    raise Exception('Token invalid')
-        except:
+                    raise Exception("Token invalid")
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            print("bith")
+            raise Exception(e)
 
     @classmethod
     def get_by_email(self, email):
@@ -107,13 +130,13 @@ class User:
                 cursor.execute(query, (email,))
                 result = cursor.fetchone()
                 if result == None:
-                    raise Exception('Email is incorrect')
+                    raise Exception("Email is incorrect")
                 if result[-1]:
-                    raise Exception('Your account was verified')
+                    raise Exception("Your account was verified")
                 return User(id=result[0], email=result[1], password=result[2])
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def get_by_email_permanently(self, email):
@@ -127,11 +150,11 @@ class User:
                 cursor.execute(query, (email,))
                 result = cursor.fetchone()
                 if result == None:
-                    raise Exception('Email is incorrect')
+                    raise Exception("Email is incorrect")
                 return User(id=result[0], email=result[1], password=result[2])
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def get(self, email, hash_password):
@@ -142,16 +165,22 @@ class User:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (email, hash_password,))
+                cursor.execute(
+                    query,
+                    (
+                        email,
+                        hash_password,
+                    ),
+                )
                 result = cursor.fetchone()
                 if result == None:
-                    raise Exception('Email or password is incorrect')
+                    raise Exception("Email or password is incorrect")
                 if not result[-1]:
-                    raise Exception('Your account has not been verified')
+                    raise Exception("Your account has not been verified")
                 return User(id=result[0], email=result[1], password=result[2])
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def get_all(self):
@@ -163,10 +192,12 @@ class User:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return list_tuple_to_dict(["id", "email", "name", "phone", "avatar"], result)
+                return list_tuple_to_dict(
+                    ["id", "email", "name", "phone", "avatar"], result
+                )
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def get_by_id(self, id):
@@ -179,10 +210,12 @@ class User:
             with connection.cursor() as cursor:
                 cursor.execute(query, (id,))
                 result = cursor.fetchone()
-                return User(name=result[0], email=result[1], phone=result[2], avatar=result[3])
+                return User(
+                    name=result[0], email=result[1], phone=result[2], avatar=result[3]
+                )
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def get_many(self, user_ids):
@@ -195,10 +228,10 @@ class User:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return list_tuple_to_dict(('name', 'phone', 'avatar'), result)
+                return list_tuple_to_dict(("name", "phone", "avatar"), result)
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def check_exist(self, email):
@@ -214,7 +247,7 @@ class User:
                 return result != None
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")
 
     @classmethod
     def search(self, s, email):
@@ -227,7 +260,9 @@ class User:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return list_tuple_to_dict(('id', 'email', 'name', 'phone', 'avatar'), result)
+                return list_tuple_to_dict(
+                    ("id", "email", "name", "phone", "avatar"), result
+                )
         except:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception("oops, something went wrong")

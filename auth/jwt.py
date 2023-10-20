@@ -15,6 +15,7 @@ def verify_token(inp):
     for i in ["id", "email", "password"]:
         if i not in inp:
             raise Exception("token invalid")
+    print(inp)
     id = inp["id"]
     email = inp["email"]
     password = inp["password"]
@@ -22,14 +23,13 @@ def verify_token(inp):
 
 
 def get_id_from_token(jwt_string):
-    result = jwt.decode(jwt_string, os.environ.get(
-        "SECRET"), algorithms="HS256")
+    result = jwt.decode(jwt_string, os.environ.get("SECRET"), algorithms="HS256")
+    # print(result)
     verify_token(result)
     return result["id"]
 
 
 def get_email_from_token(jwt_string):
-    result = jwt.decode(jwt_string, os.environ.get(
-        "SECRET"), algorithms="HS256")
+    result = jwt.decode(jwt_string, os.environ.get("SECRET"), algorithms="HS256")
     verify_token(result)
     return result["email"]
