@@ -26,10 +26,15 @@ class Process:
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchone()
-                return Process(id=result[0], project_id=result[1], name=result[2], last_saved=result[3])
-        except:
+                return Process(
+                    id=result[0],
+                    project_id=result[1],
+                    name=result[2],
+                    last_saved=result[3],
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def update_name(self, project_id, id, name):
@@ -42,9 +47,9 @@ class Process:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete(self, project_id, id):
@@ -56,9 +61,9 @@ class Process:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_by_project(cls, project_id):
@@ -72,6 +77,6 @@ class Process:
                 cursor.execute(query)
                 result = cursor.fetchall()
                 return list_tuple_to_dict(["id", "name", "last_saved"], result)
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)

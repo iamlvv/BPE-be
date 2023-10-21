@@ -49,9 +49,9 @@ class Join_Workspace:
                     )
                 else:
                     return None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def getAllMembers(cls, workspaceId: str):
@@ -72,9 +72,9 @@ class Join_Workspace:
                     )
                     for result in results
                 ]
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def updatePermission(cls, workspaceId: str, memberId: str, permission: str) -> None:
@@ -87,9 +87,9 @@ class Join_Workspace:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def deleteMember(cls, workspaceId: str, memberId: str) -> None:
@@ -102,6 +102,6 @@ class Join_Workspace:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)

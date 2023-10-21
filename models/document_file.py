@@ -16,11 +16,16 @@ class DocumentFile:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (document_link, project_id,))
+                    query,
+                    (
+                        document_link,
+                        project_id,
+                    ),
+                )
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def update(self, document_link):
@@ -31,12 +36,11 @@ class DocumentFile:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(
-                    query, (document_link,))
+                cursor.execute(query, (document_link,))
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get(self, project_id):
@@ -47,16 +51,15 @@ class DocumentFile:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(
-                    query, (project_id,))
+                cursor.execute(query, (project_id,))
                 result = cursor.fetchone()
                 if result == None:
-                    raise Exception('project_id incorrect')
+                    raise Exception("project_id incorrect")
                 return {
-                    'document_link': result[0],
-                    'project_id': result[1],
-                    'last_saved': result[2]
+                    "document_link": result[0],
+                    "project_id": result[1],
+                    "last_saved": result[2],
                 }
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)

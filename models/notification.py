@@ -73,9 +73,9 @@ class Notification:
                     )
                 else:
                     return None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def deleteNotification(cls, notificationId: str) -> bool:
@@ -91,9 +91,9 @@ class Notification:
                 connection.commit()
                 result = cursor.fetchone()
                 return True
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def starNotification(cls, notificationId: str) -> bool:
@@ -109,9 +109,9 @@ class Notification:
                 connection.commit()
                 result = cursor.fetchone()
                 return True
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def getNotifications(cls, userId: str) -> list[Notification]:
@@ -136,9 +136,9 @@ class Notification:
                     )
                     for result in results
                 ]
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def getStarredNotifications(cls, userId: str) -> list[Notification]:
@@ -163,9 +163,9 @@ class Notification:
                     )
                     for result in results
                 ]
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def readNotification(cls, notificationId: str) -> bool:
@@ -181,6 +181,6 @@ class Notification:
                 connection.commit()
                 result = cursor.fetchone()
                 return True
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)

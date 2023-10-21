@@ -21,11 +21,20 @@ class EvaluatedResult:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (xml_file_link, project_id, process_id, name, json.dumps(result), description,))
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        process_id,
+                        name,
+                        json.dumps(result),
+                        description,
+                    ),
+                )
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_result_by_bpmn_file(self, xml_file_link, project_id, process_id):
@@ -37,11 +46,19 @@ class EvaluatedResult:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (xml_file_link, project_id, process_id,))
-                return list_tuple_to_dict(["name", "result", "description", "create_at"], cursor.fetchall())
-        except:
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        process_id,
+                    ),
+                )
+                return list_tuple_to_dict(
+                    ["name", "result", "description", "create_at"], cursor.fetchall()
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get(self, xml_file_link, project_id, process_id, name):
@@ -53,15 +70,23 @@ class EvaluatedResult:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (xml_file_link, project_id, name, process_id,))
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        name,
+                        process_id,
+                    ),
+                )
                 list_result = list_tuple_to_dict(
-                    ["name", "result", "description", "create_at"], cursor.fetchall())
+                    ["name", "result", "description", "create_at"], cursor.fetchall()
+                )
                 if len(list_result) == 0:
                     return {}
                 return list_result[0]
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete(self, xml_file_link, project_id, process_id, name):
@@ -72,10 +97,17 @@ class EvaluatedResult:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (xml_file_link, project_id, name, process_id,))
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        name,
+                        process_id,
+                    ),
+                )
                 if cursor.rowcount == 0:
                     raise Exception("result doesn't exist")
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)

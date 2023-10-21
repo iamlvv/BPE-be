@@ -30,9 +30,9 @@ class Recent_Opened_Workspaces:
                     userId=result[1],
                     openedAt=result[2],
                 )
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def hideOpenedWorkspace(cls, workspaceId, userId):
@@ -48,9 +48,9 @@ class Recent_Opened_Workspaces:
                 connection.commit()
                 result = cursor.fetchone()
                 return True
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def pinOpenedWorkspace(cls, workspaceId, userId):
@@ -66,6 +66,6 @@ class Recent_Opened_Workspaces:
                 connection.commit()
                 result = cursor.fetchone()
                 return True
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)

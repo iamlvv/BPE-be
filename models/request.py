@@ -115,9 +115,9 @@ class Request:
                     )
                 else:
                     return None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def approveRequest(cls, id: str) -> Request | None:
@@ -151,9 +151,9 @@ class Request:
                     )
                 else:
                     return None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def declineRequest(cls, id: str) -> Request | None:
@@ -188,9 +188,9 @@ class Request:
                 else:
                     return None
 
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     def removeRequest(self, id: str) -> Request | None:
         query = f"""UPDATE public.request
@@ -223,6 +223,6 @@ class Request:
                     )
                 else:
                     return None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)

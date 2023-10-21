@@ -31,9 +31,9 @@ class ProcessVersion:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def update_version(self, project_id, process_id, version):
@@ -46,9 +46,9 @@ class ProcessVersion:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_all(cls):
@@ -60,10 +60,20 @@ class ProcessVersion:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return list_tuple_to_dict(["xml_file_link", "project_id", "process_id", "version", "num", "last_saved"], result)
-        except:
+                return list_tuple_to_dict(
+                    [
+                        "xml_file_link",
+                        "project_id",
+                        "process_id",
+                        "version",
+                        "num",
+                        "last_saved",
+                    ],
+                    result,
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_by_version(cls, project_id, process_id, version):
@@ -78,10 +88,12 @@ class ProcessVersion:
                 result = cursor.fetchone()
                 if result == None:
                     raise Exception("version doesn't exist")
-                return dict(zip(["xml_file_link", "version", "num", "last_saved"], result))
-        except:
+                return dict(
+                    zip(["xml_file_link", "version", "num", "last_saved"], result)
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_by_process(self, project_id, process_id):
@@ -97,10 +109,12 @@ class ProcessVersion:
                 result = cursor.fetchall()
                 if result == None:
                     raise Exception("version doesn't exist")
-                return list_tuple_to_dict(["xml_file_link", "version", "num", "last_saved"], result)
-        except:
+                return list_tuple_to_dict(
+                    ["xml_file_link", "version", "num", "last_saved"], result
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete(self, project_id, process_id, version):
@@ -117,9 +131,9 @@ class ProcessVersion:
                     raise Exception("version doesn't exist")
                 connection.commit()
                 return cursor.fetchone()[0]
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete_by_process(self, project_id, process_id):
@@ -136,9 +150,9 @@ class ProcessVersion:
                     raise Exception("version doesn't exist")
                 connection.commit()
                 return cursor.fetchall()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete_oldest_version(self, project_id, process_id):
@@ -151,6 +165,6 @@ class ProcessVersion:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)

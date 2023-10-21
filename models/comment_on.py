@@ -21,13 +21,33 @@ class CommentOn:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (user_id, project_id, process_id, xml_file_link, content,))
+                    query,
+                    (
+                        user_id,
+                        project_id,
+                        process_id,
+                        xml_file_link,
+                        content,
+                    ),
+                )
                 connection.commit()
                 result = cursor.fetchone()
-                return dict(zip(["user_id", "project_id", "process_id", "xml_file_link", "content", "create_at"], result))
-        except:
+                return dict(
+                    zip(
+                        [
+                            "user_id",
+                            "project_id",
+                            "process_id",
+                            "xml_file_link",
+                            "content",
+                            "create_at",
+                        ],
+                        result,
+                    )
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def update(self, id, content):
@@ -39,13 +59,18 @@ class CommentOn:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (content, id,))
+                    query,
+                    (
+                        content,
+                        id,
+                    ),
+                )
                 if cursor.rowcount == 0:
-                    raise Exception('update failed')
+                    raise Exception("update failed")
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def owner(self, user_id, project_id, process_id, xml_file_link, id):
@@ -57,11 +82,19 @@ class CommentOn:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (user_id, project_id, xml_file_link, id, process_id,))
+                    query,
+                    (
+                        user_id,
+                        project_id,
+                        xml_file_link,
+                        id,
+                        process_id,
+                    ),
+                )
                 return cursor.fetchone() != None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete(self, id):
@@ -73,11 +106,11 @@ class CommentOn:
             with connection.cursor() as cursor:
                 cursor.execute(query, (id,))
                 if cursor.rowcount == 0:
-                    raise Exception('delete failed')
+                    raise Exception("delete failed")
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get(self, user_id, project_id, process_id, xml_file_link):
@@ -91,21 +124,32 @@ class CommentOn:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (user_id, project_id, process_id, xml_file_link,))
-                return list_tuple_to_dict(["id",
-                                           "project_id",
-                                           "process_id",
-                                           "xml_file_link",
-                                           "content",
-                                           "create_at",
-                                           "user_id",
-                                           "email",
-                                           "phone",
-                                           "avatar"],
-                                          cursor.fetchall())
-        except:
+                    query,
+                    (
+                        user_id,
+                        project_id,
+                        process_id,
+                        xml_file_link,
+                    ),
+                )
+                return list_tuple_to_dict(
+                    [
+                        "id",
+                        "project_id",
+                        "process_id",
+                        "xml_file_link",
+                        "content",
+                        "create_at",
+                        "user_id",
+                        "email",
+                        "phone",
+                        "avatar",
+                    ],
+                    cursor.fetchall(),
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_by_bpmn_file(self, project_id, process_id, xml_file_link):
@@ -119,19 +163,35 @@ class CommentOn:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (project_id, process_id, xml_file_link,))
+                    query,
+                    (
+                        project_id,
+                        process_id,
+                        xml_file_link,
+                    ),
+                )
                 result = []
                 for record in cursor.fetchall():
                     cmt = dict(
-                        zip(["id", "project_id", "process_id", "xml_file_link", "content", "create_at"], record[:6]))
-                    user = dict(
-                        zip(["id", "email", "phone", "avatar"], record[6:]))
+                        zip(
+                            [
+                                "id",
+                                "project_id",
+                                "process_id",
+                                "xml_file_link",
+                                "content",
+                                "create_at",
+                            ],
+                            record[:6],
+                        )
+                    )
+                    user = dict(zip(["id", "email", "phone", "avatar"], record[6:]))
                     cmt["author"] = user
                     result.append(cmt)
                 return result
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_by_user(self, user_id):
@@ -144,17 +204,26 @@ class CommentOn:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(
-                    query, (user_id,))
+                cursor.execute(query, (user_id,))
                 result = []
                 for record in cursor.fetchall():
                     cmt = dict(
-                        zip(["id", "project_id", "process_id", "xml_file_link", "content", "create_at"], record[:6]))
-                    user = dict(
-                        zip(["id", "email", "phone", "avatar"], record[6:]))
+                        zip(
+                            [
+                                "id",
+                                "project_id",
+                                "process_id",
+                                "xml_file_link",
+                                "content",
+                                "create_at",
+                            ],
+                            record[:6],
+                        )
+                    )
+                    user = dict(zip(["id", "email", "phone", "avatar"], record[6:]))
                     cmt["author"] = user
                     result.append(cmt)
                 return result
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)

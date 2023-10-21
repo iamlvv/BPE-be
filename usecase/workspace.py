@@ -93,3 +93,10 @@ class WorkspaceUseCase:
             return None
         workspace.updateWorkspaceIcon(workspaceId, newIcon)
         return workspace
+
+    @classmethod
+    def getWorkspaceByOwnerId(cls, ownerId: str):
+        workspace = Workspace.getWorkspaceByOwnerId(ownerId)
+        if workspace is None:
+            return None
+        return workspace

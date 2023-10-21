@@ -24,13 +24,19 @@ class Project:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (description, name,))
+                cursor.execute(
+                    query,
+                    (
+                        description,
+                        name,
+                    ),
+                )
                 connection.commit()
                 result = cursor.fetchone()
                 return Project(id=result[0], description=result[1], name=result[2])
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get(self, project_id):
@@ -45,15 +51,15 @@ class Project:
                 connection.commit()
                 result = cursor.fetchone()
                 return {
-                    'id': result[0],
-                    'name': result[1],
-                    'description': result[2],
-                    'create_at': result[3],
-                    'user_id': result[4]
+                    "id": result[0],
+                    "name": result[1],
+                    "description": result[2],
+                    "create_at": result[3],
+                    "user_id": result[4],
                 }
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete(self, project_id):
@@ -66,9 +72,9 @@ class Project:
             with connection.cursor() as cursor:
                 cursor.execute(query, (project_id,))
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_all(cls):
@@ -82,10 +88,12 @@ class Project:
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchall()
-                return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
-        except:
+                return list_tuple_to_dict(
+                    ["id", "description", "name", "create_at"], result
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def update_name(self, project_id, name):
@@ -96,14 +104,20 @@ class Project:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (name, project_id,))
+                cursor.execute(
+                    query,
+                    (
+                        name,
+                        project_id,
+                    ),
+                )
                 connection.commit()
                 updated_row = cursor.rowcount
                 if updated_row == 0:
-                    raise Exception('project id incorrect')
-        except:
+                    raise Exception("project id incorrect")
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def update_description(self, project_id, description):
@@ -114,14 +128,20 @@ class Project:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (description, project_id,))
+                cursor.execute(
+                    query,
+                    (
+                        description,
+                        project_id,
+                    ),
+                )
                 connection.commit()
                 updated_row = cursor.rowcount
                 if updated_row == 0:
-                    raise Exception('project id incorrect')
-        except:
+                    raise Exception("project id incorrect")
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_all_project_by_project_ids(self, project_ids):
@@ -136,7 +156,9 @@ class Project:
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchall()
-                return list_tuple_to_dict(["id", "description", "name", "create_at"], result)
-        except:
+                return list_tuple_to_dict(
+                    ["id", "description", "name", "create_at"], result
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)

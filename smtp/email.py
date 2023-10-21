@@ -19,9 +19,7 @@ class Email:
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
             server.login(sender_email, password)
-            server.sendmail(
-                sender_email, receiver_email, message.as_string()
-            )
+            server.sendmail(sender_email, receiver_email, message.as_string())
 
     @classmethod
     def verify_account(self, receiver_email, name, token):
@@ -29,7 +27,6 @@ class Email:
         password = os.environ.get("PASSWORD")
         host = os.environ.get("HOST_BE")
         subject = "Verify your email"
-
         # Create the plain-text and HTML version of your message
         html = f"""\
         <html>

@@ -212,3 +212,17 @@ def uploadIcon():
             return "Upload icon success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/me/all", methods=["GET"])
+def getWorkspacesOfUser():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        data = WorkspaceUseCase.getWorkspaceByOwnerId(user_id)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)

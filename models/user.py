@@ -50,9 +50,9 @@ class User:
                 connection.commit()
                 result = cursor.fetchone()
                 return User(id=result[0], email=result[2], password=result[1])
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def change_password(self, email, new_hash_password):
@@ -71,9 +71,9 @@ class User:
                     ),
                 )
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def verify(self, email):
@@ -111,12 +111,11 @@ class User:
                         hash_password,
                     ),
                 )
-                result = cursor.fetchall()
-                if len(result) == 0:
-                    raise Exception("Token invalid")
+                result = cursor.fetchone()
+                print("resutl", result)
+                return "Verify successfully"
         except Exception as e:
             connection.rollback()
-            print("bith")
             raise Exception(e)
 
     @classmethod
@@ -135,9 +134,9 @@ class User:
                 if result[-1]:
                     raise Exception("Your account was verified")
                 return User(id=result[0], email=result[1], password=result[2])
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def get_by_email_permanently(self, email):
@@ -153,9 +152,9 @@ class User:
                 if result == None:
                     raise Exception("Email is incorrect")
                 return User(id=result[0], email=result[1], password=result[2])
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def get(self, email, hash_password):
@@ -179,9 +178,9 @@ class User:
                 if not result[-1]:
                     raise Exception("Your account has not been verified")
                 return User(id=result[0], email=result[1], password=result[2])
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def get_all(self):
@@ -196,9 +195,9 @@ class User:
                 return list_tuple_to_dict(
                     ["id", "email", "name", "phone", "avatar"], result
                 )
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def get_by_id(self, id):
@@ -214,9 +213,9 @@ class User:
                 return User(
                     name=result[0], email=result[1], phone=result[2], avatar=result[3]
                 )
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def get_many(self, user_ids):
@@ -230,9 +229,9 @@ class User:
                 cursor.execute(query)
                 result = cursor.fetchall()
                 return list_tuple_to_dict(("name", "phone", "avatar"), result)
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def check_exist(self, email):
@@ -246,9 +245,9 @@ class User:
                 cursor.execute(query, (email,))
                 result = cursor.fetchone()
                 return result != None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def search(self, s, email):
@@ -264,6 +263,6 @@ class User:
                 return list_tuple_to_dict(
                     ("id", "email", "name", "phone", "avatar"), result
                 )
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)

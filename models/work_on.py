@@ -16,16 +16,25 @@ class WorkOn:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (user_id, project_id, role,))
+                cursor.execute(
+                    query,
+                    (
+                        user_id,
+                        project_id,
+                        role,
+                    ),
+                )
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def insert_many(self, users, project_id):
-        values = ",".join("(%s, %s, %s)" %
-                          (user["user_id"], project_id, user["role"]) for user in users)
+        values = ",".join(
+            "(%s, %s, %s)" % (user["user_id"], project_id, user["role"])
+            for user in users
+        )
         query = f"""INSERT INTO public.work_on
                     (user_id, project_id, "role")
                     VALUES{values};
@@ -35,9 +44,9 @@ class WorkOn:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def update_role(self, user_id, project_id, new_role):
@@ -50,9 +59,9 @@ class WorkOn:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def update_many_role(self, users, project_id):
@@ -67,9 +76,9 @@ class WorkOn:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete_many(self, user_ids, project_id):
@@ -81,9 +90,9 @@ class WorkOn:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_all_project_by_user_id(self, user_id):
@@ -102,15 +111,20 @@ class WorkOn:
                 result = []
                 for record in cursor.fetchall():
                     prj = dict(
-                        zip(["id", "description", "name", "create_at", "role"], record[:5]))
+                        zip(
+                            ["id", "description", "name", "create_at", "role"],
+                            record[:5],
+                        )
+                    )
                     user = dict(
-                        zip(["id", "email", "name", "phone", "avatar"], record[5:]))
+                        zip(["id", "email", "name", "phone", "avatar"], record[5:])
+                    )
                     prj["owner"] = user
                     result.append(prj)
                 return result
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_all_owned_project_by_user_id(self, user_id):
@@ -129,15 +143,20 @@ class WorkOn:
                 result = []
                 for record in cursor.fetchall():
                     prj = dict(
-                        zip(["id", "description", "name", "create_at", "role"], record[:5]))
+                        zip(
+                            ["id", "description", "name", "create_at", "role"],
+                            record[:5],
+                        )
+                    )
                     user = dict(
-                        zip(["id", "email", "name", "phone", "avatar"], record[5:]))
+                        zip(["id", "email", "name", "phone", "avatar"], record[5:])
+                    )
                     prj["owner"] = user
                     result.append(prj)
                 return result
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_all_shared_project_by_user_id(self, user_id):
@@ -156,15 +175,20 @@ class WorkOn:
                 result = []
                 for record in cursor.fetchall():
                     prj = dict(
-                        zip(["id", "description", "name", "create_at", "role"], record[:5]))
+                        zip(
+                            ["id", "description", "name", "create_at", "role"],
+                            record[:5],
+                        )
+                    )
                     user = dict(
-                        zip(["id", "email", "name", "phone", "avatar"], record[5:]))
+                        zip(["id", "email", "name", "phone", "avatar"], record[5:])
+                    )
                     prj["owner"] = user
                     result.append(prj)
                 return result
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_all_user_by_project_id(self, project_id):
@@ -178,10 +202,12 @@ class WorkOn:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return list_tuple_to_dict(["id", "email", "name", "phone", "avatar", "role"], result)
-        except:
+                return list_tuple_to_dict(
+                    ["id", "email", "name", "phone", "avatar", "role"], result
+                )
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def is_not_exists(self, user_ids, project_id):
@@ -195,9 +221,9 @@ class WorkOn:
                 cursor.execute(query)
                 result = cursor.fetchall()
                 return len(result) == 0
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def is_exists(self, user_ids, project_id):
@@ -211,9 +237,9 @@ class WorkOn:
                 cursor.execute(query)
                 result = cursor.fetchall()
                 return len(result) == len(user_ids)
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def is_project_owner(self, user_id, project_id):
@@ -228,9 +254,9 @@ class WorkOn:
                 cursor.execute(query)
                 result = cursor.fetchone()
                 return result != None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def can_edit(self, user_id, project_id):
@@ -246,9 +272,9 @@ class WorkOn:
                 cursor.execute(query)
                 result = cursor.fetchone()
                 return result != None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def can_share(self, user_id, project_id):
@@ -264,9 +290,9 @@ class WorkOn:
                 cursor.execute(query)
                 result = cursor.fetchone()
                 return result != None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def can_view(self, user_id, project_id):
@@ -282,6 +308,6 @@ class WorkOn:
                 cursor.execute(query)
                 result = cursor.fetchone()
                 return result != None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)

@@ -28,7 +28,9 @@ def user_verify(token):
     host = os.environ.get("HOST")
     try:
         email = get_email_from_token(token)
-        return UserUsecase.verify(email)
+        print("email: ", email)
+        data = UserUsecase.verify(email)
+        print("data", data)
         return redirect(f"{host}/login")
     except Exception as e:
         return redirect(f"{host}/login")

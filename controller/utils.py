@@ -17,7 +17,7 @@ from usecase.workspace import WorkspaceUseCase
 def load_request_body(request):
     try:
         body = request.get_json()
-    except:
+    except Exception as e:
         raise Exception("body required")
     return body
 

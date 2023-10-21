@@ -19,11 +19,18 @@ class HistoryImage:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (xml_file_link, project_id, process_id, image_link,))
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        process_id,
+                        image_link,
+                    ),
+                )
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def get_all_image_by_bpmn_file(self, project_id, process_id, xml_file_link):
@@ -34,11 +41,18 @@ class HistoryImage:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (xml_file_link, project_id, process_id,))
-                return list_tuple_to_dict(['image_link', 'save_at'], cursor.fetchall())
-        except:
+                cursor.execute(
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        process_id,
+                    ),
+                )
+                return list_tuple_to_dict(["image_link", "save_at"], cursor.fetchall())
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def count_all_image_by_bpmn_file(self, project_id, process_id, xml_file_link):
@@ -49,11 +63,18 @@ class HistoryImage:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (xml_file_link, project_id, process_id,))
+                cursor.execute(
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        process_id,
+                    ),
+                )
                 return len(cursor.fetchall())
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete(self, project_id, process_id, xml_file_link, image_link):
@@ -64,11 +85,18 @@ class HistoryImage:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    query, (xml_file_link, project_id, image_link, process_id,))
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        image_link,
+                        process_id,
+                    ),
+                )
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def delete_oldest(self, project_id, process_id, xml_file_link):
@@ -79,12 +107,21 @@ class HistoryImage:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (xml_file_link, project_id, process_id,
-                                       xml_file_link, project_id, process_id,))
+                cursor.execute(
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        process_id,
+                        xml_file_link,
+                        project_id,
+                        process_id,
+                    ),
+                )
                 connection.commit()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)
 
     @classmethod
     def dif_last_saved(self, project_id, process_id, xml_file_link):
@@ -95,12 +132,19 @@ class HistoryImage:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (xml_file_link, project_id, process_id,))
+                cursor.execute(
+                    query,
+                    (
+                        xml_file_link,
+                        project_id,
+                        process_id,
+                    ),
+                )
                 result = cursor.fetchone()
                 if result == None or result[0] == None:
                     return True
                 last_saved = result[0]
                 return last_saved + timedelta(seconds=10) < datetime.now()
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception('oops, something went wrong')
+            raise Exception(e)

@@ -93,9 +93,9 @@ class Workspace:
                 cursor.execute(query)
                 connection.commit()
                 return "Update description success"
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def updateWorkspaceName(cls, id: str, name: str) -> str:
@@ -125,9 +125,9 @@ class Workspace:
                 cursor.execute(query)
                 connection.commit()
                 return "Update background success"
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def updateWorkspaceIcon(cls, id: str, icon: str) -> str:
@@ -141,9 +141,9 @@ class Workspace:
                 cursor.execute(query)
                 connection.commit()
                 return "Update icon success"
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def getWorkspace(cls, id: str):
@@ -170,13 +170,13 @@ class Workspace:
                     )
                 else:
                     return None
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def getWorkspaceByOwnerId(cls, ownerId: str) -> list:
-        query = f"""SELECT id, name, description, createdAt, "ownerId", background, icon, "isPersonal", "isDeleted"
+        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
                     FROM public.workspace
                     WHERE ownerId='{ownerId}';
                 """
@@ -199,9 +199,9 @@ class Workspace:
                     ],
                     result,
                 )
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def getWorkspaceByOwnerIdAndIsPersonal(cls, ownerId: str, isPersonal: bool) -> list:
@@ -228,9 +228,9 @@ class Workspace:
                     ],
                     result,
                 )
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def updateWorkspaceOwnership(cls, workspaceId: str, newOwnerId: str):
@@ -244,9 +244,9 @@ class Workspace:
                 cursor.execute(query)
                 connection.commit()
                 return "Update ownership success"
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def getDeletedWorkspace(cls):
@@ -273,9 +273,9 @@ class Workspace:
                     ],
                     result,
                 )
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
 
     @classmethod
     def getDeletedWorkspaceByOwner(cls, ownerId: str):
@@ -302,6 +302,6 @@ class Workspace:
                     ],
                     result,
                 )
-        except:
+        except Exception as e:
             connection.rollback()
-            raise Exception("oops, something went wrong")
+            raise Exception(e)
