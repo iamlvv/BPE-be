@@ -123,8 +123,8 @@ class WorkspaceUseCase:
         return workspace
 
     @classmethod
-    def searchWorkspaceByKeyword(cls, keyword: str):
-        workspace = Workspace.searchWorkspaceByKeyword(keyword)
+    def searchWorkspaceByKeyword(cls, keyword: str, userId: str):
+        workspace = Workspace.searchWorkspaceByKeyword(keyword, userId)
         if workspace is None:
             return None
         return workspace

@@ -329,10 +329,10 @@ class Workspace:
 
     @classmethod
     # search workspace by keyword, search in name and description
-    def searchWorkspaceByKeyword(cls, keyword: str):
-        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
-                    FROM public.workspace
-                    WHERE name LIKE '%{keyword}%' OR description LIKE '%{keyword}%';
+    def searchWorkspaceByKeyword(cls, keyword: str, userId: str):
+        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPinned
+                    FROM public.workspace, public.recent_opened_workspace
+                    WHERE name LIKE '%{keyword}%' AND isDeleted=false AND isHided=false AND ownerId = recent_opened_workspace.userId AND workspace.id=recent_opened_workspace.workspaceId AND recent_opened_workspace.userId='{userId}';
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -348,6 +348,7 @@ class Workspace:
                         "ownerId",
                         "background",
                         "icon",
+                        "isPinned",
                     ],
                     result,
                 )

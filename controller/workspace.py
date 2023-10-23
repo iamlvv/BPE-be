@@ -258,8 +258,8 @@ def getPinnedWorkspace():
 # search workspace by keyword, search in name and description
 def searchWorkspaceByKeyword(keyword):
     try:
-        print(keyword)
-        data = WorkspaceUseCase.searchWorkspaceByKeyword(keyword)
+        userId = get_id_from_token(get_token(request))
+        data = WorkspaceUseCase.searchWorkspaceByKeyword(keyword, userId)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
