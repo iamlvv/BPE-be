@@ -201,7 +201,7 @@ class User:
 
     @classmethod
     def get_by_id(self, id):
-        query = """SELECT name, email, phone, avatar
+        query = """SELECT id, name, email, phone, avatar
                     FROM public.bpe_user
                     WHERE id=%s;
                 """
@@ -211,7 +211,11 @@ class User:
                 cursor.execute(query, (id,))
                 result = cursor.fetchone()
                 return User(
-                    name=result[0], email=result[1], phone=result[2], avatar=result[3]
+                    id=result[0],
+                    name=result[1],
+                    email=result[2],
+                    phone=result[3],
+                    avatar=result[4],
                 )
         except Exception as e:
             connection.rollback()

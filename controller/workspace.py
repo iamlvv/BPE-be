@@ -226,3 +226,43 @@ def getWorkspacesOfUser():
         )
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/pinned", methods=["POST"])
+def pinWorkspace():
+    try:
+        body = load_request_body(request)
+        userId = get_id_from_token(get_token(request))
+        workspaceId = body["workspaceId"]
+        data = WorkspaceUseCase.pinWorkspace(userId, workspaceId)
+        return data
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/me/pinned", methods=["GET"])
+def getPinnedWorkspace():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        data = WorkspaceUseCase.getPinnedWorkspace(user_id)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/search/<keyword>", methods=["GET"])
+# search workspace by keyword, search in name and description
+def searchWorkspaceByKeyword(keyword):
+    try:
+        data = WorkspaceUseCase.searchWorkspaceByKeyword(keyword)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)

@@ -14,8 +14,22 @@ def user_signup():
         name = body["name"]
         phone = body["phone"] if "phone" in body else ""
         avatar = body["avatar"] if "avatar" in body else ""
+        response = UserUsecase.signup(password, email, name, phone, avatar)
+        if response == "Account exist":
+            return bpsky.response_class(response=response, status=500)
+        else:
+            personalWorkspace = WorkspaceUseCase.createNewWorkspace(
+                name,
+                "Personal workspace",
+                datetime.now(),
+                response["id"],
+                "",
+                "",
+                True,
+                False,
+            )
         return bpsky.response_class(
-            response=UserUsecase.signup(password, email, name, phone, avatar),
+            response=response,
             content_type="text",
             status=200,
         )

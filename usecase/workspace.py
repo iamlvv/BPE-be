@@ -28,8 +28,12 @@ class WorkspaceUseCase:
             isPersonal,
             isDeleted,
         )
+
         if newWorkspace is None:
             return None
+        newRecentOpenedWorkspace = Recent_Opened_Workspaces.insert(
+            newWorkspace.id, ownerId, createdAt
+        )
         return newWorkspace
 
     @classmethod
@@ -97,6 +101,30 @@ class WorkspaceUseCase:
     @classmethod
     def getWorkspaceByOwnerId(cls, ownerId: str):
         workspace = Workspace.getWorkspaceByOwnerId(ownerId)
+        if workspace is None:
+            return None
+        return workspace
+
+    @classmethod
+    def pinWorkspace(cls, userId: str, workspaceId: str):
+        workspace = Workspace.getWorkspace(workspaceId)
+        if workspace is None:
+            return None
+        recent_opened_workspace = Recent_Opened_Workspaces.pinOpenedWorkspace(
+            workspaceId, userId
+        )
+        return recent_opened_workspace
+
+    @classmethod
+    def getPinnedWorkspace(cls, ownerId: str):
+        workspace = Workspace.getPinnedWorkspace(ownerId)
+        if workspace is None:
+            return None
+        return workspace
+
+    @classmethod
+    def searchWorkspaceByKeyword(cls, keyword: str):
+        workspace = Workspace.searchWorkspaceByKeyword(keyword)
         if workspace is None:
             return None
         return workspace

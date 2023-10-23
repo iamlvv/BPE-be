@@ -55,8 +55,6 @@ class Workspace:
                         ownerId=result[4],
                         background=result[5],
                         icon=result[6],
-                        isPersonal=result[7],
-                        isDeleted=result[8],
                     )
                 else:
                     return None
@@ -165,8 +163,6 @@ class Workspace:
                         ownerId=result[4],
                         background=result[5],
                         icon=result[6],
-                        isPersonal=result[7],
-                        isDeleted=result[8],
                     )
                 else:
                     return None
@@ -178,7 +174,7 @@ class Workspace:
     def getWorkspaceByOwnerId(cls, ownerId: str) -> list:
         query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
                     FROM public.workspace
-                    WHERE ownerId='{ownerId}';
+                    WHERE ownerId='{ownerId}' AND isDeleted=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -223,8 +219,6 @@ class Workspace:
                         "ownerId",
                         "background",
                         "icon",
-                        "isPersonal",
-                        "isDeleted",
                     ],
                     result,
                 )
@@ -268,8 +262,6 @@ class Workspace:
                         "ownerId",
                         "background",
                         "icon",
-                        "isPersonal",
-                        "isDeleted",
                     ],
                     result,
                 )
@@ -297,8 +289,63 @@ class Workspace:
                         "ownerId",
                         "background",
                         "icon",
-                        "isPersonal",
-                        "isDeleted",
+                    ],
+                    result,
+                )
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def getPinnedWorkspace(cls, ownerId: str):
+        print("this is pinned workspace query: ")
+        # get pinned workspace by owner, which join with recent_opened_workspace
+        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
+                    FROM public.workspace, public.recent_opened_workspace
+                    WHERE workspace.id=recent_opened_workspace.workspaceId AND recent_opened_workspace.isPinned=true AND ownerId='{ownerId}' AND isDeleted=false AND isHided=false AND ownerId = recent_opened_workspace.userId;
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchall()
+                return list_tuple_to_dict(
+                    [
+                        "id",
+                        "name",
+                        "description",
+                        "createdAt",
+                        "ownerId",
+                        "background",
+                        "icon",
+                    ],
+                    result,
+                )
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    # search workspace by keyword, search in name and description
+    def searchWorkspaceByKeyword(cls, keyword: str):
+        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
+                    FROM public.workspace
+                    WHERE name LIKE '%{keyword}%' OR description LIKE '%{keyword}%';
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchall()
+                return list_tuple_to_dict(
+                    [
+                        "id",
+                        "name",
+                        "description",
+                        "createdAt",
+                        "ownerId",
+                        "background",
+                        "icon",
                     ],
                     result,
                 )

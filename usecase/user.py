@@ -38,7 +38,11 @@ class UserUsecase:
                     encode({"id": result.id, "email": email, "password": password}),
                 ),
             ).start()
-            return "Signup successfully"
+            return {
+                "id": result.id,
+                "email": result.email,
+                "name": result.name,
+            }
         else:
             return "Account exist"
 
@@ -84,6 +88,7 @@ class UserUsecase:
     def get(self, id):
         user = User.get_by_id(id)
         return {
+            "id": user.id,
             "name": user.name,
             "email": user.email,
             "phone": user.phone,
