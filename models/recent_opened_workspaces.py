@@ -61,18 +61,34 @@ class Recent_Opened_Workspaces:
 
     @classmethod
     def pinOpenedWorkspace(cls, workspaceId, userId):
-        query = f"""UPDATE public.recent_opened_workspace
-                    SET isPinned=true
+        # query to find if workspace is pinned, if pinned then unpin it, if not pinned then pin it
+        query = f"""SELECT isPinned FROM public.recent_opened_workspace
                     WHERE workspaceId='{workspaceId}' AND userId='{userId}'
-                    RETURNING workspaceId, userId;
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
+                result = cursor.fetchone()
+                message = ""
+                if result[0] == True:
+                    query = f"""UPDATE public.recent_opened_workspace
+                                SET isPinned=false
+                                WHERE workspaceId='{workspaceId}' AND userId='{userId}'
+                                RETURNING workspaceId, userId, openedAt;
+                            """
+                    message = "Unpinned workspace successfully"
+                else:
+                    query = f"""UPDATE public.recent_opened_workspace
+                                SET isPinned=true
+                                WHERE workspaceId='{workspaceId}' AND userId='{userId}'
+                                RETURNING workspaceId, userId, openedAt;
+                            """
+                    message = "Pinned workspace successfully"
+                cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchone()
-                return "Pinned workspace successfully"
+                return message
         except Exception as e:
             connection.rollback()
             raise Exception(e)

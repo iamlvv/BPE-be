@@ -254,10 +254,11 @@ def getPinnedWorkspace():
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
-@bpsky.route("/api/v1/workspace/search/<keyword>", methods=["GET"])
+@bpsky.route("/api/v1/workspace/search/<string:keyword>", methods=["GET"])
 # search workspace by keyword, search in name and description
 def searchWorkspaceByKeyword(keyword):
     try:
+        print(keyword)
         data = WorkspaceUseCase.searchWorkspaceByKeyword(keyword)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),

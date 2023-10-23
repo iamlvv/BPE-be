@@ -172,9 +172,9 @@ class Workspace:
 
     @classmethod
     def getWorkspaceByOwnerId(cls, ownerId: str) -> list:
-        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
-                    FROM public.workspace
-                    WHERE ownerId='{ownerId}' AND isDeleted=false;
+        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted, isPinned
+                    FROM public.workspace, public.recent_opened_workspace
+                    WHERE ownerId='{ownerId}' AND isDeleted=false AND isHided=false AND ownerId = recent_opened_workspace.userId AND workspace.id=recent_opened_workspace.workspaceId;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -192,6 +192,7 @@ class Workspace:
                         "icon",
                         "isPersonal",
                         "isDeleted",
+                        "isPinned",
                     ],
                     result,
                 )
@@ -300,7 +301,7 @@ class Workspace:
     def getPinnedWorkspace(cls, ownerId: str):
         print("this is pinned workspace query: ")
         # get pinned workspace by owner, which join with recent_opened_workspace
-        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
+        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPinned
                     FROM public.workspace, public.recent_opened_workspace
                     WHERE workspace.id=recent_opened_workspace.workspaceId AND recent_opened_workspace.isPinned=true AND ownerId='{ownerId}' AND isDeleted=false AND isHided=false AND ownerId = recent_opened_workspace.userId;
                 """
@@ -318,6 +319,7 @@ class Workspace:
                         "ownerId",
                         "background",
                         "icon",
+                        "isPinned",
                     ],
                     result,
                 )
