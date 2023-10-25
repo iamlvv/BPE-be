@@ -172,9 +172,11 @@ class Workspace:
 
     @classmethod
     def getWorkspaceByOwnerId(cls, ownerId: str) -> list:
+        # return all workspace of owner, sort by openedAt from latest to oldest
         query = f"""SELECT id, name, description, openedAt, ownerId, background, icon, isPersonal, isDeleted, isPinned
                     FROM public.workspace, public.recent_opened_workspace
-                    WHERE recent_opened_workspace.userId ='{ownerId}' AND isDeleted=false AND isHided=false AND workspace.id=recent_opened_workspace.workspaceId;
+                    WHERE recent_opened_workspace.userId ='{ownerId}' AND isDeleted=false AND isHided=false AND workspace.id=recent_opened_workspace.workspaceId
+                    ORDER BY openedAt DESC;
                 """
         connection = DatabaseConnector.get_connection()
         try:
