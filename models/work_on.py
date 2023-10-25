@@ -296,18 +296,22 @@ class WorkOn:
 
     @classmethod
     def can_view(self, user_id, project_id):
-        query = f"""SELECT work_on.id
-                    FROM public.work_on
-                        JOIN public.project ON work_on.project_id=project.id
-                    WHERE project_id={project_id} AND user_id={user_id}
-                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value}, {Role.CAN_SHARE.value}, {Role.CAN_VIEW.value}) AND project.is_delete=false;
+        query = f"""SELECT public.work_on.id
+                    FROM public.work_on, public.project
+                    WHERE project.id=work_on.project_id AND project.is_delete=false AND work_on.project_id={project_id} AND work_on.user_id={user_id}
+                    AND role IN ('{Role.OWNER.value}', '{Role.CAN_EDIT.value}', '{Role.CAN_SHARE.value}', '{Role.CAN_VIEW.value}') AND project.is_delete=false;
+
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
-                return result != None
+                print("result", result)
+                if result:
+                    return True
+                else:
+                    return False
         except Exception as e:
             connection.rollback()
             raise Exception(e)

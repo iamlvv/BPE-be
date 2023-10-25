@@ -9,31 +9,34 @@ from fileIO.file import FileIO
 
 class ProjectUsecase:
     @classmethod
-    def create(cls, description, name, user_id):
-        project = Project.create(description, name)
-        if not os.path.isdir(f'static/{project.id}'):
+    def create(cls, description, name, user_id, createdAt, workspaceId):
+        project = Project.create(description, name, user_id, createdAt, workspaceId)
+        if not os.path.isdir(f"static/{project.id}"):
             os.makedirs(f"static/{project.id}")
-            if not os.path.isdir(f'static/{project.id}/images'):
+            if not os.path.isdir(f"static/{project.id}/images"):
                 os.makedirs(f"static/{project.id}/images")
         ProcessUsecase.create_default(project.id, name)
         DocumentFileUsecase.create_default(project.id)
         WorkOn.insert(user_id, project.id, Role.OWNER.value)
         return {
-            'id': project.id,
-            'name': project.name,
-            'description': project.description
+            "id": project.id,
+            "name": project.name,
+            "description": project.description,
+            "createdAt": project.create_at,
+            "ownerId": project.ownerId,
+            "workspaceId": project.workspaceId,
         }
 
     @classmethod
     def get(self, project_id, user_id):
         if not WorkOn.can_view(user_id, project_id):
-            raise Exception('permission denied')
+            raise Exception("permission denied")
         return Project.get(project_id)
 
     @classmethod
     def delete(self, project_id, user_id):
         if not WorkOn.is_project_owner(user_id, project_id):
-            raise Exception('permission denied')
+            raise Exception("permission denied")
         return Project.delete(project_id)
 
     @classmethod
@@ -43,13 +46,13 @@ class ProjectUsecase:
     @classmethod
     def update_name(self, user_id, project_id, name):
         if not WorkOn.is_project_owner(user_id, project_id):
-            raise Exception('permisstion denied')
+            raise Exception("permisstion denied")
         Project.update_name(project_id, name)
 
     @classmethod
     def update_description(self, user_id, project_id, description):
         if not WorkOn.is_project_owner(user_id, project_id):
-            raise Exception('permisstion denied')
+            raise Exception("permisstion denied")
         Project.update_description(project_id, description)
 
     @classmethod
@@ -58,18 +61,18 @@ class ProjectUsecase:
             DocumentFileUsecase.save(document_link, file)
             return "Success"
         else:
-            raise Exception('permission denied')
+            raise Exception("permission denied")
 
     @classmethod
     def get_document(self, user_id, project_id):
         if not WorkOn.can_view(user_id, project_id):
-            raise Exception('permisstion denied')
+            raise Exception("permisstion denied")
         return DocumentFileUsecase.get(project_id)
 
     @classmethod
     def get_document_content(self, user_id, project_id):
         if not WorkOn.can_view(user_id, project_id):
-            raise Exception('permisstion denied')
+            raise Exception("permisstion denied")
         file_link = f"static/{project_id}/readme.md"
         return FileIO.get_content(file_link)
 
@@ -88,7 +91,7 @@ class ProjectUsecase:
     @classmethod
     def get_all_user_by_project_id(self, user_id, project_id):
         if not WorkOn.can_view(user_id, project_id):
-            raise Exception('permission denied')
+            raise Exception("permission denied")
         users = WorkOn.get_all_user_by_project_id(project_id)
         return users
 
@@ -98,11 +101,15 @@ class ProjectUsecase:
             if "user_id" not in user or "role" not in user:
                 raise Exception("bad request")
             if type(user["user_id"]) != int:
-                raise Exception('type of user_id must be integer')
+                raise Exception("type of user_id must be integer")
             role = user["role"]
             if role == 0:
-                raise Exception('new role must not be project owner')
-            if role not in [Role.CAN_EDIT.value, Role.CAN_SHARE.value, Role.CAN_VIEW.value]:
+                raise Exception("new role must not be project owner")
+            if role not in [
+                Role.CAN_EDIT.value,
+                Role.CAN_SHARE.value,
+                Role.CAN_VIEW.value,
+            ]:
                 raise Exception("bad request")
 
     @classmethod
@@ -114,9 +121,9 @@ class ProjectUsecase:
                 WorkOn.insert_many(users, project_id)
                 return "Success"
             else:
-                raise Exception('member exist')
+                raise Exception("member exist")
         else:
-            raise Exception('permission denied')
+            raise Exception("permission denied")
 
     @classmethod
     def revoke_permission(self, current_id, user_id, project_id):
@@ -131,7 +138,7 @@ class ProjectUsecase:
             else:
                 raise Exception("this user isn't project's member")
         else:
-            raise Exception('permission denied')
+            raise Exception("permission denied")
 
     @classmethod
     def update_permission(self, current_id, project_id, users):
@@ -144,4 +151,4 @@ class ProjectUsecase:
             else:
                 raise Exception("this user isn't project's member")
         else:
-            raise Exception('permission denied')
+            raise Exception("permission denied")

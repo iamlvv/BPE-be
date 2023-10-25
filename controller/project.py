@@ -10,7 +10,9 @@ def project_insert():
             raise Exception("name required")
         name = body["name"]
         description = body["description"] if "description" in body else ""
-        data = ProjectUsecase.create(description, name, user_id)
+        createdAt = datetime.now()
+        workspaceId = body["workspaceId"]
+        data = ProjectUsecase.create(description, name, user_id, createdAt, workspaceId)
         return bpsky.response_class(
             response=json.dumps(data, default=json_serial),
             status=200,
@@ -33,6 +35,7 @@ def project_project(project_id):
 
 def project_get_project(project_id):
     user_id = get_id_from_token(get_token(request))
+    print(user_id)
     result = ProjectUsecase.get(project_id, user_id)
     return bpsky.response_class(
         response=json.dumps(result, default=json_serial),

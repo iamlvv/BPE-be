@@ -7,6 +7,10 @@ class Project:
     name = ""
     is_delete = False
     create_at = datetime.now()
+    workspaceId = ""
+    ownerId = ""
+    deletedAt = datetime.now()
+    isWorkspaceDeleted = False
 
     def __init__(self, **kwargs):
         for k in kwargs:
@@ -15,12 +19,21 @@ class Project:
         vars(self).update(kwargs)
 
     @classmethod
-    def create(cls, description, name):
-        query = """INSERT INTO public.project
-                    (description, "name", is_delete, create_at)
-                    VALUES(%s, %s, false, NOW())
-                    RETURNING id, description, "name";
-                """
+    def create(
+        cls,
+        description: str,
+        name: str,
+        user_id: str,
+        createdAt: datetime,
+        workspaceId: str,
+        is_delete: bool = False,
+    ):
+        query = f"""
+            INSERT INTO public.project(
+                description, name, create_at, workspaceId, ownerId, is_delete)
+                VALUES ('{description}', '{name}', '{createdAt}', '{workspaceId}', '{user_id}', {is_delete})
+                RETURNING id, description, name, create_at, ownerId, workspaceId;
+        """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
@@ -33,14 +46,21 @@ class Project:
                 )
                 connection.commit()
                 result = cursor.fetchone()
-                return Project(id=result[0], description=result[1], name=result[2])
+                return Project(
+                    id=result[0],
+                    description=result[1],
+                    name=result[2],
+                    create_at=result[3],
+                    ownerId=result[4],
+                    workspaceId=result[5],
+                )
         except Exception as e:
             connection.rollback()
             raise Exception(e)
 
     @classmethod
     def get(self, project_id):
-        query = """SELECT project.id, description, "name", create_at, work_on.user_id
+        query = """SELECT project.id, description, "name", create_at, work_on.user_id, ownerId
                     FROM public.project, public.work_on
                     WHERE project.id=%s AND is_delete=false AND project.id=work_on.project_id;
                 """
@@ -56,6 +76,7 @@ class Project:
                     "description": result[2],
                     "create_at": result[3],
                     "user_id": result[4],
+                    "ownerId": result[5],
                 }
         except Exception as e:
             connection.rollback()

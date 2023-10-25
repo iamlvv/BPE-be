@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS public.bpe_user
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.bpe_user
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 -- Table: public.project
 
@@ -29,13 +29,17 @@ CREATE TABLE IF NOT EXISTS public.project
     description character varying COLLATE pg_catalog."default",
     name        character varying(200) COLLATE pg_catalog."default" NOT NULL,
     is_delete   boolean,
+    workspaceId integer NOT NULL,
+    isWorkspaceDeleted boolean,
+    ownerId     integer NOT NULL,
+    deletedAt   timestamp without time zone,
     create_at   timestamp without time zone,
     CONSTRAINT project_pkey PRIMARY KEY (id)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.project
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 -- Table: public.document_file
 
@@ -49,10 +53,10 @@ CREATE TABLE IF NOT EXISTS public.document_file
     last_saved    timestamp without time zone,
     CONSTRAINT document_file_pkey PRIMARY KEY (document_link, project_id)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.document_file
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 -- Table: public.work_on
 
@@ -66,10 +70,10 @@ CREATE TABLE IF NOT EXISTS public.work_on
     role       integer NOT NULL,
     CONSTRAINT work_on_pkey PRIMARY KEY (user_id, project_id)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.work_on
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 -- Table: public.process
 
@@ -84,10 +88,10 @@ CREATE TABLE IF NOT EXISTS public.process
     CONSTRAINT process_pkey PRIMARY KEY (id, project_id),
     CONSTRAINT process_version_key UNIQUE (id)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.process
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 -- Table: public.process_version
 
@@ -105,10 +109,10 @@ CREATE TABLE IF NOT EXISTS public.process_version
     CONSTRAINT process_version_pkey PRIMARY KEY (xml_file_link, project_id, process_id),
     CONSTRAINT process_version_version_key UNIQUE (version)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.process_version
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 -- Table: public.comment_on
 
@@ -125,10 +129,10 @@ CREATE TABLE IF NOT EXISTS public.comment_on
     create_at     timestamp without time zone,
     CONSTRAINT    comment_on_pkey PRIMARY KEY (id, user_id, project_id, process_id, xml_file_link)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.comment_on
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 -- Table: public.evaluated_result
 
@@ -146,10 +150,10 @@ CREATE TABLE IF NOT EXISTS public.evaluated_result
     create_at          timestamp without time zone,
     CONSTRAINT evaluated_result_pkey PRIMARY KEY (xml_file_link, project_id, process_id, name)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.evaluated_result
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 -- Table: public.history_image
 
@@ -165,7 +169,7 @@ CREATE TABLE IF NOT EXISTS public.history_image
     image_link    character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT history_image_pkey PRIMARY KEY (id, xml_file_link, project_id, process_id, save_at)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 -- CREATE NEW WORKSPACE TABLES
 -- Table: public.workspace
@@ -181,7 +185,7 @@ CREATE TABLE IF NOT EXISTS public.workspace (
     isPersonal boolean,
     isDeleted boolean 
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS public.join_workspace (
     memberId serial NOT NULL,
@@ -193,7 +197,7 @@ CREATE TABLE IF NOT EXISTS public.join_workspace (
     isWorkspaceDeleted boolean,
     PRIMARY KEY (memberId, workspaceId)
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 -- Table: public.request
 CREATE TABLE IF NOT EXISTS public.request (
@@ -213,7 +217,7 @@ CREATE TABLE IF NOT EXISTS public.request (
     to_permission text,
     rcp_permission text
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 -- Table: public.notification
 CREATE TABLE IF NOT EXISTS public.notification (
@@ -225,7 +229,7 @@ CREATE TABLE IF NOT EXISTS public.notification (
     isDeleted boolean,
     isStarred boolean
 )
-    TABLESPACE iamlvv;
+    TABLESPACE pg_default;
 
 -- Table: public.recent_opened_workspace
 CREATE TABLE IF NOT EXISTS public.recent_opened_workspace (
@@ -237,11 +241,11 @@ CREATE TABLE IF NOT EXISTS public.recent_opened_workspace (
     isWorkspaceDeleted boolean,
     PRIMARY KEY (userId, workspaceId)
 )
-	TABLESPACE iamlvv;
+	TABLESPACE pg_default;
 -- Add constraint
 
 ALTER TABLE IF EXISTS public.history_image
-    OWNER to postgres;
+    OWNER to iamlvv;
 
 ALTER TABLE IF EXISTS public.process
     ADD CONSTRAINT process_project_id_fkey FOREIGN KEY (project_id)
@@ -298,6 +302,18 @@ ALTER TABLE IF EXISTS public.history_image
         ON DELETE CASCADE;
 
 -- ADD CONSTRAINT FOR WORKSPACE TABLES
+ALTER TABLE IF EXISTS public.project
+    ADD CONSTRAINT project_workspaceId_fkey FOREIGN KEY (workspaceId)
+        REFERENCES public.workspace (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
+ALTER TABLE IF EXISTS public.project
+    ADD CONSTRAINT project_ownerId_fkey FOREIGN KEY (ownerId)
+        REFERENCES public.bpe_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION;
+
 ALTER TABLE IF EXISTS public.join_workspace
     ADD CONSTRAINT join_workspace_memberId_fkey FOREIGN KEY (memberId)
         REFERENCES public.bpe_user (id) MATCH SIMPLE
