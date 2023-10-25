@@ -94,7 +94,7 @@ class Recent_Opened_Workspaces:
             raise Exception(e)
 
     @classmethod
-    def openWorkspace(cls, userId, workspaceId, openedAt):
+    def openWorkspace(cls, workspaceId, userId, openedAt):
         query = f"""SELECT * FROM public.recent_opened_workspace
                     WHERE workspaceId='{workspaceId}' AND userId='{userId}'
                 """
