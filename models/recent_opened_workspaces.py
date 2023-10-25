@@ -92,3 +92,35 @@ class Recent_Opened_Workspaces:
         except Exception as e:
             connection.rollback()
             raise Exception(e)
+
+    @classmethod
+    def openWorkspace(cls, userId, workspaceId, openedAt):
+        query = f"""SELECT * FROM public.recent_opened_workspace
+                    WHERE workspaceId='{workspaceId}' AND userId='{userId}'
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchone()
+                if result is None:
+                    return Recent_Opened_Workspaces.insert(
+                        workspaceId, userId, openedAt
+                    )
+                else:
+                    query = f"""UPDATE public.recent_opened_workspace
+                                SET openedAt='{openedAt}'
+                                WHERE workspaceId='{workspaceId}' AND userId='{userId}'
+                                RETURNING workspaceId, userId, openedAt;
+                            """
+                    cursor.execute(query)
+                    connection.commit()
+                    result = cursor.fetchone()
+                    return Recent_Opened_Workspaces(
+                        workspaceId=result[0],
+                        userId=result[1],
+                        openedAt=result[2],
+                    )
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)

@@ -15,7 +15,6 @@ class UserUsecase:
 
     @classmethod
     def signin(self, email, password):
-        print("hihi")
         result = User.get(email, hash_password(password))
         print(
             encode(

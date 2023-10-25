@@ -116,8 +116,8 @@ class WorkspaceUseCase:
         return recent_opened_workspace
 
     @classmethod
-    def getPinnedWorkspace(cls, ownerId: str):
-        workspace = Workspace.getPinnedWorkspace(ownerId)
+    def getPinnedWorkspace(cls, userId: str):
+        workspace = Workspace.getPinnedWorkspace(userId)
         if workspace is None:
             return None
         return workspace
@@ -128,3 +128,13 @@ class WorkspaceUseCase:
         if workspace is None:
             return None
         return workspace
+
+    @classmethod
+    def openWorkspace(cls, userId: str, workspaceId: str, openedAt: datetime):
+        workspace = Workspace.getWorkspace(workspaceId)
+        if workspace is None:
+            return None
+        recent_opened_workspace = Recent_Opened_Workspaces.openWorkspace(
+            workspaceId, userId, openedAt
+        )
+        return recent_opened_workspace

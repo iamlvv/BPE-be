@@ -215,6 +215,7 @@ def uploadIcon():
 
 
 @bpsky.route("/api/v1/workspace/me/all", methods=["GET"])
+# get all workspaces that user is member of or owner of
 def getWorkspacesOfUser():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -260,6 +261,24 @@ def searchWorkspaceByKeyword(keyword):
     try:
         userId = get_id_from_token(get_token(request))
         data = WorkspaceUseCase.searchWorkspaceByKeyword(keyword, userId)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/open", methods=["POST"])
+# open workspace and add to recent opened workspace
+def openWorkspace():
+    try:
+        body = load_request_body(request)
+        workspaceId = body["workspaceId"]
+        userId = get_id_from_token(get_token(request))
+        openedAt = datetime.now()
+        data = WorkspaceUseCase.openWorkspace(userId, workspaceId, openedAt)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,

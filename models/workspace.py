@@ -172,9 +172,9 @@ class Workspace:
 
     @classmethod
     def getWorkspaceByOwnerId(cls, ownerId: str) -> list:
-        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted, isPinned
+        query = f"""SELECT id, name, description, openedAt, ownerId, background, icon, isPersonal, isDeleted, isPinned
                     FROM public.workspace, public.recent_opened_workspace
-                    WHERE ownerId='{ownerId}' AND isDeleted=false AND isHided=false AND ownerId = recent_opened_workspace.userId AND workspace.id=recent_opened_workspace.workspaceId;
+                    WHERE recent_opened_workspace.userId ='{ownerId}' AND isDeleted=false AND isHided=false AND workspace.id=recent_opened_workspace.workspaceId;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -186,12 +186,10 @@ class Workspace:
                         "id",
                         "name",
                         "description",
-                        "createdAt",
+                        "openedAt",
                         "ownerId",
                         "background",
                         "icon",
-                        "isPersonal",
-                        "isDeleted",
                         "isPinned",
                     ],
                     result,
@@ -298,12 +296,12 @@ class Workspace:
             raise Exception(e)
 
     @classmethod
-    def getPinnedWorkspace(cls, ownerId: str):
+    def getPinnedWorkspace(cls, userId: str):
         print("this is pinned workspace query: ")
         # get pinned workspace by owner, which join with recent_opened_workspace
         query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPinned
                     FROM public.workspace, public.recent_opened_workspace
-                    WHERE workspace.id=recent_opened_workspace.workspaceId AND recent_opened_workspace.isPinned=true AND ownerId='{ownerId}' AND isDeleted=false AND isHided=false AND ownerId = recent_opened_workspace.userId;
+                    WHERE workspace.id=recent_opened_workspace.workspaceId AND recent_opened_workspace.isPinned=true AND userId = '{userId}' AND isDeleted=false AND isHided=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -330,9 +328,12 @@ class Workspace:
     @classmethod
     # search workspace by keyword, search in name and description
     def searchWorkspaceByKeyword(cls, keyword: str, userId: str):
-        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPinned
-                    FROM public.workspace, public.recent_opened_workspace
-                    WHERE name LIKE '%{keyword}%' AND isDeleted=false AND isHided=false AND ownerId = recent_opened_workspace.userId AND workspace.id=recent_opened_workspace.workspaceId AND recent_opened_workspace.userId='{userId}';
+        query = f"""SELECT w.id, w.name, w.description, w.createdAt, w.ownerId, w.background, w.icon, rw.isPinned
+                    FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u
+                    WHERE (LOWER(w.name) LIKE LOWER('%{keyword}%') OR LOWER(u.name) LIKE LOWER('%{keyword}%'))
+                    AND w.isDeleted=false AND rw.isHided=false 
+                    AND w.id=rw.workspaceId 
+                    AND rw.userId='{userId}';
                 """
         connection = DatabaseConnector.get_connection()
         try:

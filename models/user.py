@@ -112,7 +112,6 @@ class User:
                     ),
                 )
                 result = cursor.fetchone()
-                print("resutl", result)
                 return "Verify successfully"
         except Exception as e:
             connection.rollback()
