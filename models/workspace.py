@@ -249,6 +249,24 @@ class Workspace:
             raise Exception(e)
 
     @classmethod
+    def getTotalWorkspacesByUser(cls, userId: str):
+        query = f"""SELECT COUNT(*) as total
+                    FROM public.workspace w, public.recent_opened_workspace rw
+                    WHERE w.id=rw.workspaceId AND rw.userId='{userId}' AND w.isDeleted=false AND rw.isHided=false;
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchone()
+                return {
+                    "total": result[0],
+                }
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
     def getWorkspaceByOwnerIdAndIsPersonal(cls, ownerId: str, isPersonal: bool) -> list:
         query = f"""SELECT id, name, description, createdAt, "ownerId", background, icon, "isPersonal", "isDeleted"
                     FROM public.workspace

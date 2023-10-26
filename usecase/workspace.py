@@ -149,3 +149,10 @@ class WorkspaceUseCase:
             workspaceId, userId, openedAt
         )
         return recent_opened_workspace
+
+    @classmethod
+    def getTotalWorkspacesByUser(cls, userId: str):
+        workspace = Workspace.getTotalWorkspacesByUser(userId)
+        if workspace is None:
+            return None
+        return workspace
