@@ -228,22 +228,27 @@ class Workspace:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return list_tuple_to_dict(
-                    [
-                        "id",
-                        "name",
-                        "description",
-                        "openedAt",
-                        "ownerId",
-                        "background",
-                        "icon",
-                        "isPinned",
-                        "ownerName",
-                        "ownerAvatar",
-                        "ownerEmail",
-                    ],
-                    result,
-                )
+                # return the result, and the length of result
+                return {
+                    "total": len(result),
+                    "limit": limit,
+                    "data": list_tuple_to_dict(
+                        [
+                            "id",
+                            "name",
+                            "description",
+                            "openedAt",
+                            "ownerId",
+                            "background",
+                            "icon",
+                            "isPinned",
+                            "ownerName",
+                            "ownerAvatar",
+                            "ownerEmail",
+                        ],
+                        result,
+                    ),
+                }
         except Exception as e:
             connection.rollback()
             raise Exception(e)
