@@ -171,13 +171,58 @@ class Workspace:
             raise Exception(e)
 
     @classmethod
-    def getWorkspaceByOwnerId(cls, ownerId: str) -> list:
-        # return all workspace of owner, sort by openedAt from latest to oldest
-        query = f"""SELECT id, name, description, openedAt, ownerId, background, icon, isPersonal, isDeleted, isPinned
-                    FROM public.workspace, public.recent_opened_workspace
-                    WHERE recent_opened_workspace.userId ='{ownerId}' AND isDeleted=false AND isHided=false AND workspace.id=recent_opened_workspace.workspaceId
-                    ORDER BY openedAt DESC;
+    def getAllWorkspacesByUser(
+        cls,
+        user_id,
+        page,
+        limit,
+        openedAt=None,
+        ownerId=None,
+        keyword=None,
+        pinned=None,
+    ) -> list:
+        # return all workspaces that user joined or owned, sort by openedAt from latest to oldest
+        # if keyword is not empty, search in name and description
+        # if ownerId is not empty, search by ownerId
+        # if openedAt == "newest", sort by openedAt from latest to oldest
+        # if openedAt == "oldest", sort by openedAt from oldest to latest
+        # if page and limit is not empty, return workspaces in page and limit
+        # else return all workspaces
+        query = f"""SELECT w.id, w.name, w.description, w.createdAt, w.ownerId, w.background, w.icon, rw.isPinned, u.name as ownerName, u.avatar as ownerAvatar, u.email as ownerEmail
+                    FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u
+                    WHERE w.id=rw.workspaceId AND rw.userId='{user_id}' AND w.isDeleted=false AND rw.isHided=false AND u.id=w.ownerId
                 """
+        print(
+            "user_id: ",
+            user_id,
+            "page: ",
+            page,
+            "limit: ",
+            limit,
+            "openedAt: ",
+            openedAt,
+            "ownerId: ",
+            ownerId,
+            "keyword: ",
+            keyword,
+            "pinned: ",
+            pinned,
+        )
+        print(type(user_id), type(page), type(limit), type(openedAt), type(ownerId))
+        if pinned == "true":
+            query += f""" AND rw.isPinned=true"""
+        if keyword:
+            query += f""" AND (LOWER(w.name) LIKE LOWER('%{keyword}%') OR LOWER(u.name) LIKE LOWER('%{keyword}%'))"""
+        if ownerId:
+            query += f""" AND w.ownerId='{ownerId}'"""
+        if openedAt == "newest" or openedAt == None:
+            query += f""" ORDER BY rw.openedAt DESC"""
+        elif openedAt == "oldest":
+            query += f""" ORDER BY rw.openedAt ASC"""
+        if page and limit:
+            page = int(page)
+            limit = int(limit)
+            query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
@@ -188,11 +233,14 @@ class Workspace:
                         "id",
                         "name",
                         "description",
-                        "openedAt",
+                        "createdAt",
                         "ownerId",
                         "background",
                         "icon",
                         "isPinned",
+                        "ownerName",
+                        "ownerAvatar",
+                        "ownerEmail",
                     ],
                     result,
                 )

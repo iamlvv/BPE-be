@@ -99,8 +99,19 @@ class WorkspaceUseCase:
         return workspace
 
     @classmethod
-    def getWorkspaceByOwnerId(cls, ownerId: str):
-        workspace = Workspace.getWorkspaceByOwnerId(ownerId)
+    def getAllWorkspacesByUser(
+        cls,
+        user_id,
+        page,
+        limit,
+        openedAt=None,
+        ownerId=None,
+        keyword=None,
+        pinned=None,
+    ):
+        workspace = Workspace.getAllWorkspacesByUser(
+            user_id, page, limit, openedAt, ownerId, keyword, pinned
+        )
         if workspace is None:
             return None
         return workspace

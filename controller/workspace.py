@@ -216,10 +216,23 @@ def uploadIcon():
 
 @bpsky.route("/api/v1/workspace/me/all", methods=["GET"])
 # get all workspaces that user is member of or owner of
-def getWorkspacesOfUser():
+# user can filter by openedAt by passing openedAt in query params, default is None. Latest to oldest, and vice versa.
+# user can filter by ownerId by passing ownerId in query params, default is None
+# user can search by keyword by passing keyword in query params, default is None
+# pagination for this endpoint too. default is 0, 10
+def getAllWorkspaces():
     try:
         user_id = get_id_from_token(get_token(request))
-        data = WorkspaceUseCase.getWorkspaceByOwnerId(user_id)
+        openedAt = request.args.get("openedAt", None)
+        ownerId = request.args.get("ownerId", None)
+        keyword = request.args.get("keyword", None)
+        page = request.args.get("page", 0)  # default is 0
+        limit = request.args.get("limit", 10)  # default is 10
+        pinned = request.args.get("pinned", None)
+        print(openedAt, ownerId, keyword, page, limit)
+        data = WorkspaceUseCase.getAllWorkspacesByUser(
+            user_id, page, limit, openedAt, ownerId, keyword, pinned
+        )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
