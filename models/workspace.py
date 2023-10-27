@@ -217,6 +217,7 @@ class Workspace:
                 result = cursor.fetchall()
                 return {
                     "total": total,
+                    "limit": limit,
                     "data": list_tuple_to_dict(
                         [
                             "id",
