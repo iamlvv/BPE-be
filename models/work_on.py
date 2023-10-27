@@ -119,15 +119,28 @@ class WorkOn:
             query += f"""ORDER BY project.create_at ASC"""
         if ownerId:
             query += f""" AND wo2.user_id={ownerId}"""
-        if page and limit:
-            page = int(page)
-            limit = int(limit)
-            query += f""" LIMIT {limit} OFFSET {page * limit};"""
+            # run the query to get the total number of records first, then run the query to get the data with limit and offset
+        total = 0
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
-                result = {"total": 0, "limit": limit, "data": []}
+                total = len(cursor.fetchall())
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+        if page and limit:
+            page = int(page)
+            limit = int(limit)
+            query += (
+                f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit};"""
+            )
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = []
                 for record in cursor.fetchall():
                     prj = dict(
                         zip(
@@ -139,9 +152,8 @@ class WorkOn:
                         zip(["id", "email", "name", "phone", "avatar"], record[5:])
                     )
                     prj["owner"] = user
-                    result["data"].append(prj)
-                result["total"] = len(result["data"])
-                return result
+                    result.append(prj)
+                return {"total": total, "limit": limit, "data": result}
         except Exception as e:
             connection.rollback()
             raise Exception(e)

@@ -192,23 +192,6 @@ class Workspace:
                     FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u
                     WHERE w.id=rw.workspaceId AND rw.userId='{user_id}' AND w.isDeleted=false AND rw.isHided=false AND u.id=w.ownerId
                 """
-        print(
-            "user_id: ",
-            user_id,
-            "page: ",
-            page,
-            "limit: ",
-            limit,
-            "openedAt: ",
-            openedAt,
-            "ownerId: ",
-            ownerId,
-            "keyword: ",
-            keyword,
-            "pinned: ",
-            pinned,
-        )
-        print(type(user_id), type(page), type(limit), type(openedAt), type(ownerId))
         if pinned == "true":
             query += f""" AND rw.isPinned=true"""
         if keyword:
@@ -219,19 +202,21 @@ class Workspace:
             query += f""" ORDER BY rw.openedAt DESC"""
         elif openedAt == "oldest":
             query += f""" ORDER BY rw.openedAt ASC"""
-        if page and limit:
-            page = int(page)
-            limit = int(limit)
-            query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
+        # run the query to get the total result first, then run the query to get the result in page and limit
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                # return the result, and the length of result
+                total = len(result)
+                if page and limit:
+                    page = int(page)
+                    limit = int(limit)
+                    query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
+                cursor.execute(query)
+                result = cursor.fetchall()
                 return {
-                    "total": len(result),
-                    "limit": limit,
+                    "total": total,
                     "data": list_tuple_to_dict(
                         [
                             "id",
