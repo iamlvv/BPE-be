@@ -95,20 +95,39 @@ class WorkOn:
             raise Exception(e)
 
     @classmethod
-    def get_all_project_by_user_id(self, user_id):
-        query = f"""SELECT project.id, project.description, project."name", project.create_at,
-                            wo."role",
-                            bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
-                    FROM work_on wo, work_on wo2, bpe_user, project
-                    WHERE wo.user_id={user_id} AND wo.project_id=wo2.project_id AND
-                        wo2."role"=0 AND bpe_user.id=wo2.user_id AND project.id = wo.project_id
-                        AND project.is_delete=false;
+    def get_all_project_by_user_id(
+        self,
+        user_id,
+        page,
+        limit,
+        workspaceId,
+        createdAt=None,
+        ownerId=None,
+        keyword=None,
+    ):
+        query = f"""SELECT project.id, project.description, project.name, project.create_at, wo.role,
+                    bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
+                    FROM work_on wo, bpe_user, project, public.workspace
+                    WHERE wo.user_id={user_id} AND bpe_user.id=wo.user_id AND project.id = wo.project_id
+                    AND project.is_delete=false AND workspace.id=project.workspaceId AND workspace.id={workspaceId}
                 """
+        if keyword:
+            query += f""" AND (LOWER(project.name) LIKE LOWER('%{keyword}%') OR LOWER(project.description) LIKE LOWER('%{keyword}%') OR LOWER(bpe_user.name) LIKE LOWER('%{keyword}%'))"""
+        if createdAt == "newest" or createdAt == None:
+            query += f"""ORDER BY project.create_at DESC"""
+        elif createdAt == "oldest":
+            query += f"""ORDER BY project.create_at ASC"""
+        if ownerId:
+            query += f""" AND wo2.user_id={ownerId}"""
+        if page and limit:
+            page = int(page)
+            limit = int(limit)
+            query += f""" LIMIT {limit} OFFSET {page * limit};"""
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
-                result = []
+                result = {"total": 0, "limit": limit, "data": []}
                 for record in cursor.fetchall():
                     prj = dict(
                         zip(
@@ -120,7 +139,8 @@ class WorkOn:
                         zip(["id", "email", "name", "phone", "avatar"], record[5:])
                     )
                     prj["owner"] = user
-                    result.append(prj)
+                    result["data"].append(prj)
+                result["total"] = len(result["data"])
                 return result
         except Exception as e:
             connection.rollback()

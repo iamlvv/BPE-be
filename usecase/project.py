@@ -77,8 +77,19 @@ class ProjectUsecase:
         return FileIO.get_content(file_link)
 
     @classmethod
-    def get_all_project_by_user_id(self, user_id):
-        return WorkOn.get_all_project_by_user_id(user_id)
+    def get_all_project_by_user_id(
+        self,
+        user_id,
+        page,
+        limit,
+        workspaceId,
+        createdAt=None,
+        ownerId=None,
+        keyword=None,
+    ):
+        return WorkOn.get_all_project_by_user_id(
+            user_id, page, limit, workspaceId, createdAt, ownerId, keyword
+        )
 
     @classmethod
     def get_all_owned_project_by_user_id(self, user_id):

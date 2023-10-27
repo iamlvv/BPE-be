@@ -50,11 +50,20 @@ def project_delete_project(project_id):
     return "Delete successfully"
 
 
-@bpsky.route("/api/v1/project/all", methods=["GET"])
+@bpsky.route("/api/v1/project/all", methods=["POST"])
 def project_get_all_project_by_user_id():
     try:
         user_id = get_id_from_token(get_token(request))
-        result = ProjectUsecase.get_all_project_by_user_id(user_id)
+        body = load_request_body(request)
+        workspaceId = body["workspaceId"]
+        createdAt = request.args.get("createdAt", None)
+        ownerId = request.args.get("ownerId", None)
+        keyword = request.args.get("keyword", None)
+        page = request.args.get("page", 0)  # default is 0
+        limit = request.args.get("limit", 10)  # default is 10
+        result = ProjectUsecase.get_all_project_by_user_id(
+            user_id, page, limit, workspaceId, createdAt, ownerId, keyword
+        )
         return bpsky.response_class(
             response=json.dumps(result, default=json_serial),
             status=200,
