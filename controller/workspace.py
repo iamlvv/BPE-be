@@ -29,7 +29,7 @@ def createNewWorkspace():
         icon = body["icon"] if "icon" in body else ""
         isPersonal = body["isPersonal"] if "isPersonal" in body else False
         isDeleted = body["isDeleted"] if "isDeleted" in body else False
-        data = WorkspaceUseCase.createNewWorkspace(
+        result = WorkspaceUseCase.createNewWorkspace(
             name=name,
             description=description,
             createdAt=createdAt,
@@ -39,6 +39,17 @@ def createNewWorkspace():
             isPersonal=isPersonal,
             isDeleted=isDeleted,
         )
+        data = {
+            "id": result.id,
+            "name": result.name,
+            "description": result.description,
+            "openedAt": result.createdAt,
+            "ownerId": result.ownerId,
+            "background": result.background,
+            "icon": result.icon,
+            "isPersonal": result.isPersonal,
+            "isDeleted": result.isDeleted,
+        }
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
