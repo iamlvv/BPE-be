@@ -188,9 +188,9 @@ class Workspace:
         # if openedAt == "oldest", sort by openedAt from oldest to latest
         # if page and limit is not empty, return workspaces in page and limit
         # else return all workspaces
-        query = f"""SELECT w.id, w.name, w.description, rw.openedAt, w.ownerId, w.background, w.icon, rw.isPinned, u.name as ownerName, u.avatar as ownerAvatar, u.email as ownerEmail
-                    FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u
-                    WHERE w.id=rw.workspaceId AND rw.userId='{user_id}' AND w.isDeleted=false AND rw.isHided=false AND u.id=w.ownerId
+        query = f"""SELECT w.id, w.name, w.description, rw.openedAt, w.ownerId, w.background, w.icon, rw.isPinned, u.name as ownerName, u.avatar as ownerAvatar, u.email as ownerEmail, jw.permission
+                    FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u, public.join_workspace jw
+                    WHERE w.id=rw.workspaceId AND rw.userId='{user_id}' AND w.isDeleted=false AND rw.isHided=false AND u.id=w.ownerId AND jw.workspaceId = rw.workspaceId AND jw.memberId = rw.userId
                 """
         if pinned == "true":
             query += f""" AND rw.isPinned=true"""

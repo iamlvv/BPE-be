@@ -34,6 +34,9 @@ class WorkspaceUseCase:
         newRecentOpenedWorkspace = Recent_Opened_Workspaces.insert(
             newWorkspace.id, ownerId, createdAt
         )
+        newJoinWorkspace = Join_Workspace.insertNewMember(
+            ownerId, newWorkspace.id, createdAt, "owner"
+        )
         return newWorkspace
 
     @classmethod
