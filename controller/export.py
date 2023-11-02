@@ -6,3 +6,4 @@ from .main import *
 from .project import *
 from .user import *
 from .workspace import *
+from .join_workspace import *

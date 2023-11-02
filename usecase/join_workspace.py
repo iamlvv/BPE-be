@@ -1,0 +1,34 @@
+from models.join_workspace import Join_Workspace
+
+
+class JoinWorkspaceUseCase:
+    @classmethod
+    def getAllMembers(
+        cls, workspaceId: str, page: int, limit: int, keyword=None, permission=None
+    ):
+        members = Join_Workspace.getAllMembers(
+            workspaceId, page, limit, keyword, permission
+        )
+        if members is None:
+            return None
+        return members
+
+    @classmethod
+    def deleteMemberFromWorkspace(cls, workspaceId: str, memberId: str):
+        Join_Workspace.deleteMembersFromWorkspace(workspaceId, memberId)
+
+    @classmethod
+    def updateMemberPermissions(cls, workspaceId: str, memberId: str, permission: str):
+        Join_Workspace.updatePermission(workspaceId, memberId, permission)
+
+    @classmethod
+    def insertNewMember(
+        cls, memberId: str, workspaceId: str, joinedAt: str, permission: str
+    ):
+        # check if member already joined
+        member = Join_Workspace.getMember(workspaceId, memberId)
+        if member is None:
+            return Join_Workspace.insertNewMember(
+                memberId, workspaceId, joinedAt, permission
+            )
+        return None
