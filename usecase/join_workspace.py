@@ -1,4 +1,5 @@
 from models.join_workspace import Join_Workspace
+from models.recent_opened_workspaces import Recent_Opened_Workspaces
 
 
 class JoinWorkspaceUseCase:
@@ -28,7 +29,11 @@ class JoinWorkspaceUseCase:
         # check if member already joined
         member = Join_Workspace.getMember(workspaceId, memberId)
         if member is None:
-            return Join_Workspace.insertNewMember(
+            newMember = Join_Workspace.insertNewMember(
                 memberId, workspaceId, joinedAt, permission
             )
+            newRecentOpenedWorkspace = Recent_Opened_Workspaces.insert(
+                workspaceId, memberId, joinedAt
+            )
+            return newMember
         return None
