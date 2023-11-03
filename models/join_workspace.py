@@ -106,34 +106,40 @@ class Join_Workspace:
             raise Exception(e)
 
     @classmethod
-    def updatePermission(cls, workspaceId: str, memberId: str, permission: str) -> None:
-        query = f"""UPDATE public.join_workspace
-                    SET permission='{permission}'
-                    WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
+    def updatePermission(cls, workspaceId, memberIdList, permission) -> None:
+        # memberId is the list of member id
+        # update permission of each member in the list
+        for memberId in memberIdList:
+            query = f"""UPDATE public.join_workspace
+                        SET permission='{permission}'
+                        WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
+                    """
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    return "Update permission successfully"
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
 
     @classmethod
-    def deleteMember(cls, workspaceId: str, memberId: str) -> None:
-        query = f"""UPDATE public.join_workspace
+    def deleteMember(cls, workspaceId: str, memberIdList) -> None:
+        for memberId in memberIdList:
+            query = f"""UPDATE public.join_workspace
                     SET isDeleted=true
                     WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
                 """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    return "Delete member successfully"
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
 
     @classmethod
     def getMember(cls, workspaceId: str, memberId: str):

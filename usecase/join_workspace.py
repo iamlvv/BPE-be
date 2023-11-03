@@ -1,5 +1,6 @@
 from models.join_workspace import Join_Workspace
 from models.recent_opened_workspaces import Recent_Opened_Workspaces
+from models.work_on import WorkOn
 
 
 class JoinWorkspaceUseCase:
@@ -15,12 +16,17 @@ class JoinWorkspaceUseCase:
         return members
 
     @classmethod
-    def deleteMemberFromWorkspace(cls, workspaceId: str, memberId: str):
-        Join_Workspace.deleteMembersFromWorkspace(workspaceId, memberId)
+    def deleteMember(cls, workspaceId: str, memberIdList):
+        try:
+            deleteJoinWorkspace = Join_Workspace.deleteMember(workspaceId, memberIdList)
+            deleteWorkOnProject = WorkOn.deleteMember(memberIdList)
+            return deleteJoinWorkspace
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
-    def updateMemberPermissions(cls, workspaceId: str, memberId: str, permission: str):
-        Join_Workspace.updatePermission(workspaceId, memberId, permission)
+    def updateMemberPermission(cls, workspaceId: str, memberIdList, permission: str):
+        return Join_Workspace.updatePermission(workspaceId, memberIdList, permission)
 
     @classmethod
     def insertNewMember(

@@ -2,8 +2,8 @@ from .utils import *
 import jsonpickle
 
 
-@bpsky.route("/api/v1/workspace/members", methods=["GET"])
-def getAllMembers():
+@bpsky.route("/api/v1/workspace/<string:workspaceId>/members", methods=["GET"])
+def getAllMembers(workspaceId):
     try:
         print("masuk")
         keyword = request.args.get("keyword", None)
@@ -11,7 +11,7 @@ def getAllMembers():
         limit = request.args.get("limit", 10)
         permission = request.args.get("permission", None)
         body = load_request_body(request)
-        workspaceId = body["workspaceId"]
+        # workspaceId = body["workspaceId"]
         data = JoinWorkspaceUseCase.getAllMembers(
             workspaceId, page, limit, keyword, permission
         )
@@ -44,6 +44,58 @@ def insertNewMember():
                 status=400,
                 mimetype="application/json",
             )
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        raise Exception(e)
+
+
+@bpsky.route(
+    "/api/v1/workspace/<string:workspaceId>/members/permission", methods=["GET"]
+)
+def getPermissionOfUser(workspaceId):
+    try:
+        body = load_request_body(request)
+        memberId = get_id_from_token(get_token(request))
+        data = JoinWorkspaceUseCase.getPermissionOfUser(memberId, workspaceId)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        raise Exception(e)
+
+
+@bpsky.route("/api/v1/workspace/members/permission", methods=["POST"])
+def updatePermission():
+    try:
+        body = load_request_body(request)
+        workspaceId = body["workspaceId"]
+        memberIdList = body["memberIdList"]
+        permission = body["permission"]
+        data = JoinWorkspaceUseCase.updateMemberPermission(
+            workspaceId, memberIdList, permission
+        )
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        raise Exception(e)
+
+
+@bpsky.route("/api/v1/workspace/members/deletion", methods=["POST"])
+def deleteMember():
+    try:
+        body = load_request_body(request)
+        workspaceId = body["workspaceId"]
+        memberIdList = body["memberIdList"]
+        data = JoinWorkspaceUseCase.deleteMember(workspaceId, memberIdList)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
