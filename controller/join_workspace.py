@@ -5,12 +5,11 @@ import jsonpickle
 @bpsky.route("/api/v1/workspace/<string:workspaceId>/members", methods=["GET"])
 def getAllMembers(workspaceId):
     try:
-        print("masuk")
         keyword = request.args.get("keyword", None)
         page = request.args.get("page", 0)
         limit = request.args.get("limit", 10)
         permission = request.args.get("permission", None)
-        body = load_request_body(request)
+        # body = load_request_body(request)
         # workspaceId = body["workspaceId"]
         data = JoinWorkspaceUseCase.getAllMembers(
             workspaceId, page, limit, keyword, permission
