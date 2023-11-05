@@ -109,6 +109,8 @@ class Join_Workspace:
     def updatePermission(cls, workspaceId, memberIdList, permission) -> None:
         # memberId is the list of member id
         # update permission of each member in the list
+        # return list of members that have been updated
+
         for memberId in memberIdList:
             query = f"""UPDATE public.join_workspace
                         SET permission='{permission}'
@@ -119,10 +121,37 @@ class Join_Workspace:
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     connection.commit()
-                    return "Update permission successfully"
+
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)
+
+        # return list of members in tuple but do not have comma in the end that have been updated
+        query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
+                    FROM public.join_workspace jw, public.bpe_user u
+                    WHERE jw.workspaceId='{workspaceId}' AND jw.memberId IN ({','.join(memberIdList)}) AND u.id = jw.memberId;
+                """
+
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                results = cursor.fetchall()
+                return [
+                    {
+                        "name": result[0],
+                        "email": result[1],
+                        "avatar": result[2],
+                        "memberId": result[3],
+                        "workspaceId": result[4],
+                        "joinedAt": result[5],
+                        "permission": result[6],
+                    }
+                    for result in results
+                ]
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
 
     @classmethod
     def deleteMember(cls, workspaceId: str, memberIdList) -> None:
