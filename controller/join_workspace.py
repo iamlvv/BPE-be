@@ -102,3 +102,19 @@ def deleteMember():
         )
     except Exception as e:
         raise Exception(e)
+
+
+@bpsky.route("/api/v1/workspace/members/undodeletion", methods=["POST"])
+def undoDeleteMember():
+    try:
+        body = load_request_body(request)
+        workspaceId = body["workspaceId"]
+        memberIdList = body["memberIdList"]
+        data = JoinWorkspaceUseCase.undoDeleteMember(workspaceId, memberIdList)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        raise Exception(e)

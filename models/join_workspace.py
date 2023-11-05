@@ -142,6 +142,23 @@ class Join_Workspace:
                 raise Exception(e)
 
     @classmethod
+    def undoDeleteMember(cls, workspaceId, memberIdList):
+        for memberId in memberIdList:
+            query = f"""UPDATE public.join_workspace
+                    SET isDeleted=false
+                    WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
+                """
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    return "Undo delete member successfully"
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+
+    @classmethod
     def getMember(cls, workspaceId: str, memberId: str):
         query = f"""SELECT * FROM public.join_workspace
                     WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}';

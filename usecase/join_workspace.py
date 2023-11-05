@@ -43,3 +43,7 @@ class JoinWorkspaceUseCase:
             )
             return newMember
         return None
+
+    @classmethod
+    def undoDeleteMember(cls, workspaceId, memberIdList):
+        return Join_Workspace.undoDeleteMember(workspaceId, memberIdList)
