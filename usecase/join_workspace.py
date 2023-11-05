@@ -18,15 +18,27 @@ class JoinWorkspaceUseCase:
     @classmethod
     def deleteMember(cls, workspaceId: str, memberIdList):
         try:
-            deleteJoinWorkspace = Join_Workspace.deleteMember(workspaceId, memberIdList)
-            deleteWorkOnProject = WorkOn.deleteMember(memberIdList)
+            newMemberList = Join_Workspace.removeOwnerFromMemberList(
+                workspaceId, memberIdList
+            )
+            if len(newMemberList) == 0:
+                return None
+            deleteJoinWorkspace = Join_Workspace.deleteMember(
+                workspaceId, newMemberList
+            )
+            deleteWorkOnProject = WorkOn.deleteMember(newMemberList)
             return deleteJoinWorkspace
         except Exception as e:
             raise Exception(e)
 
     @classmethod
     def updateMemberPermission(cls, workspaceId: str, memberIdList, permission: str):
-        return Join_Workspace.updatePermission(workspaceId, memberIdList, permission)
+        newMemberIdList = Join_Workspace.removeOwnerFromMemberList(
+            workspaceId, memberIdList
+        )
+        if len(newMemberIdList) == 0:
+            return None
+        return Join_Workspace.updatePermission(workspaceId, newMemberIdList, permission)
 
     @classmethod
     def insertNewMember(

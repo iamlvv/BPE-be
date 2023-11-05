@@ -106,12 +106,33 @@ class Join_Workspace:
             raise Exception(e)
 
     @classmethod
-    def updatePermission(cls, workspaceId, memberIdList, permission) -> None:
+    def removeOwnerFromMemberList(cls, workspaceId: str, memberIdList):
+        print("this is member id list", memberIdList)
+        query = f"""SELECT ownerId FROM public.workspace
+                    WHERE workspace.id='{workspaceId}';
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchone()
+                ownerId = result[0]
+                # print("this is owner id", ownerId)
+                if str(ownerId) in memberIdList:
+                    memberIdList.remove(str(ownerId))
+                    # print("this is member id list after remove", memberIdList)
+                return memberIdList
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def updatePermission(cls, workspaceId, newMemberIdList, permission) -> None:
         # memberId is the list of member id
         # update permission of each member in the list
         # return list of members that have been updated
 
-        for memberId in memberIdList:
+        for memberId in newMemberIdList:
             query = f"""UPDATE public.join_workspace
                         SET permission='{permission}'
                         WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
@@ -129,7 +150,7 @@ class Join_Workspace:
         # return list of members in tuple but do not have comma in the end that have been updated
         query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
                     FROM public.join_workspace jw, public.bpe_user u
-                    WHERE jw.workspaceId='{workspaceId}' AND jw.memberId IN ({','.join(memberIdList)}) AND u.id = jw.memberId;
+                    WHERE jw.workspaceId='{workspaceId}' AND jw.memberId IN ({','.join(newMemberIdList)}) AND u.id = jw.memberId;
                 """
 
         connection = DatabaseConnector.get_connection()
@@ -154,8 +175,8 @@ class Join_Workspace:
             raise Exception(e)
 
     @classmethod
-    def deleteMember(cls, workspaceId: str, memberIdList) -> None:
-        for memberId in memberIdList:
+    def deleteMember(cls, workspaceId: str, newMemberList) -> None:
+        for memberId in newMemberList:
             query = f"""UPDATE public.join_workspace
                     SET isDeleted=true
                     WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';

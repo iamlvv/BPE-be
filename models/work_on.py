@@ -96,8 +96,8 @@ class WorkOn:
             raise Exception(e)
 
     @classmethod
-    def deleteMember(cls, memberIdList) -> None:
-        for memberId in memberIdList:
+    def deleteMember(cls, newMemberList) -> None:
+        for memberId in newMemberList:
             query = f"""UPDATE public.work_on
                     SET isDeleted=true
                     WHERE user_id='{memberId}';
