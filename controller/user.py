@@ -130,9 +130,10 @@ def user_search():
     try:
         email = get_email_from_token(get_token(request))
         s = request.args.get("s", "")
+        workspaceId = request.args.get("workspaceId", None)
         if s == "":
             raise Exception("bad request")
-        data = UserUsecase.search(s, email)
+        data = UserUsecase.search(s, email, workspaceId)
         return bpsky.response_class(
             response=json.dumps(data), status=200, mimetype="application/json"
         )

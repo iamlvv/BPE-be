@@ -253,7 +253,11 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def search(self, s, email):
+    def search(self, s, email, workspaceId=None):
+        # search user in the whole system
+        # return users in workspace and users not in workspace
+        # if users in workspace, return their permission
+        # if workspaceId is None, return all users
         query = f"""SELECT id, email, name, phone, avatar
                     FROM public.bpe_user
                     WHERE email LIKE '%{s}%' AND email!='{email}';
@@ -263,9 +267,83 @@ class User:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return list_tuple_to_dict(
-                    ("id", "email", "name", "phone", "avatar"), result
-                )
+                if len(result) == 0:
+                    return []
+                if workspaceId is None:
+                    return [
+                        {
+                            "id": user[0],
+                            "email": user[1],
+                            "name": user[2],
+                            "phone": user[3],
+                            "avatar": user[4],
+                        }
+                        for user in result
+                    ]
+                else:
+                    # if workspaceId is note None, return all users in system, but with users in workspace, return including their permission
+                    query = f"""SELECT u.id, u.email, u.name, u.phone, u.avatar, jw.permission
+                                FROM public.join_workspace jw, public.bpe_user u
+                                WHERE jw.workspaceId='{workspaceId}' and u.email != '{email}' and u.id=jw.memberId;
+                            """
+                    cursor.execute(
+                        query,
+                        (
+                            workspaceId,
+                            ",".join(str(user[0]) for user in result),
+                        ),
+                    )
+                    resultWithWorkspaceId = cursor.fetchall()
+                    # combine 2 list, remove item with duplicate id
+                    result = result + resultWithWorkspaceId
+                    result = list(
+                        {user[0]: user for user in result}.values()
+                    )  # remove duplicate
+                    return [
+                        {
+                            "id": user[0],
+                            "email": user[1],
+                            "name": user[2],
+                            "phone": user[3],
+                            "avatar": user[4],
+                            "permission": user[5] if len(user) == 6 else None,
+                        }
+                        for user in result
+                    ]
+
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+        query = f"""SELECT id, name, email, phone, avatar
+                    FROM public.bpe_user
+                    WHERE email LIKE '{s}' and email != '{email}';
+                """
+        print("query", query)
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchall()
+                print("result", result)
+                if workspaceId is None:
+                    return list_tuple_to_dict(
+                        ["id", "name", "email", "phone", "avatar"], result
+                    )
+                else:
+                    query = """SELECT member_id, permission
+                                FROM public.bpe_join_workspace
+                                WHERE workspace_id=%s and member_id IN (%s);
+                            """
+                    cursor.execute(
+                        query,
+                        (
+                            workspaceId,
+                            ",".join(str(user["id"]) for user in result),
+                        ),
+                    )
+                    result = cursor.fetchall()
+                    return list_tuple_to_dict(["id", "permission"], result)
         except Exception as e:
             connection.rollback()
             raise Exception(e)

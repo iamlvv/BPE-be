@@ -107,8 +107,8 @@ class UserUsecase:
         return User.check_exist(email)
 
     @classmethod
-    def search(self, s, email):
-        return User.search(s, email)
+    def search(self, s, email, workspaceId=None):
+        return User.search(s, email, workspaceId)
 
     @classmethod
     def auth_with_google(self, email, picture, name):
