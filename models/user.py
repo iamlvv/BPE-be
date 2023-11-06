@@ -314,36 +314,3 @@ class User:
         except Exception as e:
             connection.rollback()
             raise Exception(e)
-
-        query = f"""SELECT id, name, email, phone, avatar
-                    FROM public.bpe_user
-                    WHERE email LIKE '{s}' and email != '{email}';
-                """
-        print("query", query)
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                result = cursor.fetchall()
-                print("result", result)
-                if workspaceId is None:
-                    return list_tuple_to_dict(
-                        ["id", "name", "email", "phone", "avatar"], result
-                    )
-                else:
-                    query = """SELECT member_id, permission
-                                FROM public.bpe_join_workspace
-                                WHERE workspace_id=%s and member_id IN (%s);
-                            """
-                    cursor.execute(
-                        query,
-                        (
-                            workspaceId,
-                            ",".join(str(user["id"]) for user in result),
-                        ),
-                    )
-                    result = cursor.fetchall()
-                    return list_tuple_to_dict(["id", "permission"], result)
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
