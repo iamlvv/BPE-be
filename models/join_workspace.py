@@ -211,7 +211,7 @@ class Join_Workspace:
     @classmethod
     def getMember(cls, workspaceId: str, memberId: str):
         query = f"""SELECT * FROM public.join_workspace
-                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}';
+                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}' and join_workspace.isDeleted=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:
