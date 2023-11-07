@@ -284,7 +284,7 @@ class User:
                     # if workspaceId is note None, return all users in system, but with users in workspace, return including their permission
                     query = f"""SELECT u.id, u.email, u.name, u.phone, u.avatar, jw.permission
                                 FROM public.join_workspace jw, public.bpe_user u
-                                WHERE jw.workspaceId='{workspaceId}' and u.email != '{email}' and u.id=jw.memberId;
+                                WHERE jw.workspaceId='{workspaceId}' and u.email != '{email}' and u.id=jw.memberId and jw.isDeleted=false;
                             """
                     cursor.execute(
                         query,
