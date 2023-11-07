@@ -48,12 +48,22 @@ class Join_Workspace:
                     cursor.execute(query)
                     connection.commit()
                     # return the updated member
-                    return Join_Workspace(
-                        memberId=memberId,
-                        workspaceId=workspaceId,
-                        joinedAt=joinedAt,
-                        permission=permission,
-                    )
+                    query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
+                            FROM public.join_workspace jw, public.bpe_user u
+                            WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
+                        """
+                    cursor.execute(query)
+                    result = cursor.fetchone()
+                    return {
+                        "name": result[0],
+                        "email": result[1],
+                        "avatar": result[2],
+                        "memberId": result[3],
+                        "workspaceId": result[4],
+                        "joinedAt": result[5],
+                        "permission": result[6],
+                    }
+
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)
@@ -69,15 +79,26 @@ class Join_Workspace:
                     cursor.execute(query)
                     connection.commit()
                     result = cursor.fetchone()
+                    # return the inserted member including name, email, avatar, joinedAt, permission, memberId, workspaceId
                     if result:
-                        return Join_Workspace(
-                            memberId=result[0],
-                            workspaceId=result[1],
-                            joinedAt=result[2],
-                            permission=result[3],
-                        )
+                        query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
+                                FROM public.join_workspace jw, public.bpe_user u
+                                WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
+                            """
+                        cursor.execute(query)
+                        result = cursor.fetchone()
+                        return {
+                            "name": result[0],
+                            "email": result[1],
+                            "avatar": result[2],
+                            "memberId": result[3],
+                            "workspaceId": result[4],
+                            "joinedAt": result[5],
+                            "permission": result[6],
+                        }
                     else:
-                        return "something wrong"
+                        return None
+
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)
