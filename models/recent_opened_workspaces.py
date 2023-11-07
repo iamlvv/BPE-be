@@ -20,12 +20,18 @@ class Recent_Opened_Workspaces:
         vars(self).update(kwargs)
 
     @classmethod
-    def insert(cls, workspaceId, userId, openedAt):
-        query = f"""INSERT INTO public.recent_opened_workspace
-                    (workspaceId, userId, openedAt, isHided, isPinned, isWorkspaceDeleted)
-                    VALUES('{workspaceId}', '{userId}', '{openedAt}', false, false, false)
-                    RETURNING workspaceId, userId, openedAt;
-                """
+    def insert(cls, workspaceId, userId, openedAt, isDeleted):
+        if isDeleted:
+            query = f"""UPDATE public.recent_opened_workspace
+                        SET isUserDeletedFromWorkspace=false, openedAt='{openedAt}'
+                        WHERE workspaceId='{workspaceId}' AND userId='{userId}'
+                        RETURNING workspaceId, userId, openedAt;
+                    """
+        else:
+            query = f"""INSERT INTO public.recent_opened_workspace(workspaceId, userId, openedAt)
+                        VALUES('{workspaceId}', '{userId}', '{openedAt}')
+                        RETURNING workspaceId, userId, openedAt;
+                    """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:

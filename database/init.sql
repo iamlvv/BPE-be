@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS public.work_on
     user_id    integer NOT NULL,
     project_id integer NOT NULL,
     role       integer NOT NULL,
+    isDeleted boolean,
     CONSTRAINT work_on_pkey PRIMARY KEY (user_id, project_id)
 )
     TABLESPACE pg_default;
@@ -238,7 +239,7 @@ CREATE TABLE IF NOT EXISTS public.recent_opened_workspace (
     openedAt timestamp without time zone NOT NULL,
     isHided boolean,
     isPinned boolean,
-    isWorkspaceDeleted boolean,
+    isUserDeletedFromWorkspace boolean,
     PRIMARY KEY (userId, workspaceId)
 )
 	TABLESPACE pg_default;

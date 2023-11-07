@@ -28,31 +28,59 @@ class Join_Workspace:
 
     @classmethod
     def insertNewMember(
-        cls, memberId: str, workspaceId: str, joinedAt: str, permission: str
+        cls,
+        memberId: str,
+        workspaceId: str,
+        joinedAt: str,
+        permission: str,
+        isDeleted: bool,
     ):
-        query = f"""INSERT INTO public.join_workspace
+        print("this is isDeleted in models", isDeleted)
+        if isDeleted:
+            query = f"""UPDATE public.join_workspace
+                        SET isDeleted=false, joinedAt='{joinedAt}', permission='{permission}'
+                        WHERE memberId='{memberId}' AND workspaceId='{workspaceId}'
+                        RETURNING memberId, workspaceId, joinedAt, permission;
+                    """
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    # return the updated member
+                    return Join_Workspace(
+                        memberId=memberId,
+                        workspaceId=workspaceId,
+                        joinedAt=joinedAt,
+                        permission=permission,
+                    )
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+        else:
+            query = f"""INSERT INTO public.join_workspace
                     (memberId, workspaceId, joinedAt, permission, isDeleted, isWorkspaceDeleted)
                     VALUES('{memberId}', '{workspaceId}', '{joinedAt}', '{permission}', false, false)
                     RETURNING memberId, workspaceId, joinedAt, permission;
                 """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                result = cursor.fetchone()
-                if result:
-                    return Join_Workspace(
-                        memberId=result[0],
-                        workspaceId=result[1],
-                        joinedAt=result[2],
-                        permission=result[3],
-                    )
-                else:
-                    return "something wrong"
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    result = cursor.fetchone()
+                    if result:
+                        return Join_Workspace(
+                            memberId=result[0],
+                            workspaceId=result[1],
+                            joinedAt=result[2],
+                            permission=result[3],
+                        )
+                    else:
+                        return "something wrong"
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
 
     @classmethod
     def getAllMembers(
@@ -210,8 +238,8 @@ class Join_Workspace:
 
     @classmethod
     def getMember(cls, workspaceId: str, memberId: str):
-        query = f"""SELECT * FROM public.join_workspace
-                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}' and join_workspace.isDeleted=false;
+        query = f"""SELECT memberId, workspaceId, joinedAt, permission, isDeleted FROM public.join_workspace
+                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}';
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -224,6 +252,7 @@ class Join_Workspace:
                         workspaceId=result[1],
                         joinedAt=result[2],
                         permission=result[3],
+                        isDeleted=result[4],
                     )
                 else:
                     return None

@@ -192,6 +192,7 @@ class Workspace:
         query = f"""SELECT w.id, w.name, w.description, rw.openedAt, w.ownerId, w.background, w.icon, rw.isPinned, u.name as ownerName, u.avatar as ownerAvatar, u.email as ownerEmail, jw.permission as permission
                     FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u, public.join_workspace jw
                     WHERE w.id=rw.workspaceId AND rw.userId='{user_id}' AND w.isDeleted=false AND rw.isHided=false AND u.id=w.ownerId AND jw.workspaceId = rw.workspaceId AND jw.memberId = '{user_id}'
+                    AND rw.isUserDeletedFromWorkspace = false AND jw.isDeleted = false
                 """
         if pinned == "true":
             query += f""" AND rw.isPinned=true"""
