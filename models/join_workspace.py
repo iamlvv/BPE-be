@@ -214,10 +214,11 @@ class Join_Workspace:
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     connection.commit()
-                    return "Delete member successfully"
+
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)
+        return "Delete member successfully"
 
     @classmethod
     def undoDeleteMember(cls, workspaceId, memberIdList):
