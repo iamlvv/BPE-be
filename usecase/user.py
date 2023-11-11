@@ -84,15 +84,9 @@ class UserUsecase:
         return user
 
     @classmethod
-    def get(self, id):
-        user = User.get_by_id(id)
-        return {
-            "id": user.id,
-            "name": user.name,
-            "email": user.email,
-            "phone": user.phone,
-            "avatar": user.avatar,
-        }
+    def get(self, id, workspaceId=None):
+        user = User.get_by_id(id, workspaceId)
+        return user
 
     @classmethod
     def get_all(self):

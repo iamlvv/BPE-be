@@ -75,7 +75,8 @@ def user_get_all():
 def user_get():
     try:
         id = get_id_from_token(get_token(request))
-        user = UserUsecase.get(id)
+        workspaceId = request.args.get("workspaceId", None)
+        user = UserUsecase.get(id, workspaceId)
         return bpsky.response_class(
             response=json.dumps(user), status=200, mimetype="application/json"
         )

@@ -199,23 +199,31 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def get_by_id(self, id):
-        query = """SELECT id, name, email, phone, avatar
-                    FROM public.bpe_user
-                    WHERE id=%s;
-                """
+    def get_by_id(self, id, workspaceId=None):
+        if workspaceId:
+            query = f"""SELECT u.id, u.email, u.name, u.phone, u.avatar, jw.permission
+                        FROM public.join_workspace jw, public.bpe_user u
+                        WHERE jw.workspaceId={workspaceId} and u.id={id} and jw.memberId=u.id and jw.isDeleted=false;
+                    """
+        else:
+            query = f"""SELECT id, email, "name", phone, avatar
+                        FROM public.bpe_user
+                        WHERE id= {id};
+                    """
+
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query, (id,))
                 result = cursor.fetchone()
-                return User(
-                    id=result[0],
-                    name=result[1],
-                    email=result[2],
-                    phone=result[3],
-                    avatar=result[4],
-                )
+                return {
+                    "id": result[0],
+                    "email": result[1],
+                    "name": result[2],
+                    "phone": result[3],
+                    "avatar": result[4],
+                    "permission": result[5] if len(result) == 6 else None,
+                }
         except Exception as e:
             connection.rollback()
             raise Exception(e)
