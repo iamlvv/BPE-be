@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS public.work_on
     project_id integer NOT NULL,
     role       integer NOT NULL,
     isDeleted boolean,
+    leftAt timestamp without time zone,
     CONSTRAINT work_on_pkey PRIMARY KEY (user_id, project_id)
 )
     TABLESPACE pg_default;

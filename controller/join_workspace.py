@@ -94,7 +94,8 @@ def deleteMember():
         body = load_request_body(request)
         workspaceId = body["workspaceId"]
         memberIdList = body["memberIdList"]
-        data = JoinWorkspaceUseCase.deleteMember(workspaceId, memberIdList)
+        leftAt = datetime.now()
+        data = JoinWorkspaceUseCase.deleteMember(workspaceId, memberIdList, leftAt)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,

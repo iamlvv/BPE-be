@@ -18,37 +18,10 @@ class Request:
     to_permission = ""
     rcp_permission = ""
 
-    def __init__(
-        self,
-        id: str,
-        type: str,
-        content: str,
-        createdAt: datetime,
-        status: str,
-        isDeleted: bool,
-        isWorkspaceDeleted: bool,
-        workspaceId: str,
-        senderId: str,
-        handlerId: str,
-        recipientId: str,
-        fr_permission: str,
-        to_permission: str,
-        rcp_permission: str,
-    ) -> None:
-        self.id = id
-        self.type = type
-        self.content = content
-        self.createdAt = createdAt
-        self.status = status
-        self.isDeleted = isDeleted
-        self.isWorkspaceDeleted = isWorkspaceDeleted
-        self.workspaceId = workspaceId
-        self.senderId = senderId
-        self.handlerId = handlerId
-        self.recipientId = recipientId
-        self.fr_permission = fr_permission
-        self.to_permission = to_permission
-        self.rcp_permission = rcp_permission
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            getattr(self, k)
+        vars(self).update(kwargs)
 
     def __str__(self) -> str:
         return f"""Request(

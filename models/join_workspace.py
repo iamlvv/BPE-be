@@ -224,10 +224,10 @@ class Join_Workspace:
             raise Exception(e)
 
     @classmethod
-    def deleteMember(cls, workspaceId: str, newMemberList) -> None:
+    def deleteMember(cls, workspaceId: str, newMemberList, leftAt) -> None:
         for memberId in newMemberList:
             query = f"""UPDATE public.join_workspace
-                    SET isDeleted=true
+                    SET isDeleted=true, leftAt = '{leftAt}'
                     WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
                 """
             connection = DatabaseConnector.get_connection()
@@ -245,7 +245,7 @@ class Join_Workspace:
     def undoDeleteMember(cls, workspaceId, memberIdList):
         for memberId in memberIdList:
             query = f"""UPDATE public.join_workspace
-                    SET isDeleted=false
+                    SET isDeleted=false, leftAt = null
                     WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
                 """
             connection = DatabaseConnector.get_connection()

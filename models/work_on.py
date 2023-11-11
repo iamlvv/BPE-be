@@ -7,6 +7,7 @@ class WorkOn:
     project_id = 0
     role = 0
     isDeleted = False
+    leftAt = datetime.now()
 
     @classmethod
     def insert(cls, user_id, project_id, role):
@@ -96,10 +97,10 @@ class WorkOn:
             raise Exception(e)
 
     @classmethod
-    def deleteMember(cls, newMemberList) -> None:
+    def deleteMember(cls, newMemberList, leftAt) -> None:
         for memberId in newMemberList:
             query = f"""UPDATE public.work_on
-                    SET isDeleted=true
+                    SET isDeleted=true, leftAt = '{leftAt}'
                     WHERE user_id='{memberId}';
                 """
             connection = DatabaseConnector.get_connection()

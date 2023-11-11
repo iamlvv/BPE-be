@@ -16,7 +16,7 @@ class JoinWorkspaceUseCase:
         return members
 
     @classmethod
-    def deleteMember(cls, workspaceId: str, memberIdList):
+    def deleteMember(cls, workspaceId: str, memberIdList, leftAt):
         try:
             newMemberList = Join_Workspace.removeOwnerFromMemberList(
                 workspaceId, memberIdList
@@ -24,9 +24,9 @@ class JoinWorkspaceUseCase:
             if len(newMemberList) == 0:
                 return None
             deleteJoinWorkspace = Join_Workspace.deleteMember(
-                workspaceId, newMemberList
+                workspaceId, newMemberList, leftAt
             )
-            deleteWorkOnProject = WorkOn.deleteMember(newMemberList)
+            deleteWorkOnProject = WorkOn.deleteMember(newMemberList, leftAt)
             return deleteJoinWorkspace
         except Exception as e:
             raise Exception(e)
@@ -47,8 +47,6 @@ class JoinWorkspaceUseCase:
         # check if member already joined
         member = Join_Workspace.getMember(workspaceId, memberId)
         isDeleted = member.isDeleted
-        print("this is member", member)
-        print("this is isDeleted", isDeleted)
         if member is None or isDeleted:
             newMember = Join_Workspace.insertNewMember(
                 memberId, workspaceId, joinedAt, permission, isDeleted
