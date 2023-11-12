@@ -78,18 +78,31 @@ class RequestUseCase:
     @classmethod
     def adjust_permission(cls, approvedRequest):
         # TODO: update permission of user in workspace
-        to_permission = approvedRequest[10]
-        userId = approvedRequest[8]
-        workspaceId = approvedRequest[5]
-        newMemberIdList = [str(userId)]
-        Join_Workspace.updatePermission(
-            workspaceId, newMemberIdList, permission=to_permission
-        )
+        try:
+            to_permission = approvedRequest[10]
+            userId = approvedRequest[8]
+            workspaceId = approvedRequest[5]
+            newMemberIdList = [str(userId)]
+            Join_Workspace.updatePermission(
+                workspaceId, newMemberIdList, permission=to_permission
+            )
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def invitation(cls, approvedRequest):
         # TODO: send notification to user
-        pass
+        try:
+            memberId = approvedRequest[8]
+            workspaceId = approvedRequest[5]
+            joinedAt = approvedRequest[3]
+            permission = approvedRequest[11]
+            isDeleted = False
+            Join_Workspace.insertNewMember(
+                memberId, workspaceId, joinedAt, permission, isDeleted
+            )
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def declineRequest(cls, workspaceId, requestIdList, handlerId):
