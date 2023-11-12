@@ -226,37 +226,22 @@ class Request:
 
         return result
 
-    def removeRequest(self, id: str):
-        query = f"""UPDATE public.request
-                    SET isDeleted=true
-                    WHERE id='{id}'
+    @classmethod
+    def deleteRequests(cls, workspaceId, requestIdList, deletedAt):
+        for requestId in requestIdList:
+            query = f"""UPDATE public.request
+                    SET isDeleted=true, deletedAt='{deletedAt}'
+                    WHERE id='{requestId}' AND workspaceId='{workspaceId}'
                     RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
                 """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                result = cursor.fetchone()
-                if result:
-                    return Request(
-                        id=result[0],
-                        type=result[1],
-                        content=result[2],
-                        createdAt=result[3],
-                        status=result[4],
-                        isDeleted=result[5],
-                        isWorkspaceDeleted=result[6],
-                        workspaceId=result[7],
-                        senderId=result[8],
-                        handlerId=result[9],
-                        recipientId=result[10],
-                        fr_permission=result[11],
-                        to_permission=result[12],
-                        rcp_permission=result[13],
-                    )
-                else:
-                    return None
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+
+        return "Delete requests successfully"

@@ -67,8 +67,11 @@ def insertNewRequest():
 def deleteRequest():
     try:
         body = load_request_body(request)
+        workspaceId = body["workspaceId"]
+        requestIdList = body["requestIdList"]
+        deletedAt = datetime.now()
         deletedRequests = RequestUseCase.deleteRequests(
-            body["workspaceId"], body["requestIdList"], body["deletedAt"]
+            workspaceId, requestIdList, deletedAt
         )
         return bpsky.response_class(
             response=jsonpickle.encode(deletedRequests, unpicklable=False),
