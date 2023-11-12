@@ -28,8 +28,8 @@ class Recent_Opened_Workspaces:
                         RETURNING workspaceId, userId, openedAt;
                     """
         else:
-            query = f"""INSERT INTO public.recent_opened_workspace(workspaceId, userId, openedAt)
-                        VALUES('{workspaceId}', '{userId}', '{openedAt}')
+            query = f"""INSERT INTO public.recent_opened_workspace(workspaceId, userId, openedAt, isHided, isPinned, isUserDeletedFromWorkspace)
+                        VALUES('{workspaceId}', '{userId}', '{openedAt}', false, false, false)
                         RETURNING workspaceId, userId, openedAt;
                     """
         connection = DatabaseConnector.get_connection()
