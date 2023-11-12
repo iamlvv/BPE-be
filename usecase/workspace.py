@@ -32,10 +32,10 @@ class WorkspaceUseCase:
         if newWorkspace is None:
             return None
         newRecentOpenedWorkspace = Recent_Opened_Workspaces.insert(
-            newWorkspace.id, ownerId, createdAt
+            newWorkspace.id, ownerId, createdAt, isDeleted
         )
         newJoinWorkspace = Join_Workspace.insertNewMember(
-            ownerId, newWorkspace.id, createdAt, "owner"
+            ownerId, newWorkspace.id, createdAt, "owner", isDeleted
         )
         return newWorkspace
 
