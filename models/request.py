@@ -70,20 +70,27 @@ class Request:
             raise Exception(e)
 
     @classmethod
-    def getAllRequests(cls, workspaceId, keyword=None, type=None, status=None):
+    def getAllRequests(
+        cls, workspaceId, page, limit, keyword=None, type=None, status=None
+    ):
         query = f"""SELECT id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission
                     FROM public.request
                     WHERE workspaceId='{workspaceId}' AND isDeleted=false AND isWorkspaceDeleted=false
                 """
 
         if keyword:
-            query += f""" AND content LIKE '%{keyword}%'"""
+            query += f""" AND LOWER(content) LIKE LOWER('%{keyword}%')"""
         if type:
             query += f""" AND type='{type}'"""
         if status:
             query += f""" AND status='{status}'"""
 
-        query += f""" ORDER BY createdAt DESC;"""
+        query += f""" ORDER BY createdAt DESC"""
+
+        if page and limit:
+            page = int(page)
+            limit = int(limit)
+            query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
 
         connection = DatabaseConnector.get_connection()
         try:

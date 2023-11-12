@@ -9,7 +9,11 @@ def getAllRequests():
         keyword = request.args.get("keyword", None)
         type = request.args.get("type", None)
         status = request.args.get("status", None)
-        data = RequestUseCase.getAllRequests(workspaceId, keyword, type, status)
+        page = request.args.get("page", 0)
+        limit = request.args.get("limit", 10)
+        data = RequestUseCase.getAllRequests(
+            workspaceId, page, limit, keyword, type, status
+        )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,

@@ -114,7 +114,7 @@ class Join_Workspace:
                 """
 
         if keyword:
-            query += f""" AND u.name LIKE '%{keyword}%'"""
+            query += f""" AND LOWER(u.name) LIKE LOWER('%{keyword}%')"""
         if permission:
             query += f""" AND jw.permission='{permission}'"""
 

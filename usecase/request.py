@@ -3,8 +3,12 @@ from models.request import Request
 
 class RequestUseCase:
     @classmethod
-    def getAllRequests(cls, workspaceId, keyword=None, type=None, status=None):
-        requestsList = Request.getAllRequests(workspaceId, keyword, type, status)
+    def getAllRequests(
+        cls, workspaceId, page, limit, keyword=None, type=None, status=None
+    ):
+        requestsList = Request.getAllRequests(
+            workspaceId, page, limit, keyword, type, status
+        )
         return requestsList
 
     @classmethod
