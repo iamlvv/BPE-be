@@ -3,53 +3,51 @@ from models.request import Request
 
 class RequestUseCase:
     @classmethod
-    def getAllRequests(cls, workspaceId):
-        requestsList = Request.getAllRequests(workspaceId)
+    def getAllRequests(cls, workspaceId, keyword=None, type=None, status=None):
+        requestsList = Request.getAllRequests(workspaceId, keyword, type, status)
         return requestsList
 
+    @classmethod
     def insertNewRequest(
         cls,
-        type,
+        requestType,
         content,
         createdAt,
         status,
-        isDeleted,
-        isWorkspaceDeleted,
         workspaceId,
         senderId,
-        handlerId,
         recipientId,
-        fr_permission,
-        to_permission,
-        rcp_permission,
-        deletedAt,
+        handlerId,
+        fr_permission="",
+        to_permission="",
+        rcp_permission="",
     ):
         newRequest = Request.insertNewRequest(
-            type,
+            requestType,
             content,
             createdAt,
             status,
-            isDeleted,
-            isWorkspaceDeleted,
             workspaceId,
             senderId,
-            handlerId,
             recipientId,
+            handlerId,
             fr_permission,
             to_permission,
             rcp_permission,
-            deletedAt,
         )
         return newRequest
 
+    @classmethod
     def deleteRequests(cls, workspaceId, requestIdList, deletedAt):
         deletedRequests = Request.deleteRequests(workspaceId, requestIdList, deletedAt)
         return deletedRequests
 
+    @classmethod
     def approveRequest(cls, id):
         request = Request.approveRequest(id)
         return request
 
+    @classmethod
     def declineRequest(cls, id):
         request = Request.declineRequest(id)
         return request

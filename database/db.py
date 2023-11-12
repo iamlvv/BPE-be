@@ -15,7 +15,7 @@ class DatabaseConnector:
     @classmethod
     def get_connection(self):
         if self.connection != None and self.connection.closed == 0:
-            print("Get connection to the PostgreSQL database...")
+            print("Connected to the PostgreSQL database!")
             return self.connection
 
         print("Connecting to the PostgreSQL database...")
