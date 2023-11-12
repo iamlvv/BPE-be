@@ -1,4 +1,5 @@
 from models.request import Request
+from models.join_workspace import Join_Workspace
 
 
 class RequestUseCase:
@@ -47,11 +48,50 @@ class RequestUseCase:
         return deletedRequests
 
     @classmethod
-    def approveRequest(cls, id):
-        request = Request.approveRequest(id)
-        return request
+    def createNewMemberIdList(cls, requestList):
+        newMemberIdList = []
+        for request in requestList:
+            newMemberIdList.append(str(request["recipientId"]))
+        return newMemberIdList
 
     @classmethod
-    def declineRequest(cls, id):
-        request = Request.declineRequest(id)
+    def approveRequest(cls, workspaceId, requestIdList, handlerId):
+        try:
+            approvedRequests = Request.approveRequest(
+                workspaceId, requestIdList, handlerId
+            )
+            if len(approvedRequests) == 0:
+                raise Exception("No request is approved")
+            else:
+                # if requestType is invitation, then add user to workspace
+                # if requestType is adjust permission, then adjust permission
+                for approvedRequest in approvedRequests:
+                    requestType = approvedRequest[1]
+                    if requestType == "invitation":
+                        RequestUseCase.invitation(approvedRequest)
+                    elif requestType == "adjust permission":
+                        RequestUseCase.adjust_permission(approvedRequest)
+            return "Requests approved successfully"
+        except Exception as e:
+            raise Exception(e)
+
+    @classmethod
+    def adjust_permission(cls, approvedRequest):
+        # TODO: update permission of user in workspace
+        to_permission = approvedRequest[10]
+        userId = approvedRequest[8]
+        workspaceId = approvedRequest[5]
+        newMemberIdList = [str(userId)]
+        Join_Workspace.updatePermission(
+            workspaceId, newMemberIdList, permission=to_permission
+        )
+
+    @classmethod
+    def invitation(cls, approvedRequest):
+        # TODO: send notification to user
+        pass
+
+    @classmethod
+    def declineRequest(cls, workspaceId, requestIdList, handlerId):
+        request = Request.declineRequest(workspaceId, requestIdList, handlerId)
         return request

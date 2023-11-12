@@ -87,36 +87,45 @@ class Request:
 
         query += f""" ORDER BY createdAt DESC"""
 
-        if page and limit:
-            page = int(page)
-            limit = int(limit)
-            query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
+        total = 0
 
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
+                total = len(result)
+
+                if page and limit:
+                    page = int(page)
+                    limit = int(limit)
+                    query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
+
+                cursor.execute(query)
+                result = cursor.fetchall()
+
                 if result:
-                    requestsList = []
-                    for request in result:
-                        requestsList.append(
+                    return {
+                        "total": total,
+                        "limit": limit,
+                        "data": [
                             Request(
-                                id=request[0],
-                                type=request[1],
-                                content=request[2],
-                                createdAt=request[3],
-                                status=request[4],
-                                workspaceId=request[5],
-                                senderId=request[6],
-                                handlerId=request[7],
-                                recipientId=request[8],
-                                fr_permission=request[9],
-                                to_permission=request[10],
-                                rcp_permission=request[11],
+                                id=item[0],
+                                type=item[1],
+                                content=item[2],
+                                createdAt=item[3],
+                                status=item[4],
+                                workspaceId=item[5],
+                                senderId=item[6],
+                                handlerId=item[7],
+                                recipientId=item[8],
+                                fr_permission=item[9],
+                                to_permission=item[10],
+                                rcp_permission=item[11],
                             )
-                        )
-                    return requestsList
+                            for item in result
+                        ],
+                    }
                 else:
                     return []
         except Exception as e:
@@ -177,77 +186,45 @@ class Request:
             raise Exception(e)
 
     @classmethod
-    def approveRequest(cls, id: str, handlerId: str):
-        query = f"""UPDATE public.request
-                    SET status=approved, handlerId='{handlerId}'
-                    WHERE id='{id}'
-                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                result = cursor.fetchone()
-                if result:
-                    return Request(
-                        id=result[0],
-                        type=result[1],
-                        content=result[2],
-                        createdAt=result[3],
-                        status=result[4],
-                        isDeleted=result[5],
-                        isWorkspaceDeleted=result[6],
-                        workspaceId=result[7],
-                        senderId=result[8],
-                        handlerId=result[9],
-                        recipientId=result[10],
-                        fr_permission=result[11],
-                        to_permission=result[12],
-                        rcp_permission=result[13],
-                    )
-                else:
-                    return None
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
+    def approveRequest(cls, workspaceId, requestIdList, handlerId):
+        result = []
+        for requestId in requestIdList:
+            query = f"""UPDATE public.request
+                        SET status='approved', handlerId='{handlerId}'
+                        WHERE id='{requestId}' AND workspaceId='{workspaceId}'
+                        RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
+                    """
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    result.append(cursor.fetchone())
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+        return result
 
     @classmethod
-    def declineRequest(cls, id: str, handlerId: str):
-        query = f"""UPDATE public.request
+    def declineRequest(cls, workspaceId, requestIdList, handlerId):
+        result = []
+        for requestId in requestIdList:
+            query = f"""UPDATE public.request
                     SET status='declined', handlerId='{handlerId}'
-                    WHERE "id"='{id}'
+                    WHERE "id"='{requestId}' AND workspaceId='{workspaceId}'
                     RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
                 """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                result = cursor.fetchone()
-                if result:
-                    return Request(
-                        id=result[0],
-                        type=result[1],
-                        content=result[2],
-                        createdAt=result[3],
-                        status=result[4],
-                        isDeleted=result[5],
-                        isWorkspaceDeleted=result[6],
-                        workspaceId=result[7],
-                        senderId=result[8],
-                        handlerId=result[9],
-                        recipientId=result[10],
-                        fr_permission=result[11],
-                        to_permission=result[12],
-                        rcp_permission=result[13],
-                    )
-                else:
-                    return None
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    result.append(cursor.fetchone())
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
 
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
+        return result
 
     def removeRequest(self, id: str):
         query = f"""UPDATE public.request

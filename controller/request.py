@@ -77,3 +77,37 @@ def deleteRequest():
         )
     except Exception as e:
         raise Exception(e)
+
+
+@bpsky.route("/api/v1/request/approve", methods=["POST"])
+def approveRequest():
+    try:
+        body = load_request_body(request)
+        handlerId = get_id_from_token(get_token(request))
+        requestIdList = body["requestIdList"]
+        workspaceId = body["workspaceId"]
+        data = RequestUseCase.approveRequest(workspaceId, requestIdList, handlerId)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        raise Exception(e)
+
+
+@bpsky.route("/api/v1/request/decline", methods=["POST"])
+def declineRequest():
+    try:
+        body = load_request_body(request)
+        handlerId = get_id_from_token(get_token(request))
+        requestIdList = body["requestIdList"]
+        workspaceId = body["workspaceId"]
+        data = RequestUseCase.declineRequest(workspaceId, requestIdList, handlerId)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        raise Exception(e)
