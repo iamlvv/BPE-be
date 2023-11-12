@@ -105,10 +105,10 @@ class Workspace:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
-                notification_payload = {"type": "workspace", "id": id}
-                cursor.execute(
-                    f"NOTIFY workspace_changes, '{json.dumps(notification_payload)}'"
-                )
+                # notification_payload = {"type": "workspace", "id": id}
+                # cursor.execute(
+                #     f"NOTIFY update_workspace_name, '{json.dumps(notification_payload)}'"
+                # )
                 connection.commit()
                 # notify when workspace name is changed
 

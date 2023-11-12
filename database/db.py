@@ -27,19 +27,22 @@ class DatabaseConnector:
         password = result.password
         database = result.path[1:]
         hostname = result.hostname
+
         self.connection = psycopg2.connect(
             database=database,
             user=username,
             password=password,
             host=hostname,
         )
+
         self.connection.set_isolation_level(
             psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
         )
+
         cur = self.connection.cursor()
 
-        channel_name = "workspace_changes"
-        cur.execute(sql.SQL("LISTEN {}").format(sql.Identifier(channel_name)))
+        channel_name = "update_workspace_name"
+        cur.execute('LISTEN "' + channel_name + ';"')
         while True:
             if select.select([self.connection], [], [], 5) == ([], [], []):
                 print("No events.")
