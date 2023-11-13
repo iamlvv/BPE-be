@@ -45,10 +45,14 @@ class Request:
         requestType, content, status, createdAt, workspaceId, senderId, recipientId
     ):
         # find duplicate request
+        # if after sending request, user be kicked out of workspace, then the request is deleted, so it is not a duplicate request
         # if createdAt is different, if the discrepancy is less than 1 day, then it is a duplicate request
-        query = f"""SELECT createdAt, status
-                    FROM public.request
-                    WHERE type='{requestType}' AND content='{content}' AND status='{status}' AND workspaceId='{workspaceId}' AND senderId='{senderId}' AND recipientId='{recipientId}' AND isDeleted=false AND isWorkspaceDeleted=false
+        query = f"""SELECT r.createdAt, r.status, jw.isDeleted
+                    FROM public.request r, public.join_workspace jw
+                    WHERE r.type='{requestType}' AND r.content='{content}' AND r.status='{status}' 
+                    AND r.workspaceId='{workspaceId}' AND r.senderId='{senderId}' AND r.recipientId='{recipientId}' 
+                    AND r.isDeleted=false AND r.isWorkspaceDeleted=false AND jw.memberId='{senderId}'
+                    AND r.workspaceId=jw.workspaceId
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -58,9 +62,13 @@ class Request:
                 if result:
                     recentCreatedAt = result[0]
                     resultStatus = result[1]
+                    isDeleted = result[2]
+                    print(recentCreatedAt, resultStatus, isDeleted)
                     if (
-                        createdAt - recentCreatedAt
-                    ).days < 1 and resultStatus == "pending":
+                        (createdAt - recentCreatedAt).days < 1
+                        and resultStatus == "pending"
+                        and isDeleted == False
+                    ):
                         return True
                     else:
                         return False
@@ -151,7 +159,19 @@ class Request:
         )
         if isDuplicate:
             return "Duplicate request"
-
+        print(
+            requestType,
+            content,
+            createdAt,
+            status,
+            workspaceId,
+            senderId,
+            recipientId,
+            handlerId,
+            fr_permission,
+            to_permission,
+            rcp_permission,
+        )
         query = f"""INSERT INTO public.request
                     (type, content, createdAt, status, isDeleted, isWorkspaceDeleted, workspaceId, senderId, recipientId, handlerId, fr_permission, to_permission, rcp_permission)
                     VALUES('{requestType}', '{content}', '{createdAt}', '{status}', false, false, '{workspaceId}', '{senderId}', '{recipientId}', '{handlerId}', '{fr_permission}', '{to_permission}', '{rcp_permission}')
@@ -232,6 +252,26 @@ class Request:
             query = f"""UPDATE public.request
                     SET isDeleted=true, deletedAt='{deletedAt}'
                     WHERE id='{requestId}' AND workspaceId='{workspaceId}'
+                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
+                """
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+
+        return "Delete requests successfully"
+
+    @classmethod
+    def deleteRequestsWhenDeletingUser(cls, workspaceId, newMemberList, deletedAt):
+        for memberId in newMemberList:
+            query = f"""UPDATE public.request
+                    SET isDeleted=true, deletedAt='{deletedAt}'
+                    WHERE workspaceId='{workspaceId}' AND senderId = '{memberId}'
                     RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
                 """
             connection = DatabaseConnector.get_connection()
