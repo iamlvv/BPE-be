@@ -1,6 +1,7 @@
 from models.join_workspace import Join_Workspace
 from models.recent_opened_workspaces import Recent_Opened_Workspaces
 from models.work_on import WorkOn
+from models.request import Request
 
 
 class JoinWorkspaceUseCase:
@@ -26,7 +27,13 @@ class JoinWorkspaceUseCase:
             deleteJoinWorkspace = Join_Workspace.deleteMember(
                 workspaceId, newMemberList, leftAt
             )
+            # when member left workspace, delete all work on project of that member
+            # and delete all requests of that member
+
             deleteWorkOnProject = WorkOn.deleteMember(newMemberList, leftAt)
+            deleteRequest = Request.deleteRequestsWhenDeletingUser(
+                workspaceId, newMemberList, leftAt
+            )
             return deleteJoinWorkspace
         except Exception as e:
             raise Exception(e)

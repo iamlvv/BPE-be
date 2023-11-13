@@ -35,9 +35,9 @@ def insertNewRequest():
         workspaceId = body["workspaceId"]
         senderId = body["senderId"]
         recipientId = body["recipientId"]
-        fr_permission = body["fr_permission"] if "fr_permission" in body else ""
-        to_permission = body["to_permission"] if "to_permission" in body else ""
-        rcp_permission = body["rcp_permission"] if "rcp_permission" in body else ""
+        fr_permission = body["frPermission"] if "frPermission" in body else ""
+        to_permission = body["toPermission"] if "toPermission" in body else ""
+        rcp_permission = body["rcpPermission"] if "rcpPermission" in body else ""
         if fr_permission == "" and to_permission == "" and rcp_permission == "":
             raise Exception("No permission is set")
 
