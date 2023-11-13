@@ -46,7 +46,9 @@ class JoinWorkspaceUseCase:
     ):
         # check if member already joined
         member = Join_Workspace.getMember(workspaceId, memberId)
-        isDeleted = member.isDeleted
+        isDeleted = False
+        if member is not None:
+            isDeleted = member.isDeleted
         if member is None or isDeleted:
             newMember = Join_Workspace.insertNewMember(
                 memberId, workspaceId, joinedAt, permission, isDeleted
