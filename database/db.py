@@ -1,8 +1,6 @@
 import psycopg2
 import os
-import select
 from urllib.parse import urlparse
-from psycopg2 import sql
 
 HOST_DB_TEST = os.environ.get("HOST_DB_TEST")
 POSTGRES_USER = os.environ.get("POSTGRES_USER")
