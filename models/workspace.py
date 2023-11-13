@@ -216,6 +216,7 @@ class Workspace:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
+                print(result)
                 total = len(result)
                 if page and limit:
                     page = int(page)
