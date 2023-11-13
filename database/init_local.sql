@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS public.bpe_user
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.bpe_user
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 -- Table: public.project
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.project
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.project
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 -- Table: public.document_file
 
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS public.document_file
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.document_file
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 -- Table: public.work_on
 
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS public.work_on
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.work_on
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 -- Table: public.process
 
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS public.process
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.process
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 -- Table: public.process_version
 
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS public.process_version
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.process_version
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 -- Table: public.comment_on
 
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS public.comment_on
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.comment_on
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 -- Table: public.evaluated_result
 
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS public.evaluated_result
     TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.evaluated_result
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 -- Table: public.history_image
 
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS public.recent_opened_workspace (
 -- Add constraint
 
 ALTER TABLE IF EXISTS public.history_image
-    OWNER to iamlvv;
+    OWNER to postgres;
 
 ALTER TABLE IF EXISTS public.process
     ADD CONSTRAINT process_project_id_fkey FOREIGN KEY (project_id)
