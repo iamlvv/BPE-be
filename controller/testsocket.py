@@ -1,6 +1,6 @@
-import select
+from .utils import *
 import psycopg2
-import socketio
+import select
 
 HOST_DB_TEST = "localhost"
 POSTGRES_USER = "postgres"
@@ -8,7 +8,26 @@ POSTGRES_PASSWORD = "1234"
 POSTGRES_DB = "bpe"
 
 
-def listenForChanges():
+@socketio.on("connect")
+def handleConnect():
+    print("Client connected")
+
+
+@socketio.on("disconnect")
+def handleDisconnect():
+    print("Client disconnected")
+
+
+@socketio.on("message")
+def handleMessage(data):
+    print("message: " + data)
+    socketio.emit("message", data)
+
+
+@socketio.on("client")
+# send the workspace_changes to the client
+# get the data from the database and send it to the client
+def handle_workspace_changes(data):
     try:
         connection = psycopg2.connect(
             host=HOST_DB_TEST,

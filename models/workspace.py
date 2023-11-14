@@ -1,5 +1,6 @@
 from .utils import *
 import json
+from bpsky import socketio
 
 
 class Workspace:
@@ -110,6 +111,11 @@ class Workspace:
                 #     f"NOTIFY update_workspace_name, '{json.dumps(notification_payload)}'"
                 # )
                 connection.commit()
+                # after update workspace name, notify to the client by socketio
+                socketio.emit(
+                    "workspace_changes",
+                    json.dumps({"type": "workspace", "id": id}),
+                )
                 # notify when workspace name is changed
 
                 return "Update name success"

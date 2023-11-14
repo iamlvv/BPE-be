@@ -14,6 +14,7 @@ from usecase.image import ImageUsecase
 from usecase.workspace import WorkspaceUseCase
 from usecase.join_workspace import JoinWorkspaceUseCase
 from usecase.request import RequestUseCase
+from bpsky import socketio
 
 
 def load_request_body(request):
