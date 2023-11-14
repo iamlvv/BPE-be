@@ -19,17 +19,17 @@ class DatabaseConnector:
             return self.connection
 
         print("Connecting to the PostgreSQL database...")
-        # database_url = os.environ.get("DATABASE_URL")
-        # result = urlparse(database_url)
-        # username = result.username
-        # password = result.password
-        # database = result.path[1:]
-        # hostname = result.hostname
+        database_url = os.environ.get("DATABASE_URL")
+        result = urlparse(database_url)
+        username = result.username
+        password = result.password
+        database = result.path[1:]
+        hostname = result.hostname
 
         self.connection = psycopg2.connect(
-            host=HOST_DB_TEST,
-            database=POSTGRES_DB,
-            user=POSTGRES_USER,
-            password=POSTGRES_PASSWORD,
+            host=hostname,
+            database=database,
+            user=username,
+            password=password,
         )
         return self.connection
