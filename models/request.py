@@ -36,9 +36,9 @@ class Request:
             senderId={self.senderId},
             handlerId={self.handlerId},
             recipientId={self.recipientId},
-            fr_permission={self.fr_permission},
-            to_permission={self.to_permission},
-            rcp_permission={self.rcp_permission},
+            frPermission={self.fr_permission},
+            toPermission={self.to_permission},
+            rcpPermission={self.rcp_permission},
         )"""
 
     def findDuplicateRequest(
@@ -239,6 +239,7 @@ class Request:
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     connection.commit()
+                    # rename column, fr_permission -> frPermission, to_permission -> toPermission, rcp_permission -> rcpPermission
                     result.append(cursor.fetchone())
             except Exception as e:
                 connection.rollback()
