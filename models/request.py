@@ -1,5 +1,6 @@
 from .utils import *
 from datetime import date
+from bpsky import socketio
 
 
 class Request:
@@ -185,6 +186,24 @@ class Request:
                 result = cursor.fetchone()
                 print(result)
                 if result:
+                    # send result to socket, channel "insertNewRequest"
+                    socketio.emit(
+                        "insertNewRequest",
+                        {
+                            "id": result[0],
+                            "type": result[1],
+                            "content": result[2],
+                            "createdAt": result[3],
+                            "status": result[4],
+                            "workspaceId": result[5],
+                            "senderId": result[6],
+                            "handlerId": result[7],
+                            "recipientId": result[8],
+                            "frPermission": result[9],
+                            "toPermission": result[10],
+                            "rcpPermission": result[11],
+                        },
+                    )
                     return Request(
                         id=result[0],
                         type=result[1],
