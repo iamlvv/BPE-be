@@ -113,7 +113,7 @@ class Workspace:
                 connection.commit()
                 # after update workspace name, notify to the client by socketio
                 socketio.emit(
-                    "workspace_changes",
+                    "workspace_changes" + id,
                     json.dumps({"type": "workspace", "id": id}),
                 )
                 # notify when workspace name is changed
