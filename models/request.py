@@ -242,8 +242,11 @@ class Request:
             try:
                 with connection.cursor() as cursor:
                     cursor.execute(query)
+
                     connection.commit()
-                    result.append(cursor.fetchone())
+                    result = cursor.fetchone()
+                    return result
+
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)
@@ -262,9 +265,10 @@ class Request:
             try:
                 with connection.cursor() as cursor:
                     cursor.execute(query)
-                    connection.commit()
+                    # connection.commit()
                     # rename column, fr_permission -> frPermission, to_permission -> toPermission, rcp_permission -> rcpPermission
-                    result.append(cursor.fetchone())
+                    result = cursor.fetchone()
+                    return result
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)
