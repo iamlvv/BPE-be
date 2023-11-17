@@ -27,6 +27,21 @@ class User:
     #                          (invalid_args,))
 
     @classmethod
+    def getUserName(cls, userId):
+        query = """SELECT name
+                    FROM public.bpe_user
+                    WHERE id=%s;
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (userId,))
+                result = cursor.fetchone()
+                return result[0]
+        except Exception as e:
+            raise Exception(e)
+
+    @classmethod
     def create(self, hash_password, email, name, phone, avatar, verified=False):
         query = """INSERT INTO public.bpe_user
                 ("password", email, "name", phone, avatar, verified)

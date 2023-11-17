@@ -56,7 +56,7 @@ class Notification:
                 if result:
                     # only emit to the user who is being notified
                     socketio.emit(
-                        "insertNewNotification_" + userId,
+                        "insertNewNotification_" + str(userId),
                         json.dumps(
                             {
                                 "id": result[0],

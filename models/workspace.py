@@ -25,6 +25,25 @@ class Workspace:
         vars(self).update(kwargs)
 
     @classmethod
+    def getWorkspaceName(cls, workspaceId):
+        query = f"""SELECT name
+                    FROM public.workspace
+                    WHERE id={workspaceId};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchone()
+                if result:
+                    return result[0]
+                else:
+                    return None
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
     def insertNewWorkspace(
         cls,
         name: str,

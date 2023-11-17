@@ -1,6 +1,8 @@
 from models.request import Request
 from models.join_workspace import Join_Workspace
 from models.notification import Notification
+from models.contentNoti import generateContent
+from datetime import date, datetime
 
 
 class RequestUseCase:
@@ -68,43 +70,58 @@ class RequestUseCase:
                 # if requestType is adjust permission, then adjust permission
                 for approvedRequest in approvedRequests:
                     requestType = approvedRequest[1]
+                    createdAt = datetime.now()
                     if requestType == "invitation":
-                        RequestUseCase.invitation(approvedRequest)
+                        RequestUseCase.invitation(approvedRequest, createdAt)
                     elif requestType == "adjust permission":
-                        RequestUseCase.adjust_permission(approvedRequest)
+                        RequestUseCase.adjust_permission(approvedRequest, createdAt)
             return "Requests approved successfully"
         except Exception as e:
             raise Exception(e)
 
     @classmethod
-    def adjust_permission(cls, approvedRequest):
+    def adjust_permission(cls, approvedRequest, createdAt):
         # TODO: update permission of user in workspace
         try:
+            requestType = approvedRequest[1]
             fr_permission = approvedRequest[9]
             to_permission = approvedRequest[10]
             userId = approvedRequest[8]
             workspaceId = approvedRequest[5]
             newMemberIdList = [str(userId)]
+            isDeleted = False
             Join_Workspace.updatePermission(
                 workspaceId,
                 newMemberIdList,
                 currentPermission=fr_permission,
                 newPermission=to_permission,
             )
+            content = generateContent(
+                requestType, None, fr_permission, to_permission, workspaceId, userId
+            )
+            Notification.insertNewNotification(
+                userId, content, createdAt, isDeleted, isStarred=False, isRead=False
+            )
+            print(content)
         except Exception as e:
             raise Exception(e)
 
     @classmethod
-    def invitation(cls, approvedRequest):
+    def invitation(cls, approvedRequest, createdAt):
         # TODO: send notification to user
         try:
+            requestType = approvedRequest[1]
+            senderId = approvedRequest[6]
             memberId = approvedRequest[8]
             workspaceId = approvedRequest[5]
-            joinedAt = approvedRequest[3]
             permission = approvedRequest[11]
             isDeleted = False
-            Join_Workspace.insertNewMember(
-                memberId, workspaceId, joinedAt, permission, isDeleted
+            content = generateContent(
+                requestType, permission, None, None, workspaceId, senderId
+            )
+            print(content)
+            Notification.insertNewNotification(
+                memberId, content, createdAt, isDeleted, isStarred=False, isRead=False
             )
         except Exception as e:
             raise Exception(e)
