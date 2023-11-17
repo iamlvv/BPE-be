@@ -45,7 +45,7 @@ class Notification:
         query = f"""INSERT INTO public.notification
                     (userId, createdAt, content, isDeleted, isStarred, isRead)
                     VALUES('{userId}', '{createdAt}', '{content}', {isDeleted}, {isStarred}, {isRead})
-                    RETURNING id, userId, createdAt, content, isRead;
+                    RETURNING id, userId, createdAt, content, isRead, isStarred;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -64,6 +64,7 @@ class Notification:
                                 "createdAt": result[2],
                                 "content": result[3],
                                 "isRead": result[4],
+                                "isStarred": result[5],
                             },
                             default=str,
                         ),
@@ -74,6 +75,7 @@ class Notification:
                         createdAt=result[2],
                         content=result[3],
                         isRead=result[4],
+                        isStarred=result[5],
                     )
                 else:
                     return None
