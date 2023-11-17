@@ -106,7 +106,7 @@ class Notification:
         query = f"""UPDATE public.notification
                     SET isStarred=true
                     WHERE id='{notificationId}' AND isDeleted=false
-                    RETURNING id, userId, createdAt, content, isStarred;
+                    RETURNING id, userId, createdAt, content, isStarred, isRead;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -120,6 +120,7 @@ class Notification:
                     createdAt=result[2],
                     content=result[3],
                     isStarred=result[4],
+                    isRead=result[5],
                 )
         except Exception as e:
             connection.rollback()
@@ -201,7 +202,7 @@ class Notification:
         query = f"""UPDATE public.notification
                     SET isRead=true
                     WHERE id='{notificationId}'
-                    RETURNING id, userId, createdAt, content, isRead;
+                    RETURNING id, userId, createdAt, content, isRead, isStarred;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -215,6 +216,7 @@ class Notification:
                     createdAt=result[2],
                     content=result[3],
                     isRead=result[4],
+                    isStarred=result[5],
                 )
         except Exception as e:
             connection.rollback()
