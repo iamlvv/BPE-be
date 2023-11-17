@@ -135,8 +135,7 @@ class Notification:
             query += " AND isStarred=true"
         if keyword:
             query += f" AND LOWER(content) LIKE LOWER('%{keyword}%')"
-        query += " ORDER BY createdAt DESC;"
-
+        query += " ORDER BY createdAt DESC"
         total = 0
 
         connection = DatabaseConnector.get_connection()
@@ -149,6 +148,7 @@ class Notification:
                     page = int(page)
                     limit = int(limit)
                     query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
+
                 cursor.execute(query)
                 results = cursor.fetchall()
                 return {

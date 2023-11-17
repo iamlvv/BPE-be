@@ -1,5 +1,6 @@
 from models.request import Request
 from models.join_workspace import Join_Workspace
+from models.notification import Notification
 
 
 class RequestUseCase:
