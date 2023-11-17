@@ -104,9 +104,9 @@ class Notification:
         return "Delete notification successfully"
 
     @classmethod
-    def starNotification(cls, notificationId: str):
+    def starNotification(cls, notificationId: str, isStarred: bool):
         query = f"""UPDATE public.notification
-                    SET isStarred=true
+                    SET isStarred={isStarred}
                     WHERE id='{notificationId}' AND isDeleted=false
                     RETURNING id, userId, createdAt, content, isStarred, isRead;
                 """

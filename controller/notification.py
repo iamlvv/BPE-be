@@ -70,7 +70,8 @@ def starNotification():
     try:
         body = load_request_body(request)
         notificationId = body["notificationId"]
-        data = NotificationUseCase.starNotification(notificationId)
+        isStarred = body["isStarred"]
+        data = NotificationUseCase.starNotification(notificationId, isStarred)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,

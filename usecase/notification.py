@@ -27,8 +27,8 @@ class NotificationUseCase:
         return Notification.deleteNotification(notificationIdList, deletedAt)
 
     @classmethod
-    def starNotification(cls, notificationId):
-        return Notification.starNotification(notificationId)
+    def starNotification(cls, notificationId, isStarred):
+        return Notification.starNotification(notificationId, isStarred)
 
     @classmethod
     def readNotification(cls, notificationId):
