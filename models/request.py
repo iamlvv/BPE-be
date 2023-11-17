@@ -245,7 +245,22 @@ class Request:
 
                     data = cursor.fetchone()
                     # push data to result
-                    result.append(data)
+                    result.append(
+                        {
+                            "id": data[0],
+                            "type": data[1],
+                            "content": data[2],
+                            "createdAt": data[3],
+                            "status": data[4],
+                            "workspaceId": data[5],
+                            "senderId": data[6],
+                            "handlerId": data[7],
+                            "recipientId": data[8],
+                            "frPermission": data[9],
+                            "toPermission": data[10],
+                            "rcpPermission": data[11],
+                        }
+                    )
 
             except Exception as e:
                 connection.rollback()
@@ -268,7 +283,22 @@ class Request:
                     # connection.commit()
                     # rename column, fr_permission -> frPermission, to_permission -> toPermission, rcp_permission -> rcpPermission
                     data = cursor.fetchone()
-                    result.append(data)
+                    result.append(
+                        {
+                            "id": data[0],
+                            "type": data[1],
+                            "content": data[2],
+                            "createdAt": data[3],
+                            "status": data[4],
+                            "workspaceId": data[5],
+                            "senderId": data[6],
+                            "handlerId": data[7],
+                            "recipientId": data[8],
+                            "frPermission": data[9],
+                            "toPermission": data[10],
+                            "rcpPermission": data[11],
+                        }
+                    )
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)
