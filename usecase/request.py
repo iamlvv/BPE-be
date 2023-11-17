@@ -77,7 +77,7 @@ class RequestUseCase:
                         RequestUseCase.invitation(approvedRequest, createdAt)
                     elif requestType == "adjust permission":
                         RequestUseCase.adjust_permission(approvedRequest, createdAt)
-            return "Requests approved successfully"
+            return approvedRequests
         except Exception as e:
             raise Exception(e)
 
