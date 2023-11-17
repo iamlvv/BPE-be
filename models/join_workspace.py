@@ -188,9 +188,6 @@ class Join_Workspace:
         # return list of members that have been updated
         # print("this is new member id list", newMemberIdList)
         print("this is current permission", currentPermission, newPermission)
-        query = f"""SELECT permission FROM public.join_workspace
-                    WHERE workspaceId='{workspaceId}' AND memberId IN ({','.join(newMemberIdList)});
-                """
         connection = DatabaseConnector.get_connection()
         try:
             for memberId in newMemberIdList:
@@ -205,13 +202,13 @@ class Join_Workspace:
                     if currentPermission:
                         if result[0] != currentPermission:
                             raise Exception("Current permission does not match")
-                    else:
-                        query = f"""UPDATE public.join_workspace
-                                SET permission='{newPermission}'
-                                WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
-                            """
-                        cursor.execute(query)
-                        connection.commit()
+                    query = f"""UPDATE public.join_workspace
+                            SET permission='{newPermission}'
+                            WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
+                        """
+                    cursor.execute(query)
+                    print("update permission")
+                    connection.commit()
 
             # return list of members in tuple but do not have comma in the end that have been updated
             query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission

@@ -243,9 +243,9 @@ class Request:
                 with connection.cursor() as cursor:
                     cursor.execute(query)
 
-                    connection.commit()
-                    result = cursor.fetchone()
-                    return result
+                    data = cursor.fetchone()
+                    # push data to result
+                    result.append(data)
 
             except Exception as e:
                 connection.rollback()
@@ -258,7 +258,7 @@ class Request:
         for requestId in requestIdList:
             query = f"""UPDATE public.request
                     SET status='declined', handlerId='{handlerId}'
-                    WHERE "id"='{requestId}' AND workspaceId='{workspaceId}'
+                    WHERE id='{requestId}' AND workspaceId='{workspaceId}'
                     RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
                 """
             connection = DatabaseConnector.get_connection()
@@ -267,8 +267,8 @@ class Request:
                     cursor.execute(query)
                     # connection.commit()
                     # rename column, fr_permission -> frPermission, to_permission -> toPermission, rcp_permission -> rcpPermission
-                    result = cursor.fetchone()
-                    return result
+                    data = cursor.fetchone()
+                    result.append(data)
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)

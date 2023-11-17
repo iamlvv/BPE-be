@@ -63,12 +63,14 @@ class RequestUseCase:
             approvedRequests = Request.approveRequest(
                 workspaceId, requestIdList, handlerId
             )
+            print("approvedRequests", approvedRequests)
             if len(approvedRequests) == 0:
                 raise Exception("No request is approved")
             else:
                 # if requestType is invitation, then add user to workspace
                 # if requestType is adjust permission, then adjust permission
                 for approvedRequest in approvedRequests:
+                    print("approvedRequest", approvedRequest)
                     requestType = approvedRequest[1]
                     createdAt = datetime.now()
                     if requestType == "invitation":
@@ -90,6 +92,7 @@ class RequestUseCase:
             workspaceId = approvedRequest[5]
             newMemberIdList = [str(userId)]
             isDeleted = False
+            print(fr_permission, to_permission)
             Join_Workspace.updatePermission(
                 workspaceId,
                 newMemberIdList,
