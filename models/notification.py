@@ -134,7 +134,7 @@ class Notification:
                     WHERE userId='{userId}' AND isDeleted=false
                 """
         if isStarred:
-            query += " AND isStarred=true"
+            query += f" AND isStarred={isStarred}"
         if keyword:
             query += f" AND LOWER(content) LIKE LOWER('%{keyword}%')"
         query += " ORDER BY createdAt DESC"
