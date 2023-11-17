@@ -45,7 +45,9 @@ class JoinWorkspaceUseCase:
         )
         if len(newMemberIdList) == 0:
             return None
-        return Join_Workspace.updatePermission(workspaceId, newMemberIdList, permission)
+        return Join_Workspace.updatePermission(
+            workspaceId, newMemberIdList, None, permission
+        )
 
     @classmethod
     def insertNewMember(
