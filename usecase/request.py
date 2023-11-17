@@ -79,12 +79,16 @@ class RequestUseCase:
     def adjust_permission(cls, approvedRequest):
         # TODO: update permission of user in workspace
         try:
+            fr_permission = approvedRequest[9]
             to_permission = approvedRequest[10]
             userId = approvedRequest[8]
             workspaceId = approvedRequest[5]
             newMemberIdList = [str(userId)]
             Join_Workspace.updatePermission(
-                workspaceId, newMemberIdList, permission=to_permission
+                workspaceId,
+                newMemberIdList,
+                currentPermission=fr_permission,
+                newPermission=to_permission,
             )
         except Exception as e:
             raise Exception(e)

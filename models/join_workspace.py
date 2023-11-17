@@ -176,25 +176,57 @@ class Join_Workspace:
             raise Exception(e)
 
     @classmethod
-    def updatePermission(cls, workspaceId, newMemberIdList, permission) -> None:
+    def updatePermission(
+        cls, workspaceId, newMemberIdList, currentPermission, newPermission
+    ) -> None:
         # memberId is the list of member id
         # update permission of each member in the list
         # return list of members that have been updated
-
-        for memberId in newMemberIdList:
-            query = f"""UPDATE public.join_workspace
-                        SET permission='{permission}'
-                        WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
+        # first, check if current permission match with permission in database
+        # if not, raise exception
+        # if yes, update permission
+        # return list of members that have been updated
+        # print("this is new member id list", newMemberIdList)
+        query = f"""SELECT permission FROM public.join_workspace
+                    WHERE workspaceId='{workspaceId}' AND memberId IN ({','.join(newMemberIdList)});
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                results = cursor.fetchall()
+                for result in results:
+                    if result[0] != currentPermission:
+                        raise Exception("Current permission does not match")
+            for memberId in newMemberIdList:
+                query = f"""SELECT permission FROM public.join_workspace
+                        WHERE workspaceId='{workspaceId}' AND memberId = '{memberId}';
                     """
-            connection = DatabaseConnector.get_connection()
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute(query)
-                    connection.commit()
+                connection = DatabaseConnector.get_connection()
+                try:
+                    with connection.cursor() as cursor:
+                        cursor.execute(query)
+                        result = cursor.fetchone()
+                        print(result)
+                        if result[0] != currentPermission:
+                            raise Exception("Current permission does not match")
 
-            except Exception as e:
-                connection.rollback()
-                raise Exception(e)
+                        query = f"""UPDATE public.join_workspace
+                            SET permission='{newPermission}'
+                            WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
+                        """
+                        cursor.execute(query)
+                        connection.commit()
+
+                except Exception as e:
+                    connection.rollback()
+                    raise Exception(e)
+
+            return "Update permission successfully"
+
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
 
         # return list of members in tuple but do not have comma in the end that have been updated
         query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
