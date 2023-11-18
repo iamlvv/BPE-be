@@ -71,7 +71,7 @@ class RequestUseCase:
                 # if requestType is adjust permission, then adjust permission
                 for approvedRequest in approvedRequests:
                     print("approvedRequest", approvedRequest)
-                    requestType = approvedRequest[1]
+                    requestType = approvedRequest["type"]
                     createdAt = datetime.now()
                     if requestType == "invitation":
                         RequestUseCase.invitation(approvedRequest, createdAt)
@@ -85,11 +85,11 @@ class RequestUseCase:
     def adjust_permission(cls, approvedRequest, createdAt):
         # TODO: update permission of user in workspace
         try:
-            requestType = approvedRequest[1]
-            fr_permission = approvedRequest[9]
-            to_permission = approvedRequest[10]
-            userId = approvedRequest[8]
-            workspaceId = approvedRequest[5]
+            requestType = approvedRequest["type"]
+            fr_permission = approvedRequest["frPermission"]
+            to_permission = approvedRequest["toPermission"]
+            userId = approvedRequest["recipientId"]
+            workspaceId = approvedRequest["workspaceId"]
             newMemberIdList = [str(userId)]
             isDeleted = False
             print(fr_permission, to_permission)
@@ -113,11 +113,11 @@ class RequestUseCase:
     def invitation(cls, approvedRequest, createdAt):
         # TODO: send notification to user
         try:
-            requestType = approvedRequest[1]
-            senderId = approvedRequest[6]
-            memberId = approvedRequest[8]
-            workspaceId = approvedRequest[5]
-            permission = approvedRequest[11]
+            requestType = approvedRequest["type"]
+            senderId = approvedRequest["senderId"]
+            memberId = approvedRequest["recipientId"]
+            workspaceId = approvedRequest["workspaceId"]
+            permission = approvedRequest["rcpPermission"]
             isDeleted = False
             content = generateContent(
                 requestType, permission, None, None, workspaceId, senderId

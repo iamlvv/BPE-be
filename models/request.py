@@ -119,20 +119,20 @@ class Request:
                         "total": total,
                         "limit": limit,
                         "data": [
-                            Request(
-                                id=item[0],
-                                type=item[1],
-                                content=item[2],
-                                createdAt=item[3],
-                                status=item[4],
-                                workspaceId=item[5],
-                                senderId=item[6],
-                                handlerId=item[7],
-                                recipientId=item[8],
-                                fr_permission=item[9],
-                                to_permission=item[10],
-                                rcp_permission=item[11],
-                            )
+                            {
+                                "id": item[0],
+                                "type": item[1],
+                                "content": item[2],
+                                "createdAt": item[3],
+                                "status": item[4],
+                                "workspaceId": item[5],
+                                "senderId": item[6],
+                                "handlerId": item[7],
+                                "recipientId": item[8],
+                                "frPermission": item[9],
+                                "toPermission": item[10],
+                                "rcpPermission": item[11],
+                            }
                             for item in result
                         ],
                     }
@@ -201,28 +201,28 @@ class Request:
                                 "senderId": result[6],
                                 "handlerId": result[7],
                                 "recipientId": result[8],
-                                "fr_permission": result[9],
-                                "to_permission": result[10],
-                                "rcp_permission": result[11],
+                                "frPermission": result[9],
+                                "toPermission": result[10],
+                                "rcpPermission": result[11],
                             },
                             default=str,
                         ),
                     )
 
-                    return Request(
-                        id=result[0],
-                        type=result[1],
-                        content=result[2],
-                        createdAt=result[3],
-                        status=result[4],
-                        workspaceId=result[5],
-                        senderId=result[6],
-                        recipientId=result[7],
-                        handlerId=result[8],
-                        fr_permission=result[9],
-                        to_permission=result[10],
-                        rcp_permission=result[11],
-                    )
+                    return {
+                        "id": result[0],
+                        "type": result[1],
+                        "content": result[2],
+                        "createdAt": result[3],
+                        "status": result[4],
+                        "workspaceId": result[5],
+                        "senderId": result[6],
+                        "handlerId": result[7],
+                        "recipientId": result[8],
+                        "frPermission": result[9],
+                        "toPermission": result[10],
+                        "rcpPermission": result[11],
+                    }
                 else:
                     return None
         except Exception as e:
