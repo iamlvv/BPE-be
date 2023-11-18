@@ -4,45 +4,8 @@ from bpsky import socketio
 import json
 
 
-class Request:
-    id = ""
-    type = ""
-    content = ""
-    createdAt = datetime.now()
-    status = ""
-    isDeleted = False
-    isWorkspaceDeleted = False
-    workspaceId = ""
-    senderId = ""
-    handlerId = ""
-    recipientId = ""
-    fr_permission = ""
-    to_permission = ""
-    rcp_permission = ""
-
-    def __init__(self, **kwargs):
-        for k in kwargs:
-            getattr(self, k)
-        vars(self).update(kwargs)
-
-    def __str__(self) -> str:
-        return f"""Request(
-            id={self.id},
-            type={self.type},
-            content={self.content},
-            createdAt={self.createdAt},
-            status={self.status},
-            isDeleted={self.isDeleted},
-            isWorkspaceDeleted={self.isWorkspaceDeleted},
-            workspaceId={self.workspaceId},
-            senderId={self.senderId},
-            handlerId={self.handlerId},
-            recipientId={self.recipientId},
-            frPermission={self.fr_permission},
-            toPermission={self.to_permission},
-            rcpPermission={self.rcp_permission},
-        )"""
-
+class FindDuplicateRequest:
+    @classmethod
     def findDuplicateRequest(
         requestType, content, status, createdAt, workspaceId, senderId, recipientId
     ):
@@ -79,6 +42,8 @@ class Request:
         except Exception as e:
             raise Exception(e)
 
+
+class Request_Get:
     @classmethod
     def getAllRequests(
         cls, workspaceId, page, limit, keyword=None, type=None, status=None
@@ -141,6 +106,8 @@ class Request:
         except Exception as e:
             raise Exception(e)
 
+
+class Request_Insert(FindDuplicateRequest):
     @classmethod
     def insertNewRequest(
         cls,
@@ -156,7 +123,7 @@ class Request:
         to_permission,
         rcp_permission,
     ):
-        isDuplicate = Request.findDuplicateRequest(
+        isDuplicate = Request_Insert.findDuplicateRequest(
             requestType, content, status, createdAt, workspaceId, senderId, recipientId
         )
         if isDuplicate:
@@ -229,6 +196,8 @@ class Request:
             connection.rollback()
             raise Exception(e)
 
+
+class Request_Update:
     @classmethod
     def approveRequest(cls, workspaceId, requestIdList, handlerId):
         result = []
@@ -305,6 +274,8 @@ class Request:
 
         return result
 
+
+class Request_Delete:
     @classmethod
     def deleteRequests(cls, workspaceId, requestIdList, deletedAt):
         for requestId in requestIdList:
@@ -344,3 +315,43 @@ class Request:
                 raise Exception(e)
 
         return "Delete requests successfully"
+
+
+class Request(Request_Update, Request_Delete, Request_Get, Request_Insert):
+    id = ""
+    type = ""
+    content = ""
+    createdAt = datetime.now()
+    status = ""
+    isDeleted = False
+    isWorkspaceDeleted = False
+    workspaceId = ""
+    senderId = ""
+    handlerId = ""
+    recipientId = ""
+    fr_permission = ""
+    to_permission = ""
+    rcp_permission = ""
+
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            getattr(self, k)
+        vars(self).update(kwargs)
+
+    def __str__(self) -> str:
+        return f"""Request(
+            id={self.id},
+            type={self.type},
+            content={self.content},
+            createdAt={self.createdAt},
+            status={self.status},
+            isDeleted={self.isDeleted},
+            isWorkspaceDeleted={self.isWorkspaceDeleted},
+            workspaceId={self.workspaceId},
+            senderId={self.senderId},
+            handlerId={self.handlerId},
+            recipientId={self.recipientId},
+            frPermission={self.fr_permission},
+            toPermission={self.to_permission},
+            rcpPermission={self.rcp_permission},
+        )"""

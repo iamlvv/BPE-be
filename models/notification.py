@@ -3,131 +3,7 @@ import json
 from bpsky import socketio
 
 
-class Notification:
-    id = ""
-    userId = ""
-    createdAt = datetime.now()
-    content = ""
-    isDeleted = False
-    isStarred = False
-    isRead = False
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
-
-    def __init__(self, **kwargs):
-        for k in kwargs:
-            getattr(self, k)
-
-        vars(self).update(kwargs)
-
-    def __str__(self) -> str:
-        return f"""Notification(
-            id={self.id},
-            userId={self.userId},
-            createdAt={self.createdAt},
-            content={self.content},
-            isDeleted={self.isDeleted},
-            isStarred={self.isStarred},
-            isRead={self.isRead},
-        )"""
-
-    @classmethod
-    def insertNewNotification(
-        cls,
-        userId: str,
-        content: str,
-        createdAt: str,
-        isDeleted: bool,
-        isStarred: bool,
-        isRead: bool,
-    ):
-        query = f"""INSERT INTO public.notification
-                    (userId, createdAt, content, isDeleted, isStarred, isRead)
-                    VALUES('{userId}', '{createdAt}', '{content}', {isDeleted}, {isStarred}, {isRead})
-                    RETURNING id, userId, createdAt, content, isRead, isStarred;
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                result = cursor.fetchone()
-                if result:
-                    # only emit to the user who is being notified
-                    socketio.emit(
-                        "insertNewNotification_" + str(userId),
-                        json.dumps(
-                            {
-                                "id": result[0],
-                                "userId": result[1],
-                                "createdAt": result[2],
-                                "content": result[3],
-                                "isRead": result[4],
-                                "isStarred": result[5],
-                            },
-                            default=str,
-                        ),
-                    )
-                    return Notification(
-                        id=result[0],
-                        userId=result[1],
-                        createdAt=result[2],
-                        content=result[3],
-                        isRead=result[4],
-                        isStarred=result[5],
-                    )
-                else:
-                    return None
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def deleteNotification(cls, notificationIdList, deletedAt):
-        for notificationId in notificationIdList:
-            query = f"""UPDATE public.notification
-                    SET isDeleted=true, deletedAt='{deletedAt}'
-                    WHERE id='{notificationId}'
-                    RETURNING id, userId, createdAt, content;
-                """
-            connection = DatabaseConnector.get_connection()
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute(query)
-                    connection.commit()
-                    # result = cursor.fetchone()
-            except Exception as e:
-                connection.rollback()
-                raise Exception(e)
-
-        return "Delete notification successfully"
-
-    @classmethod
-    def starNotification(cls, notificationId: str, isStarred: bool):
-        query = f"""UPDATE public.notification
-                    SET isStarred={isStarred}
-                    WHERE id='{notificationId}' AND isDeleted=false
-                    RETURNING id, userId, createdAt, content, isStarred, isRead;
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                result = cursor.fetchone()
-                return Notification(
-                    id=result[0],
-                    userId=result[1],
-                    createdAt=result[2],
-                    content=result[3],
-                    isStarred=result[4],
-                    isRead=result[5],
-                )
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
+class Notification_Get:
     @classmethod
     def getAllNotifications(cls, userId, page, limit, isStarred, keyword=None):
         query = f"""SELECT id, userId, createdAt, content, isStarred, isRead FROM public.notification
@@ -199,6 +75,33 @@ class Notification:
             connection.rollback()
             raise Exception(e)
 
+
+class Notification_Update:
+    @classmethod
+    def starNotification(cls, notificationId: str, isStarred: bool):
+        query = f"""UPDATE public.notification
+                    SET isStarred={isStarred}
+                    WHERE id='{notificationId}' AND isDeleted=false
+                    RETURNING id, userId, createdAt, content, isStarred, isRead;
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                result = cursor.fetchone()
+                return Notification(
+                    id=result[0],
+                    userId=result[1],
+                    createdAt=result[2],
+                    content=result[3],
+                    isStarred=result[4],
+                    isRead=result[5],
+                )
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
     @classmethod
     def readNotification(cls, notificationId: str):
         query = f"""UPDATE public.notification
@@ -223,3 +126,110 @@ class Notification:
         except Exception as e:
             connection.rollback()
             raise Exception(e)
+
+
+class Notification_Delete:
+    @classmethod
+    def deleteNotification(cls, notificationIdList, deletedAt):
+        for notificationId in notificationIdList:
+            query = f"""UPDATE public.notification
+                    SET isDeleted=true, deletedAt='{deletedAt}'
+                    WHERE id='{notificationId}'
+                    RETURNING id, userId, createdAt, content;
+                """
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    # result = cursor.fetchone()
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+
+        return "Delete notification successfully"
+
+
+class Notification_Insert:
+    @classmethod
+    def insertNewNotification(
+        cls,
+        userId: str,
+        content: str,
+        createdAt: str,
+        isDeleted: bool,
+        isStarred: bool,
+        isRead: bool,
+    ):
+        query = f"""INSERT INTO public.notification
+                    (userId, createdAt, content, isDeleted, isStarred, isRead)
+                    VALUES('{userId}', '{createdAt}', '{content}', {isDeleted}, {isStarred}, {isRead})
+                    RETURNING id, userId, createdAt, content, isRead, isStarred;
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                result = cursor.fetchone()
+                if result:
+                    # only emit to the user who is being notified
+                    socketio.emit(
+                        "insertNewNotification_" + str(userId),
+                        json.dumps(
+                            {
+                                "id": result[0],
+                                "userId": result[1],
+                                "createdAt": result[2],
+                                "content": result[3],
+                                "isRead": result[4],
+                                "isStarred": result[5],
+                            },
+                            default=str,
+                        ),
+                    )
+                    return Notification(
+                        id=result[0],
+                        userId=result[1],
+                        createdAt=result[2],
+                        content=result[3],
+                        isRead=result[4],
+                        isStarred=result[5],
+                    )
+                else:
+                    return None
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+
+class Notification(
+    Notification_Get, Notification_Insert, Notification_Update, Notification_Delete
+):
+    id = ""
+    userId = ""
+    createdAt = datetime.now()
+    content = ""
+    isDeleted = False
+    isStarred = False
+    isRead = False
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            getattr(self, k)
+
+        vars(self).update(kwargs)
+
+    def __str__(self) -> str:
+        return f"""Notification(
+            id={self.id},
+            userId={self.userId},
+            createdAt={self.createdAt},
+            content={self.content},
+            isDeleted={self.isDeleted},
+            isStarred={self.isStarred},
+            isRead={self.isRead},
+        )"""

@@ -4,7 +4,7 @@ from models.work_on import WorkOn
 from models.request import Request
 
 
-class JoinWorkspaceUseCase:
+class JoinWorkspaceUseCase_Get:
     @classmethod
     def getAllMembers(
         cls, workspaceId: str, page: int, limit: int, keyword=None, permission=None
@@ -16,6 +16,8 @@ class JoinWorkspaceUseCase:
             return None
         return members
 
+
+class JoinWorkspaceUseCase_Update:
     @classmethod
     def deleteMember(cls, workspaceId: str, memberIdList, leftAt):
         try:
@@ -50,6 +52,12 @@ class JoinWorkspaceUseCase:
         )
 
     @classmethod
+    def undoDeleteMember(cls, workspaceId, memberIdList):
+        return Join_Workspace.undoDeleteMember(workspaceId, memberIdList)
+
+
+class JoinWorkspaceUseCase_Insert:
+    @classmethod
     def insertNewMember(
         cls, memberId: str, workspaceId: str, joinedAt: str, permission: str
     ):
@@ -68,6 +76,8 @@ class JoinWorkspaceUseCase:
             return newMember
         return None
 
-    @classmethod
-    def undoDeleteMember(cls, workspaceId, memberIdList):
-        return Join_Workspace.undoDeleteMember(workspaceId, memberIdList)
+
+class JoinWorkspaceUseCase(
+    JoinWorkspaceUseCase_Get, JoinWorkspaceUseCase_Insert, JoinWorkspaceUseCase_Update
+):
+    pass

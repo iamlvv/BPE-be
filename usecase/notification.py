@@ -1,7 +1,7 @@
 from models.notification import Notification
 
 
-class NotificationUseCase:
+class NotificationUseCase_Get:
     @classmethod
     def getAllNotifications(cls, userId, page, limit, isStarred, keyword=None):
         notifications = Notification.getAllNotifications(
@@ -11,17 +11,8 @@ class NotificationUseCase:
             return None
         return notifications
 
-    @classmethod
-    def insertNewNotification(
-        cls, userId, content, createdAt, isDeleted, isStarred, isRead
-    ):
-        notification = Notification.insertNewNotification(
-            userId, content, createdAt, isDeleted, isStarred, isRead
-        )
-        if notification is None:
-            return None
-        return notification
 
+class NotificationUseCase_Update:
     @classmethod
     def deleteNotification(cls, notificationIdList, deletedAt):
         return Notification.deleteNotification(notificationIdList, deletedAt)
@@ -33,3 +24,22 @@ class NotificationUseCase:
     @classmethod
     def readNotification(cls, notificationId):
         return Notification.readNotification(notificationId)
+
+
+class NotificationUseCase_Insert:
+    @classmethod
+    def insertNewNotification(
+        cls, userId, content, createdAt, isDeleted, isStarred, isRead
+    ):
+        notification = Notification.insertNewNotification(
+            userId, content, createdAt, isDeleted, isStarred, isRead
+        )
+        if notification is None:
+            return None
+        return notification
+
+
+class NotificationUseCase(
+    NotificationUseCase_Get, NotificationUseCase_Insert, NotificationUseCase_Update
+):
+    pass

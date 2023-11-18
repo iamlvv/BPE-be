@@ -2,23 +2,11 @@ from .utils import *
 import json
 
 
-class Recent_Opened_Workspaces:
-    workspaceId = ""
-    userId = ""
-    openedAt = ""
-    isHided = False
-    isPinned = False
-    isWorkspaceDeleted = False
+class Recent_Opened_Workspaces_Get:
+    pass
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
 
-    def __init__(self, **kwargs):
-        for k in kwargs:
-            getattr(self, k)
-
-        vars(self).update(kwargs)
-
+class Recent_Opened_Workspaces_Insert:
     @classmethod
     def insert(cls, workspaceId, userId, openedAt, isDeleted):
         if isDeleted:
@@ -47,6 +35,8 @@ class Recent_Opened_Workspaces:
             connection.rollback()
             raise Exception(e)
 
+
+class Recent_Opened_Workspaces_Update:
     @classmethod
     def hideOpenedWorkspace(cls, workspaceId, userId):
         query = f"""UPDATE public.recent_opened_workspace
@@ -130,3 +120,25 @@ class Recent_Opened_Workspaces:
         except Exception as e:
             connection.rollback()
             raise Exception(e)
+
+
+class Recent_Opened_Workspaces(
+    Recent_Opened_Workspaces_Get,
+    Recent_Opened_Workspaces_Insert,
+    Recent_Opened_Workspaces_Update,
+):
+    workspaceId = ""
+    userId = ""
+    openedAt = ""
+    isHided = False
+    isPinned = False
+    isWorkspaceDeleted = False
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            getattr(self, k)
+
+        vars(self).update(kwargs)

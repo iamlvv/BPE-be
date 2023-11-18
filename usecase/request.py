@@ -5,7 +5,16 @@ from models.contentNoti import generateContent
 from datetime import date, datetime
 
 
-class RequestUseCase:
+class NewMemberIdList:
+    @classmethod
+    def createNewMemberIdList(cls, requestList):
+        newMemberIdList = []
+        for request in requestList:
+            newMemberIdList.append(str(request["recipientId"]))
+        return newMemberIdList
+
+
+class RequestUseCase_Get(NewMemberIdList):
     @classmethod
     def getAllRequests(
         cls, workspaceId, page, limit, keyword=None, type=None, status=None
@@ -15,47 +24,12 @@ class RequestUseCase:
         )
         return requestsList
 
-    @classmethod
-    def insertNewRequest(
-        cls,
-        requestType,
-        content,
-        createdAt,
-        status,
-        workspaceId,
-        senderId,
-        recipientId,
-        handlerId,
-        fr_permission="",
-        to_permission="",
-        rcp_permission="",
-    ):
-        newRequest = Request.insertNewRequest(
-            requestType,
-            content,
-            createdAt,
-            status,
-            workspaceId,
-            senderId,
-            recipientId,
-            handlerId,
-            fr_permission,
-            to_permission,
-            rcp_permission,
-        )
-        return newRequest
 
+class RequestUseCase_Update(NewMemberIdList):
     @classmethod
     def deleteRequests(cls, workspaceId, requestIdList, deletedAt):
         deletedRequests = Request.deleteRequests(workspaceId, requestIdList, deletedAt)
         return deletedRequests
-
-    @classmethod
-    def createNewMemberIdList(cls, requestList):
-        newMemberIdList = []
-        for request in requestList:
-            newMemberIdList.append(str(request["recipientId"]))
-        return newMemberIdList
 
     @classmethod
     def approveRequest(cls, workspaceId, requestIdList, handlerId):
@@ -133,3 +107,39 @@ class RequestUseCase:
     def declineRequest(cls, workspaceId, requestIdList, handlerId):
         request = Request.declineRequest(workspaceId, requestIdList, handlerId)
         return request
+
+
+class RequestUseCase_Insert(NewMemberIdList):
+    @classmethod
+    def insertNewRequest(
+        cls,
+        requestType,
+        content,
+        createdAt,
+        status,
+        workspaceId,
+        senderId,
+        recipientId,
+        handlerId,
+        fr_permission="",
+        to_permission="",
+        rcp_permission="",
+    ):
+        newRequest = Request.insertNewRequest(
+            requestType,
+            content,
+            createdAt,
+            status,
+            workspaceId,
+            senderId,
+            recipientId,
+            handlerId,
+            fr_permission,
+            to_permission,
+            rcp_permission,
+        )
+        return newRequest
+
+
+class RequestUseCase(RequestUseCase_Get, RequestUseCase_Insert, RequestUseCase_Update):
+    pass

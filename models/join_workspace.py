@@ -2,107 +2,30 @@ from .utils import *
 from typing import Sequence
 
 
-class Join_Workspace:
-    memberId = ""
-    workspaceId = ""
-    joinedAt = datetime.now()
-    leftAt = datetime.now()
-    permission = ""
-    isDeleted = False
-    isWorkspaceDeleted = False
-
-    def __init__(self, **kwargs):
-        for k in kwargs:
-            getattr(self, k)
-        vars(self).update(kwargs)
-
-    def __str__(self):
-        return f"""Join_Workspace(
-            memberId={self.memberId},
-            workspaceId={self.workspaceId},
-            joinedAt={self.joinedAt},
-            permission={self.permission},
-            isDeleted={self.isDeleted},
-            isWorkspaceDeleted={self.isWorkspaceDeleted},
-        )"""
-
+class RemoveOwnerFromMemberList:
     @classmethod
-    def insertNewMember(
-        cls,
-        memberId: str,
-        workspaceId: str,
-        joinedAt: str,
-        permission: str,
-        isDeleted: bool,
-    ):
-        print("this is isDeleted in models", isDeleted)
-        if isDeleted:
-            query = f"""UPDATE public.join_workspace
-                        SET isDeleted=false, joinedAt='{joinedAt}', permission='{permission}'
-                        WHERE memberId='{memberId}' AND workspaceId='{workspaceId}'
-                        RETURNING memberId, workspaceId, joinedAt, permission;
-                    """
-            connection = DatabaseConnector.get_connection()
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute(query)
-                    connection.commit()
-                    # return the updated member
-                    query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
-                            FROM public.join_workspace jw, public.bpe_user u
-                            WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
-                        """
-                    cursor.execute(query)
-                    result = cursor.fetchone()
-                    return {
-                        "name": result[0],
-                        "email": result[1],
-                        "avatar": result[2],
-                        "memberId": result[3],
-                        "workspaceId": result[4],
-                        "joinedAt": result[5],
-                        "permission": result[6],
-                    }
-
-            except Exception as e:
-                connection.rollback()
-                raise Exception(e)
-        else:
-            query = f"""INSERT INTO public.join_workspace
-                    (memberId, workspaceId, joinedAt, permission, isDeleted, isWorkspaceDeleted)
-                    VALUES('{memberId}', '{workspaceId}', '{joinedAt}', '{permission}', false, false)
-                    RETURNING memberId, workspaceId, joinedAt, permission;
+    def removeOwnerFromMemberList(cls, workspaceId: str, memberIdList):
+        print("this is member id list", memberIdList)
+        query = f"""SELECT ownerId FROM public.workspace
+                    WHERE workspace.id='{workspaceId}';
                 """
-            connection = DatabaseConnector.get_connection()
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute(query)
-                    connection.commit()
-                    result = cursor.fetchone()
-                    # return the inserted member including name, email, avatar, joinedAt, permission, memberId, workspaceId
-                    if result:
-                        query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
-                                FROM public.join_workspace jw, public.bpe_user u
-                                WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
-                            """
-                        cursor.execute(query)
-                        result = cursor.fetchone()
-                        return {
-                            "name": result[0],
-                            "email": result[1],
-                            "avatar": result[2],
-                            "memberId": result[3],
-                            "workspaceId": result[4],
-                            "joinedAt": result[5],
-                            "permission": result[6],
-                        }
-                    else:
-                        return None
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchone()
+                ownerId = result[0]
+                # print("this is owner id", ownerId)
+                if str(ownerId) in memberIdList:
+                    memberIdList.remove(str(ownerId))
+                    # print("this is member id list after remove", memberIdList)
+                return memberIdList
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
 
-            except Exception as e:
-                connection.rollback()
-                raise Exception(e)
 
+class Join_Workspace_Get(RemoveOwnerFromMemberList):
     @classmethod
     def getAllMembers(
         cls, workspaceId: str, page: int, limit: int, keyword=None, permission=None
@@ -155,26 +78,31 @@ class Join_Workspace:
             raise Exception(e)
 
     @classmethod
-    def removeOwnerFromMemberList(cls, workspaceId: str, memberIdList):
-        print("this is member id list", memberIdList)
-        query = f"""SELECT ownerId FROM public.workspace
-                    WHERE workspace.id='{workspaceId}';
+    def getMember(cls, workspaceId: str, memberId: str):
+        query = f"""SELECT memberId, workspaceId, joinedAt, permission, isDeleted FROM public.join_workspace
+                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}';
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
-                ownerId = result[0]
-                # print("this is owner id", ownerId)
-                if str(ownerId) in memberIdList:
-                    memberIdList.remove(str(ownerId))
-                    # print("this is member id list after remove", memberIdList)
-                return memberIdList
+                if result:
+                    return Join_Workspace(
+                        memberId=result[0],
+                        workspaceId=result[1],
+                        joinedAt=result[2],
+                        permission=result[3],
+                        isDeleted=result[4],
+                    )
+                else:
+                    return None
         except Exception as e:
             connection.rollback()
             raise Exception(e)
 
+
+class Join_Workspace_Update(RemoveOwnerFromMemberList):
     @classmethod
     def updatePermission(
         cls, workspaceId, newMemberIdList, currentPermission, newPermission
@@ -271,26 +199,106 @@ class Join_Workspace:
                 connection.rollback()
                 raise Exception(e)
 
+
+class Join_Workspace_Insert(RemoveOwnerFromMemberList):
     @classmethod
-    def getMember(cls, workspaceId: str, memberId: str):
-        query = f"""SELECT memberId, workspaceId, joinedAt, permission, isDeleted FROM public.join_workspace
-                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}';
+    def insertNewMember(
+        cls,
+        memberId: str,
+        workspaceId: str,
+        joinedAt: str,
+        permission: str,
+        isDeleted: bool,
+    ):
+        print("this is isDeleted in models", isDeleted)
+        if isDeleted:
+            query = f"""UPDATE public.join_workspace
+                        SET isDeleted=false, joinedAt='{joinedAt}', permission='{permission}'
+                        WHERE memberId='{memberId}' AND workspaceId='{workspaceId}'
+                        RETURNING memberId, workspaceId, joinedAt, permission;
+                    """
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    # return the updated member
+                    query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
+                            FROM public.join_workspace jw, public.bpe_user u
+                            WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
+                        """
+                    cursor.execute(query)
+                    result = cursor.fetchone()
+                    return {
+                        "name": result[0],
+                        "email": result[1],
+                        "avatar": result[2],
+                        "memberId": result[3],
+                        "workspaceId": result[4],
+                        "joinedAt": result[5],
+                        "permission": result[6],
+                    }
+
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+        else:
+            query = f"""INSERT INTO public.join_workspace
+                    (memberId, workspaceId, joinedAt, permission, isDeleted, isWorkspaceDeleted)
+                    VALUES('{memberId}', '{workspaceId}', '{joinedAt}', '{permission}', false, false)
+                    RETURNING memberId, workspaceId, joinedAt, permission;
                 """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                result = cursor.fetchone()
-                if result:
-                    return Join_Workspace(
-                        memberId=result[0],
-                        workspaceId=result[1],
-                        joinedAt=result[2],
-                        permission=result[3],
-                        isDeleted=result[4],
-                    )
-                else:
-                    return None
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+                    result = cursor.fetchone()
+                    # return the inserted member including name, email, avatar, joinedAt, permission, memberId, workspaceId
+                    if result:
+                        query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
+                                FROM public.join_workspace jw, public.bpe_user u
+                                WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
+                            """
+                        cursor.execute(query)
+                        result = cursor.fetchone()
+                        return {
+                            "name": result[0],
+                            "email": result[1],
+                            "avatar": result[2],
+                            "memberId": result[3],
+                            "workspaceId": result[4],
+                            "joinedAt": result[5],
+                            "permission": result[6],
+                        }
+                    else:
+                        return None
+
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+
+
+class Join_Workspace(Join_Workspace_Get, Join_Workspace_Insert, Join_Workspace_Update):
+    memberId = ""
+    workspaceId = ""
+    joinedAt = datetime.now()
+    leftAt = datetime.now()
+    permission = ""
+    isDeleted = False
+    isWorkspaceDeleted = False
+
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            getattr(self, k)
+        vars(self).update(kwargs)
+
+    def __str__(self):
+        return f"""Join_Workspace(
+            memberId={self.memberId},
+            workspaceId={self.workspaceId},
+            joinedAt={self.joinedAt},
+            permission={self.permission},
+            isDeleted={self.isDeleted},
+            isWorkspaceDeleted={self.isWorkspaceDeleted},
+        )"""

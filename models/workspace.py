@@ -3,27 +3,7 @@ import json
 from bpsky import socketio
 
 
-class Workspace:
-    id = 0
-    name = ""
-    description = ""
-    createdAt = datetime.now()
-    ownerId = ""
-    background = ""
-    icon = ""
-    isPersonal = False
-    isDeleted = False
-    deletedAt = datetime.now()
-
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
-
-    def __init__(self, **kwargs):
-        for k in kwargs:
-            getattr(self, k)
-
-        vars(self).update(kwargs)
-
+class Workspace_Get:
     @classmethod
     def getWorkspaceName(cls, workspaceId):
         query = f"""SELECT name
@@ -39,137 +19,6 @@ class Workspace:
                     return result[0]
                 else:
                     return None
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def insertNewWorkspace(
-        cls,
-        name: str,
-        description: str,
-        createdAt: datetime,
-        ownerId: str,
-        background: str,
-        icon: str,
-        isPersonal: bool,
-        isDeleted: bool,
-    ):
-        query = f"""INSERT INTO public.workspace
-                    (name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted)
-                    VALUES('{name}', '{description}', '{createdAt}', '{ownerId}', '{background}', '{icon}', '{isPersonal}', '{isDeleted}')
-                    RETURNING id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted;
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                result = cursor.fetchone()
-                if result:
-                    return Workspace(
-                        id=result[0],
-                        name=result[1],
-                        description=result[2],
-                        createdAt=result[3],
-                        ownerId=result[4],
-                        background=result[5],
-                        icon=result[6],
-                    )
-                else:
-                    return None
-
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def deleteWorkspace(cls, id: str, deletedAt: datetime) -> str:
-        query = f"""UPDATE public.workspace
-                    SET isDeleted=true , deletedAt='{deletedAt}'
-                    WHERE id={id};
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                return "Delete Workspace Success"
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def updateWorkspaceDescription(cls, id: str, description: str) -> str:
-        query = f"""UPDATE public.workspace
-                    SET description='{description}'
-                    WHERE id={id};
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                return "Update description success"
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def updateWorkspaceName(cls, id: str, name: str) -> str:
-        query = f"""UPDATE public.workspace
-                    SET name='{name}'
-                    WHERE id={id};
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                # notification_payload = {"type": "workspace", "id": id}
-                # cursor.execute(
-                #     f"NOTIFY update_workspace_name, '{json.dumps(notification_payload)}'"
-                # )
-                connection.commit()
-                # after update workspace name, notify to the client by socketio
-                socketio.emit(
-                    "workspace_changes" + id,
-                    json.dumps({"type": "workspace", "id": id}),
-                )
-                # notify when workspace name is changed
-
-                return "Update name success"
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def updateWorkspaceBackground(cls, id: str, background: str) -> str:
-        query = f"""UPDATE public.workspace
-                    SET background='{background}'
-                    WHERE id={id};
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                return "Update background success"
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def updateWorkspaceIcon(cls, id: str, icon: str) -> str:
-        query = f"""UPDATE public.workspace
-                    SET icon='{icon}'
-                    WHERE id={id};
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                return "Update icon success"
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -320,22 +169,6 @@ class Workspace:
             raise Exception(e)
 
     @classmethod
-    def updateWorkspaceOwnership(cls, workspaceId: str, newOwnerId: str):
-        query = f"""UPDATE public.workspace
-                    SET ownerId={newOwnerId}
-                    WHERE id={workspaceId};
-                """
-        connection = DatabaseConnector.get_connection()
-        try:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                connection.commit()
-                return "Update ownership success"
-        except Exception as e:
-            connection.rollback()
-            raise Exception(e)
-
-    @classmethod
     def getDeletedWorkspace(cls):
         query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
                     FROM public.workspace
@@ -450,3 +283,177 @@ class Workspace:
         except Exception as e:
             connection.rollback()
             raise Exception(e)
+
+
+class Workspace_Insert:
+    @classmethod
+    def insertNewWorkspace(
+        cls,
+        name: str,
+        description: str,
+        createdAt: datetime,
+        ownerId: str,
+        background: str,
+        icon: str,
+        isPersonal: bool,
+        isDeleted: bool,
+    ):
+        query = f"""INSERT INTO public.workspace
+                    (name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted)
+                    VALUES('{name}', '{description}', '{createdAt}', '{ownerId}', '{background}', '{icon}', '{isPersonal}', '{isDeleted}')
+                    RETURNING id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted;
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                result = cursor.fetchone()
+                if result:
+                    return Workspace(
+                        id=result[0],
+                        name=result[1],
+                        description=result[2],
+                        createdAt=result[3],
+                        ownerId=result[4],
+                        background=result[5],
+                        icon=result[6],
+                    )
+                else:
+                    return None
+
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+
+class Workspace_Update:
+    @classmethod
+    def updateWorkspaceDescription(cls, id: str, description: str) -> str:
+        query = f"""UPDATE public.workspace
+                    SET description='{description}'
+                    WHERE id={id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                return "Update description success"
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def updateWorkspaceName(cls, id: str, name: str) -> str:
+        query = f"""UPDATE public.workspace
+                    SET name='{name}'
+                    WHERE id={id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                # notification_payload = {"type": "workspace", "id": id}
+                # cursor.execute(
+                #     f"NOTIFY update_workspace_name, '{json.dumps(notification_payload)}'"
+                # )
+                connection.commit()
+                # after update workspace name, notify to the client by socketio
+                socketio.emit(
+                    "workspace_changes" + id,
+                    json.dumps({"type": "workspace", "id": id}),
+                )
+                # notify when workspace name is changed
+
+                return "Update name success"
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def updateWorkspaceBackground(cls, id: str, background: str) -> str:
+        query = f"""UPDATE public.workspace
+                    SET background='{background}'
+                    WHERE id={id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                return "Update background success"
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def updateWorkspaceIcon(cls, id: str, icon: str) -> str:
+        query = f"""UPDATE public.workspace
+                    SET icon='{icon}'
+                    WHERE id={id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                return "Update icon success"
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def updateWorkspaceOwnership(cls, workspaceId: str, newOwnerId: str):
+        query = f"""UPDATE public.workspace
+                    SET ownerId={newOwnerId}
+                    WHERE id={workspaceId};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                return "Update ownership success"
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+
+class Workspace_Delete:
+    @classmethod
+    def deleteWorkspace(cls, id: str, deletedAt: datetime) -> str:
+        query = f"""UPDATE public.workspace
+                    SET isDeleted=true , deletedAt='{deletedAt}'
+                    WHERE id={id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                return "Delete Workspace Success"
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+
+class Workspace(Workspace_Get, Workspace_Insert, Workspace_Update, Workspace_Delete):
+    id = 0
+    name = ""
+    description = ""
+    createdAt = datetime.now()
+    ownerId = ""
+    background = ""
+    icon = ""
+    isPersonal = False
+    isDeleted = False
+    deletedAt = datetime.now()
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def __init__(self, **kwargs):
+        for k in kwargs:
+            getattr(self, k)
+        vars(self).update(kwargs)
