@@ -5,6 +5,25 @@ from bpsky import socketio
 
 class Workspace_Get:
     @classmethod
+    def checkIfWorkspaceExists(cls, name, userId):
+        query = f"""SELECT id
+                    FROM public.workspace
+                    WHERE name='{name}' AND ownerId='{userId}' AND isDeleted=false;
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchone()
+                if result:
+                    return result[0]
+                else:
+                    return None
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
     def getWorkspaceName(cls, workspaceId):
         query = f"""SELECT name
                     FROM public.workspace

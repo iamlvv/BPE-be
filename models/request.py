@@ -7,7 +7,7 @@ import json
 class FindDuplicateRequest:
     @classmethod
     def findDuplicateRequest(
-        requestType, content, status, createdAt, workspaceId, senderId, recipientId
+        cls, requestType, content, status, createdAt, workspaceId, senderId, recipientId
     ):
         # find duplicate request
         # if after sending request, user be kicked out of workspace, then the request is deleted, so it is not a duplicate request

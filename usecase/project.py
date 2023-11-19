@@ -7,26 +7,7 @@ from .document_file import DocumentFileUsecase
 from fileIO.file import FileIO
 
 
-class ProjectUsecase:
-    @classmethod
-    def create(cls, description, name, user_id, createdAt, workspaceId):
-        project = Project.create(description, name, user_id, createdAt, workspaceId)
-        if not os.path.isdir(f"static/{project.id}"):
-            os.makedirs(f"static/{project.id}")
-            if not os.path.isdir(f"static/{project.id}/images"):
-                os.makedirs(f"static/{project.id}/images")
-        ProcessUsecase.create_default(project.id, name)
-        DocumentFileUsecase.create_default(project.id)
-        WorkOn.insert(user_id, project.id, Role.OWNER.value)
-        return {
-            "id": project.id,
-            "name": project.name,
-            "description": project.description,
-            "createdAt": project.create_at,
-            "ownerId": project.ownerId,
-            "workspaceId": project.workspaceId,
-        }
-
+class ProjectUsecase_Get:
     @classmethod
     def get(self, project_id, user_id):
         if not WorkOn.can_view(user_id, project_id):
@@ -34,34 +15,8 @@ class ProjectUsecase:
         return Project.get(project_id)
 
     @classmethod
-    def delete(self, project_id, user_id):
-        if not WorkOn.is_project_owner(user_id, project_id):
-            raise Exception("permission denied")
-        return Project.delete(project_id)
-
-    @classmethod
     def get_all(cls):
         return Project.get_all()
-
-    @classmethod
-    def update_name(self, user_id, project_id, name):
-        if not WorkOn.is_project_owner(user_id, project_id):
-            raise Exception("permisstion denied")
-        Project.update_name(project_id, name)
-
-    @classmethod
-    def update_description(self, user_id, project_id, description):
-        if not WorkOn.is_project_owner(user_id, project_id):
-            raise Exception("permisstion denied")
-        Project.update_description(project_id, description)
-
-    @classmethod
-    def update_document(self, user_id, project_id, document_link, file):
-        if WorkOn.can_edit(user_id, project_id):
-            DocumentFileUsecase.save(document_link, file)
-            return "Success"
-        else:
-            raise Exception("permission denied")
 
     @classmethod
     def get_document(self, user_id, project_id):
@@ -123,6 +78,28 @@ class ProjectUsecase:
             ]:
                 raise Exception("bad request")
 
+
+class ProjectUsecase_Update:
+    @classmethod
+    def update_name(self, user_id, project_id, name):
+        if not WorkOn.is_project_owner(user_id, project_id):
+            raise Exception("permisstion denied")
+        Project.update_name(project_id, name)
+
+    @classmethod
+    def update_description(self, user_id, project_id, description):
+        if not WorkOn.is_project_owner(user_id, project_id):
+            raise Exception("permisstion denied")
+        Project.update_description(project_id, description)
+
+    @classmethod
+    def update_document(self, user_id, project_id, document_link, file):
+        if WorkOn.can_edit(user_id, project_id):
+            DocumentFileUsecase.save(document_link, file)
+            return "Success"
+        else:
+            raise Exception("permission denied")
+
     @classmethod
     def grant_permission(self, current_id, project_id, users):
         self.validate_members(users)
@@ -163,3 +140,43 @@ class ProjectUsecase:
                 raise Exception("this user isn't project's member")
         else:
             raise Exception("permission denied")
+
+
+class ProjectUsecase_Delete:
+    @classmethod
+    def delete(self, project_id, user_id):
+        if not WorkOn.is_project_owner(user_id, project_id):
+            raise Exception("permission denied")
+        return Project.delete(project_id)
+
+
+class ProjectUsecase_Insert:
+    @classmethod
+    def create(cls, description, name, user_id, createdAt, workspaceId):
+        # check if project name is already exist with this user in this workspace
+
+        project = Project.create(description, name, user_id, createdAt, workspaceId)
+        if not os.path.isdir(f"static/{project.id}"):
+            os.makedirs(f"static/{project.id}")
+            if not os.path.isdir(f"static/{project.id}/images"):
+                os.makedirs(f"static/{project.id}/images")
+        ProcessUsecase.create_default(project.id, name)
+        DocumentFileUsecase.create_default(project.id)
+        WorkOn.insert(user_id, project.id, Role.OWNER.value)
+        return {
+            "id": project.id,
+            "name": project.name,
+            "description": project.description,
+            "createdAt": project.create_at,
+            "ownerId": project.ownerId,
+            "workspaceId": project.workspaceId,
+        }
+
+
+class ProjectUsecase(
+    ProjectUsecase_Get,
+    ProjectUsecase_Delete,
+    ProjectUsecase_Insert,
+    ProjectUsecase_Update,
+):
+    pass

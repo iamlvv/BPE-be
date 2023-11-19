@@ -143,6 +143,10 @@ class WorkspaceUseCase_Insert:
         isPersonal: bool,
         isDeleted: bool,
     ):
+        # check if workspace name is existed with the same owner
+        workspace = Workspace.checkIfWorkspaceExists(name, ownerId)
+        if workspace is not None:
+            return None
         newWorkspace = Workspace.insertNewWorkspace(
             name,
             description,

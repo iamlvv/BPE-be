@@ -39,6 +39,8 @@ def createNewWorkspace():
             isPersonal=isPersonal,
             isDeleted=isDeleted,
         )
+        if result is None:
+            raise Exception("Workspace already exists")
         data = {
             "id": result.id,
             "name": result.name,
