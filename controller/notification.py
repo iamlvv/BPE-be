@@ -35,6 +35,8 @@ def insertNewNotification():
         isRead = False
         notificationType = body["notificationType"]
         status = body["status"]
+        workspaceId = body["workspaceId"]
+        permission = body["permission"]
         data = NotificationUseCase.insertNewNotification(
             userId=userId,
             content=content,
@@ -44,6 +46,8 @@ def insertNewNotification():
             isRead=isRead,
             notificationType=notificationType,
             status=status,
+            workspaceId=workspaceId,
+            permission=permission,
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
