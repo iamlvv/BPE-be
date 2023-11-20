@@ -59,7 +59,11 @@ class JoinWorkspaceUseCase_Update:
 class JoinWorkspaceUseCase_Insert:
     @classmethod
     def insertNewMember(
-        cls, memberId: str, workspaceId: str, joinedAt: str, permission: str
+        cls,
+        memberId: str,
+        workspaceId: str,
+        joinedAt: str,
+        permission: str,
     ):
         # check if member already joined
         member = Join_Workspace.getMember(workspaceId, memberId)

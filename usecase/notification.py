@@ -1,11 +1,15 @@
 from models.notification import Notification
+from models.join_workspace import Join_Workspace
+from .join_workspace import JoinWorkspaceUseCase
 
 
 class NotificationUseCase_Get:
     @classmethod
-    def getAllNotifications(cls, userId, page, limit, isStarred, keyword=None):
+    def getAllNotifications(
+        cls, userId, page, limit, isStarred, keyword=None, notificationType=None
+    ):
         notifications = Notification.getAllNotifications(
-            userId, page, limit, isStarred, keyword
+            userId, page, limit, isStarred, keyword, notificationType
         )
         if notifications is None:
             return None
@@ -25,14 +29,52 @@ class NotificationUseCase_Update:
     def readNotification(cls, notificationId):
         return Notification.readNotification(notificationId)
 
+    @classmethod
+    def updateNotificationStatus(cls, notificationId, status):
+        return Notification.updateNotificationStatus(notificationId, status)
+
+    @classmethod
+    def approveNotification(
+        cls, userId, workspaceId, joinedAt, permission, notificationId, status
+    ):
+        newMember = JoinWorkspaceUseCase.insertNewMember(
+            memberId=userId,
+            workspaceId=workspaceId,
+            joinedAt=joinedAt,
+            permission=permission,
+        )
+        updatedNotification = Notification.updateNotificationStatus(
+            notificationId, status
+        )
+        return updatedNotification
+
 
 class NotificationUseCase_Insert:
     @classmethod
     def insertNewNotification(
-        cls, userId, content, createdAt, isDeleted, isStarred, isRead
+        cls,
+        userId,
+        content,
+        createdAt,
+        isDeleted,
+        isStarred,
+        isRead,
+        notificationType,
+        status,
+        workspaceId=None,
+        permission=None,
     ):
         notification = Notification.insertNewNotification(
-            userId, content, createdAt, isDeleted, isStarred, isRead
+            userId,
+            content,
+            createdAt,
+            isDeleted,
+            isStarred,
+            isRead,
+            notificationType,
+            status,
+            workspaceId,
+            permission,
         )
         if notification is None:
             return None

@@ -229,7 +229,10 @@ CREATE TABLE IF NOT EXISTS public.notification (
     deletedAt timestamp without time zone,
     content text,
     isDeleted boolean,
-    isStarred boolean
+    isStarred boolean,
+    workspaceId integer,
+    permission text,
+    
 )
     TABLESPACE pg_default;
 

@@ -66,6 +66,8 @@ class RequestUseCase_Update(NewMemberIdList):
             workspaceId = approvedRequest["workspaceId"]
             newMemberIdList = [str(userId)]
             isDeleted = False
+            notificationType = "adjust permission"
+            status = "approved"
             print(fr_permission, to_permission)
             Join_Workspace.updatePermission(
                 workspaceId,
@@ -77,7 +79,16 @@ class RequestUseCase_Update(NewMemberIdList):
                 requestType, None, fr_permission, to_permission, workspaceId, userId
             )
             Notification.insertNewNotification(
-                userId, content, createdAt, isDeleted, isStarred=False, isRead=False
+                userId,
+                content,
+                createdAt,
+                isDeleted,
+                isStarred=False,
+                isRead=False,
+                notificationType=notificationType,
+                status=status,
+                workspaceId=workspaceId,
+                permission=to_permission,
             )
             print(content)
         except Exception as e:
@@ -92,13 +103,24 @@ class RequestUseCase_Update(NewMemberIdList):
             memberId = approvedRequest["recipientId"]
             workspaceId = approvedRequest["workspaceId"]
             permission = approvedRequest["rcpPermission"]
+            notificationType = "invitation"
+            status = "pending"
             isDeleted = False
             content = generateContent(
                 requestType, permission, None, None, workspaceId, senderId
             )
             print(content)
             Notification.insertNewNotification(
-                memberId, content, createdAt, isDeleted, isStarred=False, isRead=False
+                memberId,
+                content,
+                createdAt,
+                isDeleted,
+                isStarred=False,
+                isRead=False,
+                notificationType=notificationType,
+                status=status,
+                workspaceId=workspaceId,
+                permission=permission,
             )
         except Exception as e:
             raise Exception(e)

@@ -107,14 +107,6 @@ class Join_Workspace_Update(RemoveOwnerFromMemberList):
     def updatePermission(
         cls, workspaceId, newMemberIdList, currentPermission, newPermission
     ) -> None:
-        # memberId is the list of member id
-        # update permission of each member in the list
-        # return list of members that have been updated
-        # first, check if current permission match with permission in database
-        # if not, raise exception
-        # if yes, update permission
-        # return list of members that have been updated
-        # print("this is new member id list", newMemberIdList)
         print("this is current permission", currentPermission, newPermission)
         connection = DatabaseConnector.get_connection()
         try:
@@ -126,7 +118,7 @@ class Join_Workspace_Update(RemoveOwnerFromMemberList):
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     result = cursor.fetchone()
-                    print(result)
+                    print("this is result", result)
                     if currentPermission:
                         if result[0] != currentPermission:
                             raise Exception("Current permission does not match")

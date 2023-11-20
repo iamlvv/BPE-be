@@ -10,8 +10,9 @@ def getAllNotifications():
         page = request.args.get("page", 0)
         limit = request.args.get("limit", 10)
         isStarred = request.args.get("isStarred", False)
+        notificationType = request.args.get("notificationType", None)
         data = NotificationUseCase.getAllNotifications(
-            userId, page, limit, isStarred, keyword
+            userId, page, limit, isStarred, keyword, notificationType
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
@@ -32,6 +33,8 @@ def insertNewNotification():
         isDeleted = False
         isStarred = False
         isRead = False
+        notificationType = body["notificationType"]
+        status = body["status"]
         data = NotificationUseCase.insertNewNotification(
             userId=userId,
             content=content,
@@ -39,6 +42,8 @@ def insertNewNotification():
             isDeleted=isDeleted,
             isStarred=isStarred,
             isRead=isRead,
+            notificationType=notificationType,
+            status=status,
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
@@ -87,6 +92,31 @@ def readNotification():
         body = load_request_body(request)
         notificationId = body["notificationId"]
         data = NotificationUseCase.readNotification(notificationId)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/user/notification/action", methods=["POST"])
+def handleNotification():
+    try:
+        body = load_request_body(request)
+        notificationId = body["notificationId"]
+        status = body["status"]
+        if status == "declined":
+            data = NotificationUseCase.updateNotificationStatus(notificationId, status)
+        elif status == "accepted":
+            workspaceId = body["workspaceId"]
+            userId = body["userId"]
+            joinedAt = datetime.now()
+            permission = body["permission"]
+            data = NotificationUseCase.approveNotification(
+                userId, workspaceId, joinedAt, permission, notificationId, status
+            )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
