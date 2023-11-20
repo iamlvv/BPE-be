@@ -140,10 +140,10 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
 
     @classmethod
     def getMember(cls, workspaceId: str, memberId: str):
+        print("this is member id", memberId, workspaceId)
         query = f"""SELECT memberId, workspaceId, joinedAt, permission, isDeleted 
                     FROM public.join_workspace
-                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}' 
-                    AND join_workspace.isDeleted=false AND join_workspace.isWorkspaceDeleted=false;
+                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}';
                 """
         connection = DatabaseConnector.get_connection()
         try:

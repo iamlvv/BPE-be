@@ -90,18 +90,19 @@ class JoinWorkspaceUseCase_Insert:
         permission: str,
     ):
         # check if member already joined
-        member = Join_Workspace.getMember(workspaceId, memberId)
+        member = Join_Workspace.getMember(workspaceId=workspaceId, memberId=memberId)
+        print("member", member)
         isDeleted = False
         if member is not None:
-            isDeleted = member.isDeleted
+            isDeleted = member["isDeleted"]
             if isDeleted == False:
                 return None
         if member is None or isDeleted:
             newMember = Join_Workspace.insertNewMember(
-                memberId, workspaceId, joinedAt, permission, isDeleted
+                memberId, workspaceId, joinedAt, permission, isDeleted=isDeleted
             )
             newRecentOpenedWorkspace = Recent_Opened_Workspaces.insert(
-                workspaceId, memberId, joinedAt, isDeleted
+                workspaceId, memberId, joinedAt, isDeleted=isDeleted
             )
             return newMember
         return None
