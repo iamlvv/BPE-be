@@ -8,6 +8,7 @@ class CheckPermission:
     @classmethod
     def checkMemberPermission(cls, workspaceId, userId, permission):
         sender = JoinWorkspaceUseCase.getMember(workspaceId, userId)
+        print("sender", sender)
         if sender is None:
             return False
         senderPermission = sender["permission"]

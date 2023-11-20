@@ -44,7 +44,7 @@ def insertNewRequest():
         checkSenderPermission = CheckPermission.checkMemberPermission(
             workspaceId=workspaceId, userId=senderId, permission=rcp_permission
         )
-        if not checkSenderPermission:
+        if not checkSenderPermission and requestType == "invitation":
             raise Exception("You don't have permission to send request")
 
         newRequest = RequestUseCase.insertNewRequest(
