@@ -70,6 +70,8 @@ class JoinWorkspaceUseCase_Insert:
         isDeleted = False
         if member is not None:
             isDeleted = member.isDeleted
+            if isDeleted == False:
+                return None
         if member is None or isDeleted:
             newMember = Join_Workspace.insertNewMember(
                 memberId, workspaceId, joinedAt, permission, isDeleted
