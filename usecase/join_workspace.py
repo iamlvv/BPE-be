@@ -10,7 +10,6 @@ class CheckPermission:
         sender = JoinWorkspaceUseCase.getMember(workspaceId, userId)
         if sender is None:
             return False
-
         senderPermission = sender["permission"]
         if senderPermission == "viewer":
             if permission != "viewer":
@@ -19,6 +18,7 @@ class CheckPermission:
         elif senderPermission == "sharer":
             if permission != "viewer" and permission != "sharer":
                 return False
+        return True
 
 
 class JoinWorkspaceUseCase_Get:
