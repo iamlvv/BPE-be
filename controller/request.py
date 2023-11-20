@@ -41,6 +41,12 @@ def insertNewRequest():
         if fr_permission == "" and to_permission == "" and rcp_permission == "":
             raise Exception("No permission is set")
 
+        checkSenderPermission = CheckPermission.checkMemberPermission(
+            workspaceId=workspaceId, userId=senderId, permission=rcp_permission
+        )
+        if not checkSenderPermission:
+            raise Exception("You don't have permission to send request")
+
         newRequest = RequestUseCase.insertNewRequest(
             requestType,
             content,

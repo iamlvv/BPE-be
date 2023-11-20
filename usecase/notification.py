@@ -1,5 +1,4 @@
 from models.notification import Notification
-from models.join_workspace import Join_Workspace
 from .join_workspace import JoinWorkspaceUseCase
 
 

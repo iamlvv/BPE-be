@@ -15,6 +15,7 @@ from usecase.workspace import WorkspaceUseCase
 from usecase.join_workspace import JoinWorkspaceUseCase
 from usecase.request import RequestUseCase
 from usecase.notification import NotificationUseCase
+from usecase.join_workspace import CheckPermission
 from bpsky import socketio
 
 

@@ -147,6 +147,24 @@ class RequestUseCase_Insert(NewMemberIdList):
         to_permission="",
         rcp_permission="",
     ):
+        # check the permission of sender Id
+        # if sender is viewer, then rcp_permission must be viewer
+        # if sender is sharer, then rcp_permission must be viewer or sharer
+        # if sender is editor, then rcp_permission must be viewer, sharer or editor
+        # if sender is owner, then rcp_permission can be any permission
+        sender = Join_Workspace.getMember(workspaceId, senderId)
+        if sender is None:
+            raise Exception("Sender is not in this workspace")
+
+        senderPermission = sender["permission"]
+        if senderPermission == "viewer":
+            if rcp_permission != "viewer":
+                raise Exception("Sender is viewer, recipient must be viewer")
+
+        elif senderPermission == "sharer":
+            if rcp_permission != "viewer" and rcp_permission != "sharer":
+                raise Exception("Sender is sharer, recipient must be viewer or sharer")
+
         newRequest = Request.insertNewRequest(
             requestType,
             content,

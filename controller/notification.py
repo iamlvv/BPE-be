@@ -37,6 +37,15 @@ def insertNewNotification():
         status = body["status"]
         workspaceId = body["workspaceId"]
         permission = body["permission"]
+        senderId = get_id_from_token(get_token(request))
+
+        checkSenderPermission = CheckPermission.checkMemberPermission(
+            workspaceId=workspaceId, userId=senderId, permission=permission
+        )
+
+        if not checkSenderPermission:
+            raise Exception("You don't have permission to send notification")
+
         data = NotificationUseCase.insertNewNotification(
             userId=userId,
             content=content,

@@ -2,6 +2,64 @@ from .utils import *
 from typing import Sequence
 
 
+class JoinWorkspaceReturnType:
+    @classmethod
+    def getAllMembersReturnType(cls, total, limit, results):
+        return {
+            "total": total,
+            "limit": limit,
+            "data": [
+                {
+                    "name": result[0],
+                    "email": result[1],
+                    "avatar": result[2],
+                    "memberId": result[3],
+                    "workspaceId": result[4],
+                    "joinedAt": result[5],
+                    "permission": result[6],
+                }
+                for result in results
+            ],
+        }
+
+    @classmethod
+    def getMemberReturnType(cls, result):
+        return {
+            "memberId": result[0],
+            "workspaceId": result[1],
+            "joinedAt": result[2],
+            "permission": result[3],
+            "isDeleted": result[4],
+        }
+
+    @classmethod
+    def updatePermissionReturnType(cls, results):
+        return [
+            {
+                "name": result[0],
+                "email": result[1],
+                "avatar": result[2],
+                "memberId": result[3],
+                "workspaceId": result[4],
+                "joinedAt": result[5],
+                "permission": result[6],
+            }
+            for result in results
+        ]
+
+    @classmethod
+    def insertNewMemberReturnType(cls, result):
+        return {
+            "name": result[0],
+            "email": result[1],
+            "avatar": result[2],
+            "memberId": result[3],
+            "workspaceId": result[4],
+            "joinedAt": result[5],
+            "permission": result[6],
+        }
+
+
 class RemoveOwnerFromMemberList:
     @classmethod
     def removeOwnerFromMemberList(cls, workspaceId: str, memberIdList):
@@ -25,7 +83,7 @@ class RemoveOwnerFromMemberList:
             raise Exception(e)
 
 
-class Join_Workspace_Get(RemoveOwnerFromMemberList):
+class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
     @classmethod
     def getAllMembers(
         cls, workspaceId: str, page: int, limit: int, keyword=None, permission=None
@@ -56,22 +114,25 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList):
                     query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
                 cursor.execute(query)
                 results = cursor.fetchall()
-                return {
-                    "total": total,
-                    "limit": limit,
-                    "data": [
-                        {
-                            "name": result[0],
-                            "email": result[1],
-                            "avatar": result[2],
-                            "memberId": result[3],
-                            "workspaceId": result[4],
-                            "joinedAt": result[5],
-                            "permission": result[6],
-                        }
-                        for result in results
-                    ],
-                }
+                # return {
+                #     "total": total,
+                #     "limit": limit,
+                #     "data": [
+                #         {
+                #             "name": result[0],
+                #             "email": result[1],
+                #             "avatar": result[2],
+                #             "memberId": result[3],
+                #             "workspaceId": result[4],
+                #             "joinedAt": result[5],
+                #             "permission": result[6],
+                #         }
+                #         for result in results
+                #     ],
+                # }
+                return Join_Workspace_Get.getAllMembersReturnType(
+                    total=total, limit=limit, results=results
+                )
 
         except Exception as e:
             connection.rollback()
@@ -79,8 +140,10 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList):
 
     @classmethod
     def getMember(cls, workspaceId: str, memberId: str):
-        query = f"""SELECT memberId, workspaceId, joinedAt, permission, isDeleted FROM public.join_workspace
-                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}';
+        query = f"""SELECT memberId, workspaceId, joinedAt, permission, isDeleted 
+                    FROM public.join_workspace
+                    WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}' 
+                    AND join_workspace.isDeleted=false AND join_workspace.isWorkspaceDeleted=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -88,13 +151,14 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList):
                 cursor.execute(query)
                 result = cursor.fetchone()
                 if result:
-                    return Join_Workspace(
-                        memberId=result[0],
-                        workspaceId=result[1],
-                        joinedAt=result[2],
-                        permission=result[3],
-                        isDeleted=result[4],
-                    )
+                    # return {
+                    #     "memberId": result[0],
+                    #     "workspaceId": result[1],
+                    #     "joinedAt": result[2],
+                    #     "permission": result[3],
+                    #     "isDeleted": result[4],
+                    # }
+                    return Join_Workspace_Get.getMemberReturnType(result=result)
                 else:
                     return None
         except Exception as e:
@@ -102,7 +166,7 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList):
             raise Exception(e)
 
 
-class Join_Workspace_Update(RemoveOwnerFromMemberList):
+class Join_Workspace_Update(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
     @classmethod
     def updatePermission(
         cls, workspaceId, newMemberIdList, currentPermission, newPermission
@@ -140,18 +204,19 @@ class Join_Workspace_Update(RemoveOwnerFromMemberList):
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 results = cursor.fetchall()
-                return [
-                    {
-                        "name": result[0],
-                        "email": result[1],
-                        "avatar": result[2],
-                        "memberId": result[3],
-                        "workspaceId": result[4],
-                        "joinedAt": result[5],
-                        "permission": result[6],
-                    }
-                    for result in results
-                ]
+                # return [
+                #     {
+                #         "name": result[0],
+                #         "email": result[1],
+                #         "avatar": result[2],
+                #         "memberId": result[3],
+                #         "workspaceId": result[4],
+                #         "joinedAt": result[5],
+                #         "permission": result[6],
+                #     }
+                #     for result in results
+                # ]
+                return Join_Workspace_Update.updatePermissionReturnType(results=results)
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -192,7 +257,7 @@ class Join_Workspace_Update(RemoveOwnerFromMemberList):
                 raise Exception(e)
 
 
-class Join_Workspace_Insert(RemoveOwnerFromMemberList):
+class Join_Workspace_Insert(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
     @classmethod
     def insertNewMember(
         cls,
@@ -221,15 +286,18 @@ class Join_Workspace_Insert(RemoveOwnerFromMemberList):
                         """
                     cursor.execute(query)
                     result = cursor.fetchone()
-                    return {
-                        "name": result[0],
-                        "email": result[1],
-                        "avatar": result[2],
-                        "memberId": result[3],
-                        "workspaceId": result[4],
-                        "joinedAt": result[5],
-                        "permission": result[6],
-                    }
+                    # return {
+                    #     "name": result[0],
+                    #     "email": result[1],
+                    #     "avatar": result[2],
+                    #     "memberId": result[3],
+                    #     "workspaceId": result[4],
+                    #     "joinedAt": result[5],
+                    #     "permission": result[6],
+                    # }
+                    return Join_Workspace_Insert.insertNewMemberReturnType(
+                        result=result
+                    )
 
             except Exception as e:
                 connection.rollback()
@@ -254,15 +322,18 @@ class Join_Workspace_Insert(RemoveOwnerFromMemberList):
                             """
                         cursor.execute(query)
                         result = cursor.fetchone()
-                        return {
-                            "name": result[0],
-                            "email": result[1],
-                            "avatar": result[2],
-                            "memberId": result[3],
-                            "workspaceId": result[4],
-                            "joinedAt": result[5],
-                            "permission": result[6],
-                        }
+                        # return {
+                        #     "name": result[0],
+                        #     "email": result[1],
+                        #     "avatar": result[2],
+                        #     "memberId": result[3],
+                        #     "workspaceId": result[4],
+                        #     "joinedAt": result[5],
+                        #     "permission": result[6],
+                        # }
+                        return Join_Workspace_Insert.insertNewMemberReturnType(
+                            result=result
+                        )
                     else:
                         return None
 

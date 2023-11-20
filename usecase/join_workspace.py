@@ -4,6 +4,23 @@ from models.work_on import WorkOn
 from models.request import Request
 
 
+class CheckPermission:
+    @classmethod
+    def checkMemberPermission(cls, workspaceId, userId, permission):
+        sender = JoinWorkspaceUseCase.getMember(workspaceId, userId)
+        if sender is None:
+            return False
+
+        senderPermission = sender["permission"]
+        if senderPermission == "viewer":
+            if permission != "viewer":
+                return False
+
+        elif senderPermission == "sharer":
+            if permission != "viewer" and permission != "sharer":
+                return False
+
+
 class JoinWorkspaceUseCase_Get:
     @classmethod
     def getAllMembers(
@@ -15,6 +32,13 @@ class JoinWorkspaceUseCase_Get:
         if members is None:
             return None
         return members
+
+    @classmethod
+    def getMember(cls, workspaceId: str, memberId: str):
+        member = Join_Workspace.getMember(workspaceId, memberId)
+        if member is None:
+            return None
+        return member
 
 
 class JoinWorkspaceUseCase_Update:
