@@ -2,6 +2,7 @@ from models.join_workspace import Join_Workspace
 from models.recent_opened_workspaces import Recent_Opened_Workspaces
 from models.work_on import WorkOn
 from models.request import Request
+from .recent_opened_workspace import RecentOpenedWorkspaceUseCase
 
 
 class CheckPermission:
@@ -102,7 +103,7 @@ class JoinWorkspaceUseCase_Insert:
             newMember = Join_Workspace.insertNewMember(
                 memberId, workspaceId, joinedAt, permission, isDeleted=isDeleted
             )
-            newRecentOpenedWorkspace = Recent_Opened_Workspaces.insert(
+            newRecentOpenedWorkspace = RecentOpenedWorkspaceUseCase.insert(
                 workspaceId, memberId, joinedAt, isDeleted=isDeleted
             )
             return newMember

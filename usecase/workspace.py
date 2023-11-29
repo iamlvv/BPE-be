@@ -2,6 +2,7 @@ import os
 from models.workspace import Workspace
 from models.join_workspace import Join_Workspace
 from models.recent_opened_workspaces import Recent_Opened_Workspaces
+from .join_workspace import JoinWorkspaceUseCase
 from datetime import datetime
 
 
@@ -160,11 +161,14 @@ class WorkspaceUseCase_Insert:
 
         if newWorkspace is None:
             return None
-        newRecentOpenedWorkspace = Recent_Opened_Workspaces.insert(
-            newWorkspace.id, ownerId, createdAt, isDeleted
-        )
-        newJoinWorkspace = Join_Workspace.insertNewMember(
-            ownerId, newWorkspace.id, createdAt, "owner", isDeleted
+        # newRecentOpenedWorkspace = Recent_Opened_Workspaces.insert(
+        #     newWorkspace.id, ownerId, createdAt, isDeleted
+        # )
+        # newJoinWorkspace = Join_Workspace.insertNewMember(
+        #     ownerId, newWorkspace.id, createdAt, "owner", isDeleted
+        # )
+        newJoinWorkspace = JoinWorkspaceUseCase.insertNewMember(
+            ownerId, newWorkspace.id, createdAt, "owner"
         )
         return newWorkspace
 
