@@ -1,7 +1,7 @@
 from models.request import Request
 from models.join_workspace import Join_Workspace
 from models.notification import Notification
-from models.contentNoti import generateContent
+from models.contentNoti import NotificationContent
 from datetime import date, datetime
 
 
@@ -25,7 +25,7 @@ class RequestUseCase_Get(NewMemberIdList):
         return requestsList
 
 
-class RequestUseCase_Update(NewMemberIdList):
+class RequestUseCase_Update(NewMemberIdList, NotificationContent):
     @classmethod
     def deleteRequests(cls, workspaceId, requestIdList, deletedAt):
         deletedRequests = Request.deleteRequests(workspaceId, requestIdList, deletedAt)
@@ -75,7 +75,7 @@ class RequestUseCase_Update(NewMemberIdList):
                 currentPermission=fr_permission,
                 newPermission=to_permission,
             )
-            content = generateContent(
+            content = RequestUseCase_Update.generateContent(
                 requestType, None, fr_permission, to_permission, workspaceId, userId
             )
             Notification.insertNewNotification(
@@ -106,7 +106,7 @@ class RequestUseCase_Update(NewMemberIdList):
             notificationType = "invitation"
             status = "pending"
             isDeleted = False
-            content = generateContent(
+            content = RequestUseCase_Update.generateContents(
                 requestType, permission, None, None, workspaceId, senderId
             )
             print(content)

@@ -3,7 +3,49 @@ import json
 from bpsky import socketio
 
 
-class Workspace_Get:
+class Workspace_Returning_Type:
+    @classmethod
+    def singleFieldReturn(cls, result):
+        return result[0]
+
+    @classmethod
+    def multipleFieldReturn(cls, result):
+        return Workspace(
+            id=result[0],
+            name=result[1],
+            description=result[2],
+            createdAt=result[3],
+            ownerId=result[4],
+            background=result[5],
+            icon=result[6],
+        )
+
+    @classmethod
+    def allWorkspacesByUserReturn(cls, result, total, limit):
+        return {
+            "total": total,
+            "limit": limit,
+            "data": list_tuple_to_dict(
+                [
+                    "id",
+                    "name",
+                    "description",
+                    "openedAt",
+                    "ownerId",
+                    "background",
+                    "icon",
+                    "isPinned",
+                    "ownerName",
+                    "ownerAvatar",
+                    "ownerEmail",
+                    "permission",
+                ],
+                result,
+            ),
+        }
+
+
+class Workspace_Get(Workspace_Returning_Type):
     @classmethod
     def checkIfWorkspaceExists(cls, name, userId):
         query = f"""SELECT id
@@ -16,7 +58,7 @@ class Workspace_Get:
                 cursor.execute(query)
                 result = cursor.fetchone()
                 if result:
-                    return result[0]
+                    return Workspace_Get.singleFieldReturn(result)
                 else:
                     return None
         except Exception as e:
@@ -35,7 +77,7 @@ class Workspace_Get:
                 cursor.execute(query)
                 result = cursor.fetchone()
                 if result:
-                    return result[0]
+                    return Workspace_Get.singleFieldReturn(result)
                 else:
                     return None
         except Exception as e:
@@ -44,7 +86,7 @@ class Workspace_Get:
 
     @classmethod
     def getWorkspace(cls, id: str):
-        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
+        query = f"""SELECT id
                     FROM public.workspace
                     WHERE id={id};
                 """
@@ -54,15 +96,7 @@ class Workspace_Get:
                 cursor.execute(query)
                 result = cursor.fetchone()
                 if result:
-                    return Workspace(
-                        id=result[0],
-                        name=result[1],
-                        description=result[2],
-                        createdAt=result[3],
-                        ownerId=result[4],
-                        background=result[5],
-                        icon=result[6],
-                    )
+                    return Workspace_Get.singleFieldReturn(result)
                 else:
                     return None
         except Exception as e:
@@ -87,7 +121,6 @@ class Workspace_Get:
         # if openedAt == "oldest", sort by openedAt from oldest to latest
         # if page and limit is not empty, return workspaces in page and limit
         # else return all workspaces
-        print(user_id)
         query = f"""SELECT w.id, w.name, w.description, rw.openedAt, w.ownerId, w.background, w.icon, rw.isPinned, u.name as ownerName, u.avatar as ownerAvatar, u.email as ownerEmail, jw.permission as permission
                     FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u, public.join_workspace jw
                     WHERE w.id=rw.workspaceId AND rw.userId='{user_id}' AND w.isDeleted=false AND rw.isHided=false AND u.id=w.ownerId AND jw.workspaceId = rw.workspaceId AND jw.memberId = '{user_id}'
@@ -117,27 +150,7 @@ class Workspace_Get:
                     query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
                 cursor.execute(query)
                 result = cursor.fetchall()
-                return {
-                    "total": total,
-                    "limit": limit,
-                    "data": list_tuple_to_dict(
-                        [
-                            "id",
-                            "name",
-                            "description",
-                            "openedAt",
-                            "ownerId",
-                            "background",
-                            "icon",
-                            "isPinned",
-                            "ownerName",
-                            "ownerAvatar",
-                            "ownerEmail",
-                            "permission",
-                        ],
-                        result,
-                    ),
-                }
+                return Workspace_Get.allWorkspacesByUserReturn(result, total, limit)
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -162,7 +175,7 @@ class Workspace_Get:
 
     @classmethod
     def getWorkspaceByOwnerIdAndIsPersonal(cls, ownerId: str, isPersonal: bool) -> list:
-        query = f"""SELECT id, name, description, createdAt, "ownerId", background, icon, "isPersonal", "isDeleted"
+        query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted
                     FROM public.workspace
                     WHERE ownerId='{ownerId}' AND isPersonal={isPersonal};
                 """

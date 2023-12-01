@@ -1,12 +1,35 @@
 from .utils import *
 import json
 
+class Recent_Opened_Workspaces_Returning_Type:
+    @classmethod
+    def update_returning(cls, result):
+        return Recent_Opened_Workspaces(
+            workspaceId=result[0],
+            userId=result[1],
+            openedAt=result[2],
+        )
+    
+    @classmethod
+    def hide_workspace_message(cls, status):
+        if status:
+            return "Hided workspace successfully"
+        else:
+            return "Unhided workspace successfully"
+        
+    @classmethod
+    def pin_workspace_message(cls, status):
+        if status:
+            return "Pinned workspace successfully"
+        else:
+            return "Unpinned workspace successfully"
+    
 
 class Recent_Opened_Workspaces_Get:
     pass
 
 
-class Recent_Opened_Workspaces_Insert:
+class Recent_Opened_Workspaces_Insert(Recent_Opened_Workspaces_Returning_Type):
     @classmethod
     def insert(cls, workspaceId, userId, openedAt, isDeleted):
         if isDeleted:
@@ -26,17 +49,13 @@ class Recent_Opened_Workspaces_Insert:
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchone()
-                return Recent_Opened_Workspaces(
-                    workspaceId=result[0],
-                    userId=result[1],
-                    openedAt=result[2],
-                )
+                return Recent_Opened_Workspaces_Insert.update_returning(result)
         except Exception as e:
             connection.rollback()
             raise Exception(e)
 
 
-class Recent_Opened_Workspaces_Update:
+class Recent_Opened_Workspaces_Update(Recent_Opened_Workspaces_Returning_Type):
     @classmethod
     def hideOpenedWorkspace(cls, workspaceId, userId):
         query = f"""UPDATE public.recent_opened_workspace
@@ -50,7 +69,8 @@ class Recent_Opened_Workspaces_Update:
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchone()
-                return "Hided workspace successfully"
+                return Recent_Opened_Workspaces_Update.hide_workspace_message(True)
+            
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -66,25 +86,25 @@ class Recent_Opened_Workspaces_Update:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
-                message = ""
+                status = True
                 if result[0] == True:
                     query = f"""UPDATE public.recent_opened_workspace
                                 SET isPinned=false
                                 WHERE workspaceId='{workspaceId}' AND userId='{userId}'
                                 RETURNING workspaceId, userId, openedAt;
                             """
-                    message = "Unpinned workspace successfully"
+                    status = False
                 else:
                     query = f"""UPDATE public.recent_opened_workspace
                                 SET isPinned=true
                                 WHERE workspaceId='{workspaceId}' AND userId='{userId}'
                                 RETURNING workspaceId, userId, openedAt;
                             """
-                    message = "Pinned workspace successfully"
+                    status = True
                 cursor.execute(query)
                 connection.commit()
                 result = cursor.fetchone()
-                return message
+                return Recent_Opened_Workspaces_Update.pin_workspace_message(status)
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -112,11 +132,7 @@ class Recent_Opened_Workspaces_Update:
                     cursor.execute(query)
                     connection.commit()
                     result = cursor.fetchone()
-                    return Recent_Opened_Workspaces(
-                        workspaceId=result[0],
-                        userId=result[1],
-                        openedAt=result[2],
-                    )
+                    return Recent_Opened_Workspaces_Update.update_returning(result)
         except Exception as e:
             connection.rollback()
             raise Exception(e)
