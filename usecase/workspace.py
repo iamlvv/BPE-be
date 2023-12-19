@@ -62,7 +62,6 @@ class WorkspaceUseCase_Get:
             return None
         return workspace
 
-
 class WorkspaceUseCase_Update:
     @classmethod
     def deleteWorkspace(cls, workspaceId: str, deletedAt: str):

@@ -121,13 +121,13 @@ def handleNotification():
         notificationId = body["notificationId"]
         status = body["status"]
         if status == "declined":
-            data = NotificationUseCase.updateNotificationStatus(notificationId, status)
+            data = NotificationUseCase.declineNotification(notificationId, status)
         elif status == "accepted":
             workspaceId = body["workspaceId"]
             userId = body["userId"]
             joinedAt = datetime.now()
             permission = body["permission"]
-            data = NotificationUseCase.approveNotification(
+            data = NotificationUseCase.acceptNotification(
                 userId, workspaceId, joinedAt, permission, notificationId, status
             )
         return bpsky.response_class(

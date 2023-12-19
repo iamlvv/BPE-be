@@ -1,5 +1,4 @@
 from .utils import *
-from typing import Sequence
 
 
 class JoinWorkspaceReturnType:
@@ -222,24 +221,6 @@ class Join_Workspace_Update(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
             raise Exception(e)
 
     @classmethod
-    def deleteMember(cls, workspaceId: str, newMemberList, leftAt) -> None:
-        for memberId in newMemberList:
-            query = f"""UPDATE public.join_workspace
-                    SET isDeleted=true, leftAt = '{leftAt}'
-                    WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
-                """
-            connection = DatabaseConnector.get_connection()
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute(query)
-                    connection.commit()
-
-            except Exception as e:
-                connection.rollback()
-                raise Exception(e)
-        return "Delete member successfully"
-
-    @classmethod
     def undoDeleteMember(cls, workspaceId, memberIdList):
         for memberId in memberIdList:
             query = f"""UPDATE public.join_workspace
@@ -255,6 +236,26 @@ class Join_Workspace_Update(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
             except Exception as e:
                 connection.rollback()
                 raise Exception(e)
+
+
+class Join_Workspace_Delete:
+    @classmethod
+    def deleteMember(cls, workspaceId: str, newMemberList, leftAt):
+        for memberId in newMemberList:
+            query = f"""UPDATE public.join_workspace
+                    SET isDeleted=true, leftAt = '{leftAt}'
+                    WHERE workspaceId='{workspaceId}' AND memberId='{memberId}';
+                """
+            connection = DatabaseConnector.get_connection()
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
+
+            except Exception as e:
+                connection.rollback()
+                raise Exception(e)
+        return "Delete member successfully"
 
 
 class Join_Workspace_Insert(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
@@ -342,7 +343,12 @@ class Join_Workspace_Insert(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
                 raise Exception(e)
 
 
-class Join_Workspace(Join_Workspace_Get, Join_Workspace_Insert, Join_Workspace_Update):
+class Join_Workspace(
+    Join_Workspace_Get,
+    Join_Workspace_Insert,
+    Join_Workspace_Update,
+    Join_Workspace_Delete,
+):
     memberId = ""
     workspaceId = ""
     joinedAt = datetime.now()

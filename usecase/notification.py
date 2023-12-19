@@ -33,7 +33,7 @@ class NotificationUseCase_Update:
         return Notification.updateNotificationStatus(notificationId, status)
 
     @classmethod
-    def approveNotification(
+    def acceptNotification(
         cls, userId, workspaceId, joinedAt, permission, notificationId, status
     ):
         newMember = JoinWorkspaceUseCase.insertNewMember(
@@ -42,6 +42,13 @@ class NotificationUseCase_Update:
             joinedAt=joinedAt,
             permission=permission,
         )
+        updatedNotification = Notification.updateNotificationStatus(
+            notificationId, status
+        )
+        return updatedNotification
+    
+    @classmethod
+    def declineNotification(cls, notificationId, status):
         updatedNotification = Notification.updateNotificationStatus(
             notificationId, status
         )
