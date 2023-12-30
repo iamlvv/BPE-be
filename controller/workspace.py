@@ -126,9 +126,7 @@ def updateWorkspaceDescription():
         workspaceId = body["workspaceId"]
         description = body["description"]
         # check if user is owner of workspace
-        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
-            workspaceId=workspaceId, ownerId=user_id
-        )
+        checkResult = WorkspaceUseCase.checkWorkspaceOwner(workspaceId, user_id)
         if checkResult is not True:
             raise Exception(checkResult)
         # update description

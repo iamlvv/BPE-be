@@ -77,7 +77,7 @@ class WorkspaceUseCase_Update:
         workspace = Workspace.getWorkspace(workspaceId)
         if workspace is None:
             return None
-        workspace.updateWorkspaceDescription(workspaceId, description)
+        workspace = Workspace.updateWorkspaceDescription(workspaceId, description)
         return workspace
 
     @classmethod
@@ -85,7 +85,7 @@ class WorkspaceUseCase_Update:
         workspace = Workspace.getWorkspace(workspaceId)
         if workspace is None:
             return None
-        workspace.updateWorkspaceOwnership(workspaceId, newOwnerId)
+        workspace = Workspace.updateWorkspaceOwnership(workspaceId, newOwnerId)
         return workspace
 
     @classmethod
@@ -93,7 +93,7 @@ class WorkspaceUseCase_Update:
         workspace = Workspace.getWorkspace(workspaceId)
         if workspace is None:
             return None
-        workspace.updateWorkspaceBackground(workspaceId, newBackground)
+        workspace = Workspace.updateWorkspaceBackground(workspaceId, newBackground)
         return workspace
 
     @classmethod
@@ -101,7 +101,7 @@ class WorkspaceUseCase_Update:
         workspace = Workspace.getWorkspace(workspaceId)
         if workspace is None:
             return None
-        workspace.updateWorkspaceIcon(workspaceId, newIcon)
+        workspace = Workspace.updateWorkspaceIcon(workspaceId, newIcon)
         return workspace
 
     @classmethod
