@@ -86,7 +86,7 @@ class Workspace_Get(Workspace_Returning_Type):
 
     @classmethod
     def getWorkspace(cls, id: str):
-        query = f"""SELECT id
+        query = f"""SELECT ownerId
                     FROM public.workspace
                     WHERE id={id};
                 """

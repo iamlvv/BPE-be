@@ -85,7 +85,9 @@ def deleteWorkspace():
         user_id = get_id_from_token(get_token(request))
         workspaceId = body["workspaceId"]
         # check if user is owner of workspace
-        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+            workspaceId=workspaceId, ownerId=user_id
+        )
         if checkResult is not True:
             raise Exception(checkResult)
         # delete workspace
@@ -104,8 +106,9 @@ def updateWorkspaceName():
         user_id = get_id_from_token(get_token(request))
         workspaceId = body["workspaceId"]
         name = body["name"]
+        print(workspaceId, name, user_id)
         # check if user is owner of workspace
-        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        checkResult = WorkspaceUseCase.checkWorkspaceOwner(workspaceId, user_id)
         if checkResult is not True:
             raise Exception(checkResult)
         # update name
@@ -123,7 +126,9 @@ def updateWorkspaceDescription():
         workspaceId = body["workspaceId"]
         description = body["description"]
         # check if user is owner of workspace
-        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+            workspaceId=workspaceId, ownerId=user_id
+        )
         if checkResult is not True:
             raise Exception(checkResult)
         # update description
@@ -141,7 +146,9 @@ def changeOwner():
         workspaceId = body["workspaceId"]
         newOwnerId = body["newOwnerId"]
         # check if user is owner of workspace
-        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+            workspaceId=workspaceId, ownerId=user_id
+        )
         if checkResult is not True:
             raise Exception(checkResult)
         # update owner
@@ -168,7 +175,9 @@ def uploadBackground():
         user_id = get_id_from_token(get_token(request))
         workspaceId = request.form["workspaceId"]
         # check if user is owner of workspace
-        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+            workspaceId=workspaceId, ownerId=user_id
+        )
         if checkResult is not True:
             raise Exception(checkResult)
         # upload background
@@ -201,7 +210,9 @@ def uploadIcon():
         user_id = get_id_from_token(get_token(request))
         workspaceId = request.form["workspaceId"]
         # check if user is owner of workspace
-        checkResult = checkWorkspaceOwner(workspaceId, user_id)
+        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+            workspaceId=workspaceId, ownerId=user_id
+        )
         if checkResult is not True:
             raise Exception(checkResult)
         # upload icon

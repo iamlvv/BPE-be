@@ -47,11 +47,11 @@ class WorkspaceUseCase_Get:
         return workspace
 
     @classmethod
-    def checkWorkspaceOwner(cls, workspaceId: str, ownerId: str):
-        workspace = Workspace.getWorkspace(workspaceId)
-        if workspace is None:
+    def checkWorkspaceOwner(cls, workspaceId, ownerId):
+        workspaceId = Workspace.getWorkspace(workspaceId)
+        if workspaceId is None:
             return None
-        if workspace.ownerId == ownerId:
+        if workspaceId == ownerId:
             return True
         return False
 
@@ -62,19 +62,14 @@ class WorkspaceUseCase_Get:
             return None
         return workspace
 
-class WorkspaceUseCase_Update:
-    @classmethod
-    def deleteWorkspace(cls, workspaceId: str, deletedAt: str):
-        if Workspace.deleteWorkspace(workspaceId, deletedAt):
-            return True
-        return False
 
+class WorkspaceUseCase_Update:
     @classmethod
     def updateWorkspaceName(cls, workspaceId: str, name: str):
         workspace = Workspace.getWorkspace(workspaceId)
         if workspace is None:
             return None
-        workspace.updateWorkspaceName(workspaceId, name)
+        workspace = Workspace.updateWorkspaceName(workspaceId, name)
         return workspace
 
     @classmethod
@@ -130,6 +125,14 @@ class WorkspaceUseCase_Update:
         return recent_opened_workspace
 
 
+class WorkspaceUseCase_Delete:
+    @classmethod
+    def deleteWorkspace(cls, workspaceId: str, deletedAt: str):
+        if Workspace.deleteWorkspace(workspaceId, deletedAt):
+            return True
+        return False
+
+
 class WorkspaceUseCase_Insert:
     @classmethod
     def createNewWorkspace(
@@ -173,6 +176,9 @@ class WorkspaceUseCase_Insert:
 
 
 class WorkspaceUseCase(
-    WorkspaceUseCase_Get, WorkspaceUseCase_Insert, WorkspaceUseCase_Update
+    WorkspaceUseCase_Get,
+    WorkspaceUseCase_Insert,
+    WorkspaceUseCase_Update,
+    WorkspaceUseCase_Delete,
 ):
     pass
