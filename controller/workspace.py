@@ -1,4 +1,4 @@
-from .utils import *
+from controller.utils import *
 import jsonpickle
 import cloudinary
 import cloudinary.uploader
@@ -6,7 +6,7 @@ import cloudinary.uploader
 
 # check if user is owner of workspace
 def checkWorkspaceOwner(workspaceId: str, ownerId: str):
-    check = WorkspaceUseCase.checkWorkspaceOwner(workspaceId, ownerId)
+    check = WorkspaceService.checkWorkspaceOwner(workspaceId, ownerId)
     if check is None:
         raise Exception("Workspace not found")
     if check is False:
@@ -29,7 +29,7 @@ def createNewWorkspace():
         icon = body["icon"] if "icon" in body else ""
         isPersonal = body["isPersonal"] if "isPersonal" in body else False
         isDeleted = body["isDeleted"] if "isDeleted" in body else False
-        result = WorkspaceUseCase.createNewWorkspace(
+        result = WorkspaceService.createNewWorkspace(
             name=name,
             description=description,
             createdAt=createdAt,
@@ -64,7 +64,7 @@ def createNewWorkspace():
 @bpsky.route("/api/v1/workspace/<workspaceId>", methods=["GET"])
 def getWorkspace(workspaceId):
     try:
-        result = WorkspaceUseCase.getWorkspace(workspaceId)
+        result = WorkspaceService.getWorkspace(workspaceId)
         if result is None:
             raise Exception("Workspace not found")
         else:
@@ -85,14 +85,14 @@ def deleteWorkspace():
         user_id = get_id_from_token(get_token(request))
         workspaceId = body["workspaceId"]
         # check if user is owner of workspace
-        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+        checkResult = WorkspaceService.checkWorkspaceOwner(
             workspaceId=workspaceId, ownerId=user_id
         )
         if checkResult is not True:
             raise Exception(checkResult)
         # delete workspace
         deletedAt = datetime.now()
-        data = WorkspaceUseCase.deleteWorkspace(workspaceId, deletedAt)
+        data = WorkspaceService.deleteWorkspace(workspaceId, deletedAt)
         return "Delete Workspace Success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -108,11 +108,11 @@ def updateWorkspaceName():
         name = body["name"]
         print(workspaceId, name, user_id)
         # check if user is owner of workspace
-        checkResult = WorkspaceUseCase.checkWorkspaceOwner(workspaceId, user_id)
+        checkResult = WorkspaceService.checkWorkspaceOwner(workspaceId, user_id)
         if checkResult is not True:
             raise Exception(checkResult)
         # update name
-        data = WorkspaceUseCase.updateWorkspaceName(workspaceId, name)
+        data = WorkspaceService.updateWorkspaceName(workspaceId, name)
         return "Update name success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -126,11 +126,11 @@ def updateWorkspaceDescription():
         workspaceId = body["workspaceId"]
         description = body["description"]
         # check if user is owner of workspace
-        checkResult = WorkspaceUseCase.checkWorkspaceOwner(workspaceId, user_id)
+        checkResult = WorkspaceService.checkWorkspaceOwner(workspaceId, user_id)
         if checkResult is not True:
             raise Exception(checkResult)
         # update description
-        data = WorkspaceUseCase.updateWorkspaceDescription(workspaceId, description)
+        data = WorkspaceService.updateWorkspaceDescription(workspaceId, description)
         return "Update description success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -144,13 +144,13 @@ def changeOwner():
         workspaceId = body["workspaceId"]
         newOwnerId = body["newOwnerId"]
         # check if user is owner of workspace
-        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+        checkResult = WorkspaceService.checkWorkspaceOwner(
             workspaceId=workspaceId, ownerId=user_id
         )
         if checkResult is not True:
             raise Exception(checkResult)
         # update owner
-        data = WorkspaceUseCase.changeOwnership(workspaceId, newOwnerId)
+        data = WorkspaceService.changeOwnership(workspaceId, newOwnerId)
         return "Change owner success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -173,7 +173,7 @@ def uploadBackground():
         user_id = get_id_from_token(get_token(request))
         workspaceId = request.form["workspaceId"]
         # check if user is owner of workspace
-        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+        checkResult = WorkspaceService.checkWorkspaceOwner(
             workspaceId=workspaceId, ownerId=user_id
         )
         if checkResult is not True:
@@ -193,7 +193,7 @@ def uploadBackground():
                 secure=True,
             )
             upload_result = cloudinary.uploader.upload(file)
-            data = WorkspaceUseCase.updateWorkspaceBackground(
+            data = WorkspaceService.updateWorkspaceBackground(
                 workspaceId, upload_result["secure_url"]
             )
             return "Upload background success"
@@ -208,7 +208,7 @@ def uploadIcon():
         user_id = get_id_from_token(get_token(request))
         workspaceId = request.form["workspaceId"]
         # check if user is owner of workspace
-        checkResult = WorkspaceUseCase.checkWorkspaceOwner(
+        checkResult = WorkspaceService.checkWorkspaceOwner(
             workspaceId=workspaceId, ownerId=user_id
         )
         if checkResult is not True:
@@ -228,7 +228,7 @@ def uploadIcon():
                 secure=True,
             )
             upload_result = cloudinary.uploader.upload(file)
-            data = WorkspaceUseCase.updateWorkspaceIcon(
+            data = WorkspaceService.updateWorkspaceIcon(
                 workspaceId, upload_result["secure_url"]
             )
             return "Upload icon success"
@@ -252,7 +252,7 @@ def getAllWorkspaces():
         limit = request.args.get("limit", 10)  # default is 10
         pinned = request.args.get("pinned", None)
         print(openedAt, ownerId, keyword, page, limit)
-        data = WorkspaceUseCase.getAllWorkspacesByUser(
+        data = WorkspaceService.getAllWorkspacesByUser(
             user_id, page, limit, openedAt, ownerId, keyword, pinned
         )
         return bpsky.response_class(
@@ -269,7 +269,7 @@ def getAllWorkspaces():
 def getTotalWorkspaces():
     try:
         user_id = get_id_from_token(get_token(request))
-        data = WorkspaceUseCase.getTotalWorkspacesByUser(user_id)
+        data = WorkspaceService.getTotalWorkspacesByUser(user_id)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -285,7 +285,7 @@ def pinWorkspace():
         body = load_request_body(request)
         userId = get_id_from_token(get_token(request))
         workspaceId = body["workspaceId"]
-        data = WorkspaceUseCase.pinWorkspace(userId, workspaceId)
+        data = WorkspaceService.pinWorkspace(userId, workspaceId)
         return data
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -295,7 +295,7 @@ def pinWorkspace():
 def getPinnedWorkspace():
     try:
         user_id = get_id_from_token(get_token(request))
-        data = WorkspaceUseCase.getPinnedWorkspace(user_id)
+        data = WorkspaceService.getPinnedWorkspace(user_id)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -310,7 +310,7 @@ def getPinnedWorkspace():
 def searchWorkspaceByKeyword(keyword):
     try:
         userId = get_id_from_token(get_token(request))
-        data = WorkspaceUseCase.searchWorkspaceByKeyword(keyword, userId)
+        data = WorkspaceService.searchWorkspaceByKeyword(keyword, userId)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -328,7 +328,7 @@ def openWorkspace():
         workspaceId = body["workspaceId"]
         userId = get_id_from_token(get_token(request))
         openedAt = datetime.now()
-        data = WorkspaceUseCase.openWorkspace(userId, workspaceId, openedAt)
+        data = WorkspaceService.openWorkspace(userId, workspaceId, openedAt)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,

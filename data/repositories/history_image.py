@@ -2,7 +2,7 @@ from .utils import *
 
 
 class HistoryImage:
-    # id = models.BigAutoField(primary_key=True)
+    # id = data.BigAutoField(primary_key=True)
     project_id = 0
     process_id = 0
     xml_file_link = ""

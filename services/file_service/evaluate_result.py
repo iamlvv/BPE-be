@@ -1,8 +1,8 @@
-from models.evaluated_result import EvaluatedResult
-from models.work_on import WorkOn
+from data.repositories.evaluated_result import EvaluatedResult
+from data.repositories.work_on import WorkOn
 
 
-class EvaluatedResultUsercase:
+class EvaluatedResultService:
     @classmethod
     def save(self, user_id, xml_file_link, project_id, process_id, name, result, description):
         if not WorkOn.can_edit(user_id, project_id):

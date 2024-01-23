@@ -1,4 +1,5 @@
-from .utils import *
+from bpsky import bpsky
+from controller.utils import *
 import jsonpickle
 
 
@@ -11,7 +12,7 @@ def getAllNotifications():
         limit = request.args.get("limit", 10)
         isStarred = request.args.get("isStarred", False)
         notificationType = request.args.get("notificationType", None)
-        data = NotificationUseCase.getAllNotifications(
+        data = NotificationService.getAllNotifications(
             userId, page, limit, isStarred, keyword, notificationType
         )
         return bpsky.response_class(
@@ -46,7 +47,7 @@ def insertNewNotification():
         if not checkSenderPermission:
             raise Exception("You don't have permission to send notification")
 
-        data = NotificationUseCase.insertNewNotification(
+        data = NotificationService.insertNewNotification(
             userId=userId,
             content=content,
             createdAt=createdAt,
@@ -73,7 +74,7 @@ def deleteNotification():
         body = load_request_body(request)
         notificationIdList = body["notificationIdList"]
         deletedAt = datetime.now()
-        data = NotificationUseCase.deleteNotification(notificationIdList, deletedAt)
+        data = NotificationService.deleteNotification(notificationIdList, deletedAt)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -89,7 +90,7 @@ def starNotification():
         body = load_request_body(request)
         notificationId = body["notificationId"]
         isStarred = body["isStarred"]
-        data = NotificationUseCase.starNotification(notificationId, isStarred)
+        data = NotificationService.starNotification(notificationId, isStarred)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -104,7 +105,7 @@ def readNotification():
     try:
         body = load_request_body(request)
         notificationId = body["notificationId"]
-        data = NotificationUseCase.readNotification(notificationId)
+        data = NotificationService.readNotification(notificationId)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -121,13 +122,13 @@ def handleNotification():
         notificationId = body["notificationId"]
         status = body["status"]
         if status == "declined":
-            data = NotificationUseCase.declineNotification(notificationId, status)
+            data = NotificationService.declineNotification(notificationId, status)
         elif status == "accepted":
             workspaceId = body["workspaceId"]
             userId = body["userId"]
             joinedAt = datetime.now()
             permission = body["permission"]
-            data = NotificationUseCase.acceptNotification(
+            data = NotificationService.acceptNotification(
                 userId, workspaceId, joinedAt, permission, notificationId, status
             )
         return bpsky.response_class(

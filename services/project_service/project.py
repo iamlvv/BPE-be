@@ -1,13 +1,12 @@
 import os
-from models.project import Project
-from models.work_on import WorkOn, Role
-from .process_version import ProcessVersionUsecase
-from .process import ProcessUsecase
-from .document_file import DocumentFileUsecase
+from data.repositories.project import Project
+from data.repositories.work_on import WorkOn, Role
+from services.process_service.process import ProcessService
+from services.file_service.document_file import DocumentFileService
 from fileIO.file import FileIO
 
 
-class ProjectUsecase_Get:
+class ProjectService_Get:
     @classmethod
     def get(self, project_id, user_id):
         if not WorkOn.can_view(user_id, project_id):
@@ -22,7 +21,7 @@ class ProjectUsecase_Get:
     def get_document(self, user_id, project_id):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permisstion denied")
-        return DocumentFileUsecase.get(project_id)
+        return DocumentFileService.get(project_id)
 
     @classmethod
     def get_document_content(self, user_id, project_id):
@@ -79,7 +78,7 @@ class ProjectUsecase_Get:
                 raise Exception("bad request")
 
 
-class ProjectUsecase_Update:
+class ProjectService_Update:
     @classmethod
     def update_name(self, user_id, project_id, name):
         if not WorkOn.is_project_owner(user_id, project_id):
@@ -95,7 +94,7 @@ class ProjectUsecase_Update:
     @classmethod
     def update_document(self, user_id, project_id, document_link, file):
         if WorkOn.can_edit(user_id, project_id):
-            DocumentFileUsecase.save(document_link, file)
+            DocumentFileService.save(document_link, file)
             return "Success"
         else:
             raise Exception("permission denied")
@@ -142,7 +141,7 @@ class ProjectUsecase_Update:
             raise Exception("permission denied")
 
 
-class ProjectUsecase_Delete:
+class ProjectService_Delete:
     @classmethod
     def delete(self, project_id, user_id):
         if not WorkOn.is_project_owner(user_id, project_id):
@@ -150,7 +149,7 @@ class ProjectUsecase_Delete:
         return Project.delete(project_id)
 
 
-class ProjectUsecase_Insert:
+class ProjectService_Insert:
     @classmethod
     def create(cls, description, name, user_id, createdAt, workspaceId):
         # check if project name is already exist with this user in this workspace
@@ -160,8 +159,8 @@ class ProjectUsecase_Insert:
             os.makedirs(f"static/{project.id}")
             if not os.path.isdir(f"static/{project.id}/images"):
                 os.makedirs(f"static/{project.id}/images")
-        ProcessUsecase.create_default(project.id, name)
-        DocumentFileUsecase.create_default(project.id)
+        ProcessService.create_default(project.id, name)
+        DocumentFileService.create_default(project.id)
         WorkOn.insert(user_id, project.id, Role.OWNER.value)
         return {
             "id": project.id,
@@ -173,10 +172,10 @@ class ProjectUsecase_Insert:
         }
 
 
-class ProjectUsecase(
-    ProjectUsecase_Get,
-    ProjectUsecase_Delete,
-    ProjectUsecase_Insert,
-    ProjectUsecase_Update,
+class ProjectService(
+    ProjectService_Get,
+    ProjectService_Delete,
+    ProjectService_Insert,
+    ProjectService_Update,
 ):
     pass

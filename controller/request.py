@@ -1,3 +1,4 @@
+from bpsky import bpsky
 from .utils import *
 import jsonpickle
 
@@ -11,7 +12,7 @@ def getAllRequests():
         status = request.args.get("status", None)
         page = request.args.get("page", 0)
         limit = request.args.get("limit", 10)
-        data = RequestUseCase.getAllRequests(
+        data = RequestService.getAllRequests(
             workspaceId, page, limit, keyword, type, status
         )
         return bpsky.response_class(
@@ -47,7 +48,7 @@ def insertNewRequest():
         if not checkSenderPermission and requestType == "invitation":
             raise Exception("You don't have permission to send request")
 
-        newRequest = RequestUseCase.insertNewRequest(
+        newRequest = RequestService.insertNewRequest(
             requestType,
             content,
             createdAt,
@@ -76,7 +77,7 @@ def deleteRequest():
         workspaceId = body["workspaceId"]
         requestIdList = body["requestIdList"]
         deletedAt = datetime.now()
-        deletedRequests = RequestUseCase.deleteRequests(
+        deletedRequests = RequestService.deleteRequests(
             workspaceId, requestIdList, deletedAt
         )
         return bpsky.response_class(
@@ -95,7 +96,7 @@ def approveRequest():
         handlerId = get_id_from_token(get_token(request))
         requestIdList = body["requestIdList"]
         workspaceId = body["workspaceId"]
-        data = RequestUseCase.approveRequest(workspaceId, requestIdList, handlerId)
+        data = RequestService.approveRequest(workspaceId, requestIdList, handlerId)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -112,7 +113,7 @@ def declineRequest():
         handlerId = get_id_from_token(get_token(request))
         requestIdList = body["requestIdList"]
         workspaceId = body["workspaceId"]
-        data = RequestUseCase.declineRequest(workspaceId, requestIdList, handlerId)
+        data = RequestService.declineRequest(workspaceId, requestIdList, handlerId)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,

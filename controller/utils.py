@@ -1,22 +1,22 @@
-import json
 from datetime import date, datetime
 from auth.jwt import *
 from bpsky import bpsky
 from flask import request, redirect
-from usecase.evaluate.evaluate import Evaluate
-from usecase.evaluate.compare import Compare
-from usecase.project import ProjectUsecase
-from usecase.user import UserUsecase
-from usecase.process_version import ProcessVersionUsecase
-from usecase.process import ProcessUsecase
-from usecase.evaluate_result import EvaluatedResultUsercase
-from usecase.image import ImageUsecase
-from usecase.workspace import WorkspaceUseCase
-from usecase.join_workspace import JoinWorkspaceUseCase
-from usecase.request import RequestUseCase
-from usecase.notification import NotificationUseCase
-from usecase.join_workspace import CheckPermission
+from services.evaluate.evaluate import Evaluate
+from services.evaluate.compare import Compare
+from services.project_service.project import ProjectService
+from services.user_service.user import UserService
+from services.process_service.process_version import ProcessVersionService
+from services.process_service.process import ProcessService
+from services.file_service.evaluate_result import EvaluatedResultService
+from services.file_service.image import ImageService
+from services.workspace_service.workspace import WorkspaceService
+from services.workspace_service.join_workspace import JoinWorkspaceService
+from services.request_service.request import RequestService
+from services.notification_service.notification import NotificationService
+from services.workspace_service.join_workspace import CheckPermission
 from bpsky import socketio
+import json
 
 
 def load_request_body(request):

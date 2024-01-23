@@ -1,8 +1,8 @@
-from models.request import Request
-from models.join_workspace import Join_Workspace
-from models.notification import Notification
-from models.contentNoti import NotificationContent
-from datetime import date, datetime
+from data.repositories.request import Request
+from data.repositories.join_workspace import Join_Workspace
+from data.repositories.notification import Notification
+from data.repositories.contentNoti import NotificationContent
+from datetime import datetime
 
 
 class NewMemberIdList:
@@ -14,7 +14,7 @@ class NewMemberIdList:
         return newMemberIdList
 
 
-class RequestUseCase_Get(NewMemberIdList):
+class RequestService_Get(NewMemberIdList):
     @classmethod
     def getAllRequests(
         cls, workspaceId, page, limit, keyword=None, type=None, status=None
@@ -25,7 +25,7 @@ class RequestUseCase_Get(NewMemberIdList):
         return requestsList
 
 
-class RequestUseCase_Update(NewMemberIdList, NotificationContent):
+class RequestService_Update(NewMemberIdList, NotificationContent):
     @classmethod
     def deleteRequests(cls, workspaceId, requestIdList, deletedAt):
         deletedRequests = Request.deleteRequests(workspaceId, requestIdList, deletedAt)
@@ -48,9 +48,9 @@ class RequestUseCase_Update(NewMemberIdList, NotificationContent):
                     requestType = approvedRequest["type"]
                     createdAt = datetime.now()
                     if requestType == "invitation":
-                        RequestUseCase.invitation(approvedRequest, createdAt)
+                        RequestService.invitation(approvedRequest, createdAt)
                     elif requestType == "adjust permission":
-                        RequestUseCase.adjust_permission(approvedRequest, createdAt)
+                        RequestService.adjust_permission(approvedRequest, createdAt)
             return approvedRequests
         except Exception as e:
             raise Exception(e)
@@ -75,7 +75,7 @@ class RequestUseCase_Update(NewMemberIdList, NotificationContent):
                 currentPermission=fr_permission,
                 newPermission=to_permission,
             )
-            content = RequestUseCase_Update.generateContent(
+            content = RequestService_Update.generateContent(
                 requestType, None, fr_permission, to_permission, workspaceId, userId
             )
             Notification.insertNewNotification(
@@ -106,7 +106,7 @@ class RequestUseCase_Update(NewMemberIdList, NotificationContent):
             notificationType = "invitation"
             status = "pending"
             isDeleted = False
-            content = RequestUseCase_Update.generateContents(
+            content = RequestService_Update.generateContents(
                 requestType, permission, None, None, workspaceId, senderId
             )
             print(content)
@@ -131,7 +131,7 @@ class RequestUseCase_Update(NewMemberIdList, NotificationContent):
         return request
 
 
-class RequestUseCase_Insert(NewMemberIdList):
+class RequestService_Insert(NewMemberIdList):
     @classmethod
     def insertNewRequest(
         cls,
@@ -169,5 +169,5 @@ class RequestUseCase_Insert(NewMemberIdList):
         return newRequest
 
 
-class RequestUseCase(RequestUseCase_Get, RequestUseCase_Insert, RequestUseCase_Update):
+class RequestService(RequestService_Get, RequestService_Insert, RequestService_Update):
     pass

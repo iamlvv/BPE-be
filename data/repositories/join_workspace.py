@@ -268,7 +268,7 @@ class Join_Workspace_Insert(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
         permission: str,
         isDeleted: bool,
     ):
-        print("this is isDeleted in models", isDeleted)
+        print("this is isDeleted in data", isDeleted)
         if isDeleted:
             query = f"""UPDATE public.join_workspace
                         SET isDeleted=false, joinedAt='{joinedAt}', permission='{permission}'

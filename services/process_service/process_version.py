@@ -1,14 +1,14 @@
 import os
 import shutil
 import uuid
-from models.process_version import ProcessVersion
-from models.process import Process
-from models.work_on import WorkOn
-from models.comment_on import CommentOn
+from data.repositories.process_version import ProcessVersion
+from data.repositories.process import Process
+from data.repositories.work_on import WorkOn
+from data.repositories.comment_on import CommentOn
 from fileIO.file import FileIO
 
 
-class ProcessVersionUsecase:
+class ProcessVersionService:
     @classmethod
     def save(self, xml_file_link, file, user_id, project_id, process_id, version):
         if not WorkOn.can_edit(user_id, project_id):

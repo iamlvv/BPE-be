@@ -1,11 +1,11 @@
 import os
 import shutil
-from models.process import Process
-from models.work_on import WorkOn
-from .process_version import ProcessVersionUsecase
+from data.repositories.process import Process
+from data.repositories.work_on import WorkOn
+from .process_version import ProcessVersionService
 
 
-class ProcessUsecase:
+class ProcessService:
     @classmethod
     def create(self, user_id, project_id, name):
         if not WorkOn.can_edit(user_id, project_id):
@@ -14,7 +14,7 @@ class ProcessUsecase:
         process = Process.insert(project_id, name)
         if not os.path.isdir(f'static/{project_id}/{process.id}'):
             os.makedirs(f"static/{project_id}/{process.id}")
-        ProcessVersionUsecase.create_default(project_id, process.id)
+        ProcessVersionService.create_default(project_id, process.id)
         return process
 
     @classmethod
@@ -22,7 +22,7 @@ class ProcessUsecase:
         process = Process.insert(project_id, name)
         if not os.path.isdir(f'static/{project_id}/{process.id}'):
             os.makedirs(f"static/{project_id}/{process.id}")
-        ProcessVersionUsecase.create_default(project_id, process.id)
+        ProcessVersionService.create_default(project_id, process.id)
         return process
 
     @classmethod

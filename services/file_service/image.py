@@ -1,11 +1,11 @@
 import os
 import uuid
 from fileIO.file import FileIO
-from models.history_image import HistoryImage
-from models.work_on import WorkOn
+from data.repositories.history_image import HistoryImage
+from data.repositories.work_on import WorkOn
 
 
-class ImageUsecase:
+class ImageService:
     @classmethod
     def get_image_by_bpmn_file(self, user_id, project_id, process_id, xml_file_link):
         if not WorkOn.can_view(user_id, project_id):

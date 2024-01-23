@@ -1,14 +1,15 @@
-from models.join_workspace import Join_Workspace
-from models.recent_opened_workspaces import Recent_Opened_Workspaces
-from models.work_on import WorkOn
-from models.request import Request
-from .recent_opened_workspace import RecentOpenedWorkspaceUseCase
+from data.repositories.join_workspace import Join_Workspace
+from data.repositories.work_on import WorkOn
+from data.repositories.request import Request
+from services.workspace_service.recent_opened_workspace import (
+    RecentOpenedWorkspaceService,
+)
 
 
 class CheckPermission:
     @classmethod
     def checkMemberPermission(cls, workspaceId, userId, permission):
-        sender = JoinWorkspaceUseCase.getMember(workspaceId, userId)
+        sender = JoinWorkspaceService.getMember(workspaceId, userId)
         print("sender", sender)
         if sender is None:
             return False
@@ -23,7 +24,7 @@ class CheckPermission:
         return True
 
 
-class JoinWorkspaceUseCase_Get:
+class JoinWorkspaceService_Get:
     @classmethod
     def getAllMembers(
         cls, workspaceId: str, page: int, limit: int, keyword=None, permission=None
@@ -43,7 +44,7 @@ class JoinWorkspaceUseCase_Get:
         return member
 
 
-class JoinWorkspaceUseCase_Update:
+class JoinWorkspaceService_Update:
     @classmethod
     def deleteMember(cls, workspaceId: str, memberIdList, leftAt):
         try:
@@ -82,7 +83,7 @@ class JoinWorkspaceUseCase_Update:
         return Join_Workspace.undoDeleteMember(workspaceId, memberIdList)
 
 
-class JoinWorkspaceUseCase_Insert:
+class JoinWorkspaceService_Insert:
     @classmethod
     def insertNewMember(
         cls,
@@ -103,14 +104,14 @@ class JoinWorkspaceUseCase_Insert:
             newMember = Join_Workspace.insertNewMember(
                 memberId, workspaceId, joinedAt, permission, isDeleted=isDeleted
             )
-            newRecentOpenedWorkspace = RecentOpenedWorkspaceUseCase.insert(
+            newRecentOpenedWorkspace = RecentOpenedWorkspaceService.insert(
                 workspaceId, memberId, joinedAt, isDeleted=isDeleted
             )
             return newMember
         return None
 
 
-class JoinWorkspaceUseCase(
-    JoinWorkspaceUseCase_Get, JoinWorkspaceUseCase_Insert, JoinWorkspaceUseCase_Update
+class JoinWorkspaceService(
+    JoinWorkspaceService_Get, JoinWorkspaceService_Insert, JoinWorkspaceService_Update
 ):
     pass

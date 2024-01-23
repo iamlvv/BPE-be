@@ -1,9 +1,8 @@
-import uuid
-from models.document_file import DocumentFile
+from data.repositories.document_file import DocumentFile
 from fileIO.file import FileIO
 
 
-class DocumentFileUsecase:
+class DocumentFileService:
     @classmethod
     def create_default(self, project_id):
         document_link = FileIO.create_default_md_file(

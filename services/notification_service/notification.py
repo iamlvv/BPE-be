@@ -1,8 +1,8 @@
-from models.notification import Notification
-from .join_workspace import JoinWorkspaceUseCase
+from data.repositories.notification import Notification
+from services.workspace_service.join_workspace import JoinWorkspaceService
 
 
-class NotificationUseCase_Get:
+class NotificationService_Get:
     @classmethod
     def getAllNotifications(
         cls, userId, page, limit, isStarred, keyword=None, notificationType=None
@@ -15,7 +15,7 @@ class NotificationUseCase_Get:
         return notifications
 
 
-class NotificationUseCase_Update:
+class NotificationService_Update:
     @classmethod
     def deleteNotification(cls, notificationIdList, deletedAt):
         return Notification.deleteNotification(notificationIdList, deletedAt)
@@ -36,7 +36,7 @@ class NotificationUseCase_Update:
     def acceptNotification(
         cls, userId, workspaceId, joinedAt, permission, notificationId, status
     ):
-        newMember = JoinWorkspaceUseCase.insertNewMember(
+        newMember = JoinWorkspaceService.insertNewMember(
             memberId=userId,
             workspaceId=workspaceId,
             joinedAt=joinedAt,
@@ -55,7 +55,7 @@ class NotificationUseCase_Update:
         return updatedNotification
 
 
-class NotificationUseCase_Insert:
+class NotificationService_Insert:
     @classmethod
     def insertNewNotification(
         cls,
@@ -87,7 +87,7 @@ class NotificationUseCase_Insert:
         return notification
 
 
-class NotificationUseCase(
-    NotificationUseCase_Get, NotificationUseCase_Insert, NotificationUseCase_Update
+class NotificationService(
+    NotificationService_Get, NotificationService_Insert, NotificationService_Update
 ):
     pass

@@ -1,4 +1,4 @@
-from .utils import *
+from controller.utils import *
 import jsonpickle
 
 
@@ -11,7 +11,7 @@ def getAllMembers(workspaceId):
         permission = request.args.get("permission", None)
         # body = load_request_body(request)
         # workspaceId = body["workspaceId"]
-        data = JoinWorkspaceUseCase.getAllMembers(
+        data = JoinWorkspaceService.getAllMembers(
             workspaceId, page, limit, keyword, permission
         )
         return bpsky.response_class(
@@ -31,7 +31,7 @@ def insertNewMember():
         workspaceId = body["workspaceId"]
         joinedAt = datetime.now()
         permission = body["permission"]
-        data = JoinWorkspaceUseCase.insertNewMember(
+        data = JoinWorkspaceService.insertNewMember(
             memberId, workspaceId, joinedAt, permission
         )
         if data is None:
@@ -59,7 +59,7 @@ def getPermissionOfUser(workspaceId):
     try:
         body = load_request_body(request)
         memberId = get_id_from_token(get_token(request))
-        data = JoinWorkspaceUseCase.getPermissionOfUser(memberId, workspaceId)
+        data = JoinWorkspaceService.getPermissionOfUser(memberId, workspaceId)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -76,7 +76,7 @@ def updatePermission():
         workspaceId = body["workspaceId"]
         memberIdList = body["memberIdList"]
         permission = body["permission"]
-        data = JoinWorkspaceUseCase.updateMemberPermission(
+        data = JoinWorkspaceService.updateMemberPermission(
             workspaceId, memberIdList, permission
         )
         return bpsky.response_class(
@@ -95,7 +95,7 @@ def deleteMember():
         workspaceId = body["workspaceId"]
         memberIdList = body["memberIdList"]
         leftAt = datetime.now()
-        data = JoinWorkspaceUseCase.deleteMember(workspaceId, memberIdList, leftAt)
+        data = JoinWorkspaceService.deleteMember(workspaceId, memberIdList, leftAt)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,
@@ -111,7 +111,7 @@ def undoDeleteMember():
         body = load_request_body(request)
         workspaceId = body["workspaceId"]
         memberIdList = body["memberIdList"]
-        data = JoinWorkspaceUseCase.undoDeleteMember(workspaceId, memberIdList)
+        data = JoinWorkspaceService.undoDeleteMember(workspaceId, memberIdList)
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,

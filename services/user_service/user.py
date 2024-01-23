@@ -1,12 +1,12 @@
-from models.user import User
+from data.repositories.user import User
 from smtp.email import Email
 from threading import Thread
 import uuid
 from auth.jwt import encode
-from .utils import *
+from services.utils import *
 
 
-class UserUsecase:
+class UserService:
     @classmethod
     def create(self, password, email, name, phone, avatar, verified=False):
         return User.create(
@@ -27,8 +27,8 @@ class UserUsecase:
 
     @classmethod
     def signup(self, password, email, name, phone, avatar):
-        if not UserUsecase.check_exist(email):
-            result = UserUsecase.create(password, email, name, phone, avatar)
+        if not UserService.check_exist(email):
+            result = UserService.create(password, email, name, phone, avatar)
             Thread(
                 target=Email.verify_account,
                 args=(

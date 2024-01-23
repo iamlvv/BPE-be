@@ -1,12 +1,12 @@
-from models.recent_opened_workspaces import Recent_Opened_Workspaces
+from data.repositories.recent_opened_workspaces import Recent_Opened_Workspaces
 from datetime import datetime
 
 
-class RecentOpenedWorkspaceUseCase_Get:
+class RecentOpenedWorkspaceService_Get:
     pass
 
 
-class RecentOpenedWorkspaceUseCase_Insert:
+class RecentOpenedWorkspaceService_Insert:
     @classmethod
     def insert(cls, workspaceId, memberId, joinedAt, isDeleted):
         recent_opened_workspace = Recent_Opened_Workspaces.insert(
@@ -15,7 +15,7 @@ class RecentOpenedWorkspaceUseCase_Insert:
         return recent_opened_workspace
 
 
-class RecentOpenedWorkspaceUseCase_Update:
+class RecentOpenedWorkspaceService_Update:
     @classmethod
     def pinOpenedWorkspace(cls, userId: str, workspaceId: str):
         recent_opened_workspace = Recent_Opened_Workspaces.pinOpenedWorkspace(
@@ -31,9 +31,9 @@ class RecentOpenedWorkspaceUseCase_Update:
         return recent_opened_workspace
 
 
-class RecentOpenedWorkspaceUseCase(
-    RecentOpenedWorkspaceUseCase_Get,
-    RecentOpenedWorkspaceUseCase_Insert,
-    RecentOpenedWorkspaceUseCase_Update,
+class RecentOpenedWorkspaceService(
+    RecentOpenedWorkspaceService_Get,
+    RecentOpenedWorkspaceService_Insert,
+    RecentOpenedWorkspaceService_Update,
 ):
     pass

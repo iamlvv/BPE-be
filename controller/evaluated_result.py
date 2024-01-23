@@ -1,28 +1,26 @@
-from .utils import *
+from controller.utils import *
 
 
 @bpsky.route("/api/v1/result/all", methods=["GET"])
 def evaluated_result_get_result_by_bpmn_file():
     try:
         user_id = get_id_from_token(get_token(request))
-        project_id = request.args.get('projectID', '')
-        version = request.args.get('version', '')
-        process_id = request.args.get('processID', '')
+        project_id = request.args.get("projectID", "")
+        version = request.args.get("version", "")
+        process_id = request.args.get("processID", "")
         if project_id == "" or version == "" or process_id == "":
             raise Exception("projectID or version or processID required")
         xml_file_link = get_xml_link(project_id, process_id, version)
-        data = EvaluatedResultUsercase.get_all_result_by_bpmn_file(
-            user_id, project_id, process_id, xml_file_link)
+        data = EvaluatedResultService.get_all_result_by_bpmn_file(
+            user_id, project_id, process_id, xml_file_link
+        )
         return bpsky.response_class(
             response=json.dumps(data, default=json_serial),
             status=200,
-            mimetype='application/json'
+            mimetype="application/json",
         )
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/result", methods=["GET", "POST", "DELETE"])
@@ -35,10 +33,7 @@ def evaluated_result():
         else:
             return evaluated_result_delete()
     except Exception as e:
-        return bpsky.response_class(
-            response=e.__str__(),
-            status=500
-        )
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 def evaluated_result_save():
@@ -47,34 +42,35 @@ def evaluated_result_save():
     for i in ["projectID", "processID", "version", "name", "result"]:
         if i not in body:
             raise Exception(i + " required")
-    project_id = body['projectID']
-    process_id = body['processID']
-    version = body['version']
-    name = body['name']
-    result = body['result']
-    description = body['description'] if 'description' in body else ""
+    project_id = body["projectID"]
+    process_id = body["processID"]
+    version = body["version"]
+    name = body["name"]
+    result = body["result"]
+    description = body["description"] if "description" in body else ""
     xml_file_link = get_xml_link(project_id, process_id, version)
-    EvaluatedResultUsercase.save(user_id, xml_file_link, project_id, process_id, name, result,
-                                 description)
+    EvaluatedResultService.save(
+        user_id, xml_file_link, project_id, process_id, name, result, description
+    )
     return "Create successfully"
 
 
 def evaluated_result_get():
     user_id = get_id_from_token(get_token(request))
-    project_id = request.args.get('projectID', '')
-    version = request.args.get('version', '')
-    name = request.args.get('name', '')
-    process_id = request.args.get('processID', '')
+    project_id = request.args.get("projectID", "")
+    version = request.args.get("version", "")
+    name = request.args.get("name", "")
+    process_id = request.args.get("processID", "")
     if project_id == "" or version == "" or name == "" or process_id == "":
-        raise Exception(
-            "projectID or version or name or processID required")
+        raise Exception("projectID or version or name or processID required")
     xml_file_link = get_xml_link(project_id, process_id, version)
-    data = EvaluatedResultUsercase.get_result(
-        user_id, project_id, process_id,  xml_file_link, name)
+    data = EvaluatedResultService.get_result(
+        user_id, project_id, process_id, xml_file_link, name
+    )
     return bpsky.response_class(
         response=json.dumps(data, default=json_serial),
         status=200,
-        mimetype='application/json'
+        mimetype="application/json",
     )
 
 
@@ -84,11 +80,10 @@ def evaluated_result_delete():
     for i in ["projectID", "processID", "version", "name"]:
         if i not in body:
             raise Exception(i + " required")
-    project_id = body['projectID']
-    process_id = body['processID']
-    version = body['version']
-    name = body['name']
+    project_id = body["projectID"]
+    process_id = body["processID"]
+    version = body["version"]
+    name = body["name"]
     xml_file_link = get_xml_link(project_id, process_id, version)
-    EvaluatedResultUsercase.delete(
-        user_id,  xml_file_link, project_id, process_id, name)
+    EvaluatedResultService.delete(user_id, xml_file_link, project_id, process_id, name)
     return "Delete successfully"

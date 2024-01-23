@@ -1,4 +1,4 @@
-from .utils import *
+from controller.utils import *
 from oauth2.google import LoginWithGoogle
 
 
@@ -14,11 +14,11 @@ def user_signup():
         name = body["name"]
         phone = body["phone"] if "phone" in body else ""
         avatar = body["avatar"] if "avatar" in body else ""
-        response = UserUsecase.signup(password, email, name, phone, avatar)
+        response = UserService.signup(password, email, name, phone, avatar)
         if response == "Account exist":
             return bpsky.response_class(response=response, status=500)
         else:
-            personalWorkspace = WorkspaceUseCase.createNewWorkspace(
+            personalWorkspace = WorkspaceService.createNewWorkspace(
                 name,
                 "Personal workspace",
                 datetime.now(),
@@ -43,7 +43,7 @@ def user_verify(token):
     try:
         email = get_email_from_token(token)
         print("email: ", email)
-        data = UserUsecase.verify(email)
+        data = UserService.verify(email)
         print("data", data)
         return redirect(f"{host}/login")
     except Exception as e:
@@ -57,7 +57,7 @@ def user_resend_email():
         if "email" not in body:
             raise Exception("email required")
         email = body["email"]
-        UserUsecase.resend_email(email)
+        UserService.resend_email(email)
         return "Resend successfully"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -65,7 +65,7 @@ def user_resend_email():
 
 @bpsky.route("/api/v1/user/all", methods=["GET"])
 def user_get_all():
-    data = UserUsecase.get_all()
+    data = UserService.get_all()
     return bpsky.response_class(
         response=json.dumps(data), status=200, mimetype="application/json"
     )
@@ -76,7 +76,7 @@ def user_get():
     try:
         id = get_id_from_token(get_token(request))
         workspaceId = request.args.get("workspaceId", None)
-        user = UserUsecase.get(id, workspaceId)
+        user = UserService.get(id, workspaceId)
         return bpsky.response_class(
             response=json.dumps(user), status=200, mimetype="application/json"
         )
@@ -93,7 +93,7 @@ def user_signin():
                 raise Exception(i + " required")
         password = body["password"]
         email = body["email"]
-        token = UserUsecase.signin(email, password)
+        token = UserService.signin(email, password)
         return bpsky.response_class(response=token, content_type="text", status=200)
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -107,7 +107,7 @@ def user_change_password():
         if "newPassword" not in body:
             raise Exception("new password required")
         new_password = body["newPassword"]
-        UserUsecase.change_password(email, new_password)
+        UserService.change_password(email, new_password)
         return "Change successfully"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -120,7 +120,7 @@ def user_reset_password():
         if "email" not in body:
             raise Exception("email required")
         email = body["email"]
-        UserUsecase.reset_password(email)
+        UserService.reset_password(email)
         return "Send email successfully"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -134,7 +134,7 @@ def user_search():
         workspaceId = request.args.get("workspaceId", None)
         if s == "":
             raise Exception("bad request")
-        data = UserUsecase.search(s, email, workspaceId)
+        data = UserService.search(s, email, workspaceId)
         return bpsky.response_class(
             response=json.dumps(data), status=200, mimetype="application/json"
         )
@@ -157,7 +157,7 @@ def user_callback():
     try:
         code = request.args.get("code")
         data = LoginWithGoogle.get(request.url, code)
-        token = UserUsecase.auth_with_google(data[1], data[2], data[3])
+        token = UserService.auth_with_google(data[1], data[2], data[3])
         return redirect(f"{host}?token={token}")
     except Exception as e:
         return redirect(f"{host}/login")

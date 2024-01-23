@@ -1,12 +1,10 @@
-import os
-from models.workspace import Workspace
-from models.join_workspace import Join_Workspace
-from models.recent_opened_workspaces import Recent_Opened_Workspaces
-from .join_workspace import JoinWorkspaceUseCase
+from data.repositories.workspace import Workspace
+from data.repositories.recent_opened_workspaces import Recent_Opened_Workspaces
+from services.workspace_service.join_workspace import JoinWorkspaceService
 from datetime import datetime
 
 
-class WorkspaceUseCase_Get:
+class WorkspaceService_Get:
     @classmethod
     def getWorkspace(cls, workspaceId: str):
         workspace = Workspace.getWorkspace(workspaceId)
@@ -63,7 +61,7 @@ class WorkspaceUseCase_Get:
         return workspace
 
 
-class WorkspaceUseCase_Update:
+class WorkspaceService_Update:
     @classmethod
     def updateWorkspaceName(cls, workspaceId: str, name: str):
         workspace = Workspace.getWorkspace(workspaceId)
@@ -125,7 +123,7 @@ class WorkspaceUseCase_Update:
         return recent_opened_workspace
 
 
-class WorkspaceUseCase_Delete:
+class WorkspaceService_Delete:
     @classmethod
     def deleteWorkspace(cls, workspaceId: str, deletedAt: str):
         if Workspace.deleteWorkspace(workspaceId, deletedAt):
@@ -133,7 +131,7 @@ class WorkspaceUseCase_Delete:
         return False
 
 
-class WorkspaceUseCase_Insert:
+class WorkspaceService_Insert:
     @classmethod
     def createNewWorkspace(
         cls,
@@ -169,16 +167,16 @@ class WorkspaceUseCase_Insert:
         # newJoinWorkspace = Join_Workspace.insertNewMember(
         #     ownerId, newWorkspace.id, createdAt, "owner", isDeleted
         # )
-        newJoinWorkspace = JoinWorkspaceUseCase.insertNewMember(
+        newJoinWorkspace = JoinWorkspaceService.insertNewMember(
             ownerId, newWorkspace.id, createdAt, "owner"
         )
         return newWorkspace
 
 
-class WorkspaceUseCase(
-    WorkspaceUseCase_Get,
-    WorkspaceUseCase_Insert,
-    WorkspaceUseCase_Update,
-    WorkspaceUseCase_Delete,
+class WorkspaceService(
+    WorkspaceService_Get,
+    WorkspaceService_Insert,
+    WorkspaceService_Update,
+    WorkspaceService_Delete,
 ):
     pass

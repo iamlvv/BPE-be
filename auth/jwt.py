@@ -1,6 +1,6 @@
 import jwt
 import os
-from models.user import User
+from data.repositories.user import User
 
 
 def encode(payload):
