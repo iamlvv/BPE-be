@@ -13,10 +13,10 @@ class DatabaseConnector:
     # connection: psycopg2.connection
 
     @classmethod
-    def get_connection(self):
-        if self.connection != None and self.connection.closed == 0:
+    def get_connection(cls):
+        if cls.connection is not None and cls.connection.closed == 0:
             print("Connected to the PostgreSQL database!")
-            return self.connection
+            return cls.connection
 
         print("Connecting to the PostgreSQL database...")
         database_url = os.environ.get("DATABASE_URL")
@@ -26,10 +26,10 @@ class DatabaseConnector:
         database = result.path[1:]
         hostname = result.hostname
 
-        self.connection = psycopg2.connect(
+        cls.connection = psycopg2.connect(
             host=hostname,
             database=database,
             user=username,
             password=password,
         )
-        return self.connection
+        return cls.connection

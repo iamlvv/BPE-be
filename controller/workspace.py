@@ -1,7 +1,6 @@
+from bpsky import bpsky
 from controller.utils import *
 import jsonpickle
-import cloudinary
-import cloudinary.uploader
 
 
 # check if user is owner of workspace
@@ -186,16 +185,7 @@ def uploadBackground():
         if file.filename == "":
             raise Exception("No selected file")
         if file:
-            cloudinary.config(
-                cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-                api_key=os.environ.get("CLOUDINARY_API_KEY"),
-                api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
-                secure=True,
-            )
-            upload_result = cloudinary.uploader.upload(file)
-            data = WorkspaceService.updateWorkspaceBackground(
-                workspaceId, upload_result["secure_url"]
-            )
+            data = WorkspaceService.updateWorkspaceBackground(workspaceId, file)
             return "Upload background success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
@@ -221,16 +211,7 @@ def uploadIcon():
         if file.filename == "":
             raise Exception("No selected file")
         if file:
-            cloudinary.config(
-                cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-                api_key=os.environ.get("CLOUDINARY_API_KEY"),
-                api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
-                secure=True,
-            )
-            upload_result = cloudinary.uploader.upload(file)
-            data = WorkspaceService.updateWorkspaceIcon(
-                workspaceId, upload_result["secure_url"]
-            )
+            data = WorkspaceService.updateWorkspaceIcon(workspaceId, file)
             return "Upload icon success"
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)

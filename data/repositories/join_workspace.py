@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 
 
 class JoinWorkspaceReturnType:
@@ -113,22 +113,6 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
                     query += f""" LIMIT {limit} OFFSET {(page-1 if page-1 >= 0 else 0)*limit}"""
                 cursor.execute(query)
                 results = cursor.fetchall()
-                # return {
-                #     "total": total,
-                #     "limit": limit,
-                #     "data": [
-                #         {
-                #             "name": result[0],
-                #             "email": result[1],
-                #             "avatar": result[2],
-                #             "memberId": result[3],
-                #             "workspaceId": result[4],
-                #             "joinedAt": result[5],
-                #             "permission": result[6],
-                #         }
-                #         for result in results
-                #     ],
-                # }
                 return Join_Workspace_Get.getAllMembersReturnType(
                     total=total, limit=limit, results=results
                 )
@@ -139,7 +123,7 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
 
     @classmethod
     def getMember(cls, workspaceId: str, memberId: str):
-        print("this is member id", memberId, workspaceId)
+        # print("this is member id", memberId, workspaceId)
         query = f"""SELECT memberId, workspaceId, joinedAt, permission, isDeleted 
                     FROM public.join_workspace
                     WHERE join_workspace.workspaceId='{workspaceId}' AND join_workspace.memberId='{memberId}';
@@ -150,13 +134,6 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
                 cursor.execute(query)
                 result = cursor.fetchone()
                 if result:
-                    # return {
-                    #     "memberId": result[0],
-                    #     "workspaceId": result[1],
-                    #     "joinedAt": result[2],
-                    #     "permission": result[3],
-                    #     "isDeleted": result[4],
-                    # }
                     return Join_Workspace_Get.getMemberReturnType(result=result)
                 else:
                     return None
@@ -287,15 +264,6 @@ class Join_Workspace_Insert(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
                         """
                     cursor.execute(query)
                     result = cursor.fetchone()
-                    # return {
-                    #     "name": result[0],
-                    #     "email": result[1],
-                    #     "avatar": result[2],
-                    #     "memberId": result[3],
-                    #     "workspaceId": result[4],
-                    #     "joinedAt": result[5],
-                    #     "permission": result[6],
-                    # }
                     return Join_Workspace_Insert.insertNewMemberReturnType(
                         result=result
                     )
@@ -315,23 +283,17 @@ class Join_Workspace_Insert(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
                     cursor.execute(query)
                     connection.commit()
                     result = cursor.fetchone()
-                    # return the inserted member including name, email, avatar, joinedAt, permission, memberId, workspaceId
+                    # return the inserted member including name, email, avatar, joinedAt, permission,
+                    # memberId, workspaceId
                     if result:
-                        query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
+                        query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, 
+                                    jw.permission
                                 FROM public.join_workspace jw, public.bpe_user u
-                                WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
+                                WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' 
+                                AND u.id = jw.memberId;
                             """
                         cursor.execute(query)
                         result = cursor.fetchone()
-                        # return {
-                        #     "name": result[0],
-                        #     "email": result[1],
-                        #     "avatar": result[2],
-                        #     "memberId": result[3],
-                        #     "workspaceId": result[4],
-                        #     "joinedAt": result[5],
-                        #     "permission": result[6],
-                        # }
                         return Join_Workspace_Insert.insertNewMemberReturnType(
                             result=result
                         )

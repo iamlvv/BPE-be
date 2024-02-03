@@ -98,7 +98,7 @@ class JoinWorkspaceService_Insert:
         isDeleted = False
         if member is not None:
             isDeleted = member["isDeleted"]
-            if isDeleted == False:
+            if not isDeleted:
                 return None
         if member is None or isDeleted:
             newMember = Join_Workspace.insertNewMember(

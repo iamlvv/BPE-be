@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 
 
 class Project:
@@ -59,7 +59,7 @@ class Project:
             raise Exception(e)
 
     @classmethod
-    def get(self, project_id):
+    def get(cls, project_id):
         query = """SELECT project.id, description, "name", create_at, work_on.user_id, ownerId
                     FROM public.project, public.work_on
                     WHERE project.id=%s AND is_delete=false AND project.id=work_on.project_id;
@@ -83,7 +83,7 @@ class Project:
             raise Exception(e)
 
     @classmethod
-    def delete(self, project_id):
+    def delete(cls, project_id):
         query = """UPDATE public.project
                     SET is_delete=true
                     WHERE id=%s;
@@ -117,7 +117,7 @@ class Project:
             raise Exception(e)
 
     @classmethod
-    def update_name(self, project_id, name):
+    def update_name(cls, project_id, name):
         query = """UPDATE public.project
                     SET "name"=%s
                     WHERE id=%s;
@@ -141,7 +141,7 @@ class Project:
             raise Exception(e)
 
     @classmethod
-    def update_description(self, project_id, description):
+    def update_description(cls, project_id, description):
         query = """UPDATE public.project
                     SET description=%s
                     WHERE id=%s;
@@ -165,7 +165,7 @@ class Project:
             raise Exception(e)
 
     @classmethod
-    def get_all_project_by_project_ids(self, project_ids):
+    def get_all_project_by_project_ids(cls, project_ids):
         query = f"""SELECT id, description, "name", create_at
                     FROM public.project
                     WHERE id IN ({",".join(str(project_id) for project_id in project_ids)}) AND is_delete=false

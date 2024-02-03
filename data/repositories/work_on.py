@@ -97,7 +97,7 @@ class WorkOn:
             raise Exception(e)
 
     @classmethod
-    def deleteMember(cls, newMemberList, leftAt) -> None:
+    def deleteMember(cls, newMemberList, leftAt) -> str:
         for memberId in newMemberList:
             query = f"""UPDATE public.work_on
                     SET isDeleted=true, leftAt = '{leftAt}'
@@ -124,21 +124,33 @@ class WorkOn:
         ownerId=None,
         keyword=None,
     ):
-        query = f"""SELECT project.id, project.description, project.name, project.create_at, wo.role,
-                    bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
-                    FROM work_on wo, bpe_user, project, public.workspace
-                    WHERE wo.user_id={user_id} AND bpe_user.id=wo.user_id AND project.id = wo.project_id
-                    AND project.is_delete=false AND workspace.id=project.workspaceId AND workspace.id={workspaceId}
-                """
+        # query = f"""SELECT project.id, project.description, project.name, project.create_at, wo.role,
+        #             bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
+        #             FROM work_on wo, bpe_user, project, workspace
+        #             WHERE wo.user_id={user_id} AND bpe_user.id=wo.user_id AND project.id = wo.project_id
+        #             AND project.is_delete=false AND workspace.id=project.workspaceId AND workspace.id={workspaceId}
+        #         """
+
+        # fix: all projects in workspace is visible to user, not only projects that user is working on
+        query = f"""SELECT project.id, project.description, project.name, project.create_at,
+                            bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
+                            FROM bpe_user, project, workspace
+                            WHERE project.is_delete=false 
+                            AND workspace.id=project.workspaceId 
+                            AND workspace.id={workspaceId}
+                        """
         if keyword:
-            query += f""" AND (LOWER(project.name) LIKE LOWER('%{keyword}%') OR LOWER(project.description) LIKE LOWER('%{keyword}%') OR LOWER(bpe_user.name) LIKE LOWER('%{keyword}%'))"""
-        if createdAt == "newest" or createdAt == None:
+            query += f""" AND (LOWER(project.name) LIKE LOWER('%{keyword}%') 
+            OR LOWER(project.description) LIKE LOWER('%{keyword}%') 
+            OR LOWER(bpe_user.name) LIKE LOWER('%{keyword}%'))"""
+        if createdAt == "newest" or createdAt is None:
             query += f"""ORDER BY project.create_at DESC"""
         elif createdAt == "oldest":
             query += f"""ORDER BY project.create_at ASC"""
         if ownerId:
             query += f""" AND wo2.user_id={ownerId}"""
-            # run the query to get the total number of records first, then run the query to get the data with limit and offset
+            # run the query to get the total number of records first, then run the query to get the data with limit
+            # and offset
         total = 0
         connection = DatabaseConnector.get_connection()
         try:

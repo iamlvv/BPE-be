@@ -1,5 +1,6 @@
-from .utils import *
+from data.repositories.utils import *
 import json
+
 
 class Recent_Opened_Workspaces_Returning_Type:
     @classmethod
@@ -9,21 +10,21 @@ class Recent_Opened_Workspaces_Returning_Type:
             userId=result[1],
             openedAt=result[2],
         )
-    
+
     @classmethod
     def hide_workspace_message(cls, status):
         if status:
             return "Hided workspace successfully"
         else:
             return "Unhided workspace successfully"
-        
+
     @classmethod
     def pin_workspace_message(cls, status):
         if status:
             return "Pinned workspace successfully"
         else:
             return "Unpinned workspace successfully"
-    
+
 
 class Recent_Opened_Workspaces_Get:
     pass
@@ -70,7 +71,7 @@ class Recent_Opened_Workspaces_Update(Recent_Opened_Workspaces_Returning_Type):
                 connection.commit()
                 result = cursor.fetchone()
                 return Recent_Opened_Workspaces_Update.hide_workspace_message(True)
-            
+
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -87,7 +88,7 @@ class Recent_Opened_Workspaces_Update(Recent_Opened_Workspaces_Returning_Type):
                 cursor.execute(query)
                 result = cursor.fetchone()
                 status = True
-                if result[0] == True:
+                if result[0]:
                     query = f"""UPDATE public.recent_opened_workspace
                                 SET isPinned=false
                                 WHERE workspaceId='{workspaceId}' AND userId='{userId}'
@@ -121,7 +122,7 @@ class Recent_Opened_Workspaces_Update(Recent_Opened_Workspaces_Returning_Type):
                 result = cursor.fetchone()
                 if result is None:
                     return Recent_Opened_Workspaces.insert(
-                        workspaceId, userId, openedAt
+                        workspaceId, userId, openedAt, False
                     )
                 else:
                     query = f"""UPDATE public.recent_opened_workspace

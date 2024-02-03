@@ -1,3 +1,4 @@
+from bpsky import bpsky
 from controller.utils import *
 import jsonpickle
 
@@ -52,21 +53,21 @@ def insertNewMember():
         raise Exception(e)
 
 
-@bpsky.route(
-    "/api/v1/workspace/<string:workspaceId>/members/permission", methods=["GET"]
-)
-def getPermissionOfUser(workspaceId):
-    try:
-        body = load_request_body(request)
-        memberId = get_id_from_token(get_token(request))
-        data = JoinWorkspaceService.getPermissionOfUser(memberId, workspaceId)
-        return bpsky.response_class(
-            response=jsonpickle.encode(data, unpicklable=False),
-            status=200,
-            mimetype="application/json",
-        )
-    except Exception as e:
-        raise Exception(e)
+# @bpsky.route(
+#     "/api/v1/workspace/<string:workspaceId>/members/permission", methods=["GET"]
+# )
+# def getPermissionOfUser(workspaceId):
+#     try:
+#         body = load_request_body(request)
+#         memberId = get_id_from_token(get_token(request))
+#         data = JoinWorkspaceService.getPermissionOfUser(memberId, workspaceId)
+#         return bpsky.response_class(
+#             response=jsonpickle.encode(data, unpicklable=False),
+#             status=200,
+#             mimetype="application/json",
+#         )
+#     except Exception as e:
+#         raise Exception(e)
 
 
 @bpsky.route("/api/v1/workspace/members/permission", methods=["POST"])

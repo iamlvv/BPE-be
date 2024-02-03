@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 from datetime import date
 from bpsky import socketio
 import json
@@ -32,7 +32,7 @@ class FindDuplicateRequest:
                     if (
                         (createdAt - recentCreatedAt).days < 1
                         and resultStatus == "pending"
-                        and isDeleted == False
+                        and isDeleted is False
                     ):
                         return True
                     else:

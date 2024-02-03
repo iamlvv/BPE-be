@@ -6,9 +6,28 @@ from services.file_service.document_file import DocumentFileService
 from fileIO.file import FileIO
 
 
+class Validate:
+    @classmethod
+    def validate_members(cls, users):
+        for user in users:
+            if "user_id" not in user or "role" not in user:
+                raise Exception("bad request")
+            if not isinstance(user["user_id"], int):
+                raise Exception("type of user_id must be integer")
+            role = user["role"]
+            if role == 0:
+                raise Exception("new role must not be project owner")
+            if role not in [
+                Role.CAN_EDIT.value,
+                Role.CAN_SHARE.value,
+                Role.CAN_VIEW.value,
+            ]:
+                raise Exception("bad request")
+
+
 class ProjectService_Get:
     @classmethod
-    def get(self, project_id, user_id):
+    def get(cls, project_id, user_id):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
         return Project.get(project_id)
@@ -18,21 +37,21 @@ class ProjectService_Get:
         return Project.get_all()
 
     @classmethod
-    def get_document(self, user_id, project_id):
+    def get_document(cls, user_id, project_id):
         if not WorkOn.can_view(user_id, project_id):
-            raise Exception("permisstion denied")
+            raise Exception("permission denied")
         return DocumentFileService.get(project_id)
 
     @classmethod
-    def get_document_content(self, user_id, project_id):
+    def get_document_content(cls, user_id, project_id):
         if not WorkOn.can_view(user_id, project_id):
-            raise Exception("permisstion denied")
+            raise Exception("permission denied")
         file_link = f"static/{project_id}/readme.md"
         return FileIO.get_content(file_link)
 
     @classmethod
     def get_all_project_by_user_id(
-        self,
+        cls,
         user_id,
         page,
         limit,
@@ -46,53 +65,36 @@ class ProjectService_Get:
         )
 
     @classmethod
-    def get_all_owned_project_by_user_id(self, user_id):
+    def get_all_owned_project_by_user_id(cls, user_id):
         return WorkOn.get_all_owned_project_by_user_id(user_id)
 
     @classmethod
-    def get_all_shared_project_by_user_id(self, user_id):
+    def get_all_shared_project_by_user_id(cls, user_id):
         return WorkOn.get_all_shared_project_by_user_id(user_id)
 
     @classmethod
-    def get_all_user_by_project_id(self, user_id, project_id):
+    def get_all_user_by_project_id(cls, user_id, project_id):
         if not WorkOn.can_view(user_id, project_id):
             raise Exception("permission denied")
         users = WorkOn.get_all_user_by_project_id(project_id)
         return users
 
-    @classmethod
-    def validate_members(self, users):
-        for user in users:
-            if "user_id" not in user or "role" not in user:
-                raise Exception("bad request")
-            if type(user["user_id"]) != int:
-                raise Exception("type of user_id must be integer")
-            role = user["role"]
-            if role == 0:
-                raise Exception("new role must not be project owner")
-            if role not in [
-                Role.CAN_EDIT.value,
-                Role.CAN_SHARE.value,
-                Role.CAN_VIEW.value,
-            ]:
-                raise Exception("bad request")
 
-
-class ProjectService_Update:
+class ProjectService_Update(Validate):
     @classmethod
-    def update_name(self, user_id, project_id, name):
+    def update_name(cls, user_id, project_id, name):
         if not WorkOn.is_project_owner(user_id, project_id):
-            raise Exception("permisstion denied")
+            raise Exception("permission denied")
         Project.update_name(project_id, name)
 
     @classmethod
-    def update_description(self, user_id, project_id, description):
+    def update_description(cls, user_id, project_id, description):
         if not WorkOn.is_project_owner(user_id, project_id):
-            raise Exception("permisstion denied")
+            raise Exception("permission denied")
         Project.update_description(project_id, description)
 
     @classmethod
-    def update_document(self, user_id, project_id, document_link, file):
+    def update_document(cls, user_id, project_id, document_link, file):
         if WorkOn.can_edit(user_id, project_id):
             DocumentFileService.save(document_link, file)
             return "Success"
@@ -100,8 +102,8 @@ class ProjectService_Update:
             raise Exception("permission denied")
 
     @classmethod
-    def grant_permission(self, current_id, project_id, users):
-        self.validate_members(users)
+    def grant_permission(cls, current_id, project_id, users):
+        ProjectService_Update.validate_members(users)
         user_ids = [user["user_id"] for user in users]
         if WorkOn.is_project_owner(current_id, project_id):
             if WorkOn.is_not_exists(user_ids, project_id):
@@ -113,7 +115,7 @@ class ProjectService_Update:
             raise Exception("permission denied")
 
     @classmethod
-    def revoke_permission(self, current_id, user_id, project_id):
+    def revoke_permission(cls, current_id, user_id, project_id):
         if WorkOn.is_project_owner(current_id, project_id):
             if type(user_id) is not list:
                 raise Exception("bad request")
@@ -128,8 +130,8 @@ class ProjectService_Update:
             raise Exception("permission denied")
 
     @classmethod
-    def update_permission(self, current_id, project_id, users):
-        self.validate_members(users)
+    def update_permission(cls, current_id, project_id, users):
+        ProjectService_Update.validate_members(users)
         user_ids = [user["user_id"] for user in users]
         if WorkOn.is_project_owner(current_id, project_id):
             if WorkOn.is_exists(user_ids, project_id):
@@ -143,7 +145,7 @@ class ProjectService_Update:
 
 class ProjectService_Delete:
     @classmethod
-    def delete(self, project_id, user_id):
+    def delete(cls, project_id, user_id):
         if not WorkOn.is_project_owner(user_id, project_id):
             raise Exception("permission denied")
         return Project.delete(project_id)

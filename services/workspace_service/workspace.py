@@ -1,3 +1,4 @@
+from cloudinary_service.cloudinary_service import cloudinary_upload
 from data.repositories.workspace import Workspace
 from data.repositories.recent_opened_workspaces import Recent_Opened_Workspaces
 from services.workspace_service.join_workspace import JoinWorkspaceService
@@ -87,19 +88,23 @@ class WorkspaceService_Update:
         return workspace
 
     @classmethod
-    def updateWorkspaceBackground(cls, workspaceId, newBackground):
+    def updateWorkspaceBackground(cls, workspaceId, file):
+        upload_result_url = cloudinary_upload(file)
         workspace = Workspace.getWorkspace(workspaceId)
         if workspace is None:
             return None
-        workspace = Workspace.updateWorkspaceBackground(workspaceId, newBackground)
+        workspace = Workspace.updateWorkspaceBackground(
+            workspaceId, background=upload_result_url
+        )
         return workspace
 
     @classmethod
-    def updateWorkspaceIcon(cls, workspaceId, newIcon):
+    def updateWorkspaceIcon(cls, workspaceId, file):
+        upload_result_url = cloudinary_upload(file)
         workspace = Workspace.getWorkspace(workspaceId)
         if workspace is None:
             return None
-        workspace = Workspace.updateWorkspaceIcon(workspaceId, newIcon)
+        workspace = Workspace.updateWorkspaceIcon(workspaceId, upload_result_url)
         return workspace
 
     @classmethod

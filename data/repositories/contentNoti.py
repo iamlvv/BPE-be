@@ -1,10 +1,11 @@
-from .workspace import Workspace
-from .user import User
+from data.repositories.workspace import Workspace
+from data.repositories.user import User
 
 
 class NotificationContent:
     @classmethod
     def generateContent(
+        cls,
         requestType,
         newPermission=None,
         fr_permission=None,
@@ -13,7 +14,7 @@ class NotificationContent:
         senderId=None,
     ):
         if requestType == "invitation":
-            if workspaceId == None or senderId == None or newPermission == None:
+            if workspaceId is None or senderId is None or newPermission is None:
                 raise Exception("Missing workspaceId or senderId or newPermission")
             else:
                 # get workspace name
@@ -24,10 +25,10 @@ class NotificationContent:
 
         elif requestType == "adjust permission":
             if (
-                workspaceId == None
-                or senderId == None
-                or fr_permission == None
-                or to_permission == None
+                workspaceId is None
+                or senderId is None
+                or fr_permission is None
+                or to_permission is None
             ):
                 raise Exception(
                     "Missing workspaceId or senderId or fr_permission or to_permission"

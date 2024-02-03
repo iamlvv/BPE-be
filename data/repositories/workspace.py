@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 import json
 from bpsky import socketio
 
@@ -85,10 +85,10 @@ class Workspace_Get(Workspace_Returning_Type):
             raise Exception(e)
 
     @classmethod
-    def getWorkspace(cls, id: str):
+    def getWorkspace(cls, workspaceId: str):
         query = f"""SELECT ownerId
                     FROM public.workspace
-                    WHERE id={id};
+                    WHERE id={workspaceId};
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -121,9 +121,12 @@ class Workspace_Get(Workspace_Returning_Type):
         # if openedAt == "oldest", sort by openedAt from oldest to latest
         # if page and limit is not empty, return workspaces in page and limit
         # else return all workspaces
-        query = f"""SELECT w.id, w.name, w.description, rw.openedAt, w.ownerId, w.background, w.icon, rw.isPinned, u.name as ownerName, u.avatar as ownerAvatar, u.email as ownerEmail, jw.permission as permission
-                    FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u, public.join_workspace jw
-                    WHERE w.id=rw.workspaceId AND rw.userId='{user_id}' AND w.isDeleted=false AND rw.isHided=false AND u.id=w.ownerId AND jw.workspaceId = rw.workspaceId AND jw.memberId = '{user_id}'
+        query = f"""SELECT w.id, w.name, w.description, rw.openedAt, w.ownerId, w.background, w.icon, rw.isPinned, 
+                    u.name as ownerName, u.avatar as ownerAvatar, u.email as ownerEmail, jw.permission as permission
+                    FROM public.workspace w, public.recent_opened_workspace rw, public.bpe_user u, 
+                    public.join_workspace jw
+                    WHERE w.id=rw.workspaceId AND rw.userId='{user_id}' AND w.isDeleted=false AND rw.isHided=false 
+                    AND u.id=w.ownerId AND jw.workspaceId = rw.workspaceId AND jw.memberId = '{user_id}'
                     AND rw.isUserDeletedFromWorkspace = false AND jw.isDeleted = false
                 """
         if pinned == "true":
@@ -132,7 +135,7 @@ class Workspace_Get(Workspace_Returning_Type):
             query += f""" AND (LOWER(w.name) LIKE LOWER('%{keyword}%') OR LOWER(u.name) LIKE LOWER('%{keyword}%'))"""
         if ownerId:
             query += f""" AND w.ownerId='{ownerId}'"""
-        if openedAt == "newest" or openedAt == None:
+        if openedAt == "newest" or openedAt is None:
             query += f""" ORDER BY rw.openedAt DESC"""
         elif openedAt == "oldest":
             query += f""" ORDER BY rw.openedAt ASC"""
@@ -404,10 +407,10 @@ class Workspace_Update:
             raise Exception(e)
 
     @classmethod
-    def updateWorkspaceBackground(cls, id: str, background: str) -> str:
+    def updateWorkspaceBackground(cls, workspaceId: str, background: str) -> str:
         query = f"""UPDATE public.workspace
                     SET background='{background}'
-                    WHERE id={id};
+                    WHERE id={workspaceId};
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -420,10 +423,10 @@ class Workspace_Update:
             raise Exception(e)
 
     @classmethod
-    def updateWorkspaceIcon(cls, id: str, icon: str) -> str:
+    def updateWorkspaceIcon(cls, workspaceId: str, icon: str) -> str:
         query = f"""UPDATE public.workspace
                     SET icon='{icon}'
-                    WHERE id={id};
+                    WHERE id={workspaceId};
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -454,10 +457,10 @@ class Workspace_Update:
 
 class Workspace_Delete:
     @classmethod
-    def deleteWorkspace(cls, id: str, deletedAt: datetime) -> str:
+    def deleteWorkspace(cls, workspaceId: str, deletedAt: datetime) -> str:
         query = f"""UPDATE public.workspace
                     SET isDeleted=true , deletedAt='{deletedAt}'
-                    WHERE id={id};
+                    WHERE id={workspaceId};
                 """
         connection = DatabaseConnector.get_connection()
         try:
