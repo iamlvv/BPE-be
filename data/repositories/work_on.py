@@ -350,7 +350,8 @@ class WorkOn:
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id=project.id
                     WHERE project_id={project_id} AND user_id={user_id}
-                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value}, {Role.CAN_SHARE.value}) AND project.is_delete=false;
+                        AND role IN ({Role.OWNER.value}, {Role.CAN_EDIT.value}, {Role.CAN_SHARE.value}) 
+                        AND project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:

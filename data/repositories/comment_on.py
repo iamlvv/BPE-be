@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 
 
 class CommentOn:
@@ -11,7 +11,7 @@ class CommentOn:
     create_at = datetime.now()
 
     @classmethod
-    def insert(self, user_id, project_id, process_id, xml_file_link, content):
+    def insert(cls, user_id, project_id, process_id, xml_file_link, content):
         query = """INSERT INTO public.comment_on
                     (user_id, project_id, process_id, xml_file_link, "content", create_at)
                     VALUES(%s, %s, %s, %s, %s, NOW())
@@ -50,7 +50,7 @@ class CommentOn:
             raise Exception(e)
 
     @classmethod
-    def update(self, id, content):
+    def update(cls, id, content):
         query = """UPDATE public.comment_on
                     SET "content"=%s
                     WHERE id=%s;
@@ -73,7 +73,7 @@ class CommentOn:
             raise Exception(e)
 
     @classmethod
-    def owner(self, user_id, project_id, process_id, xml_file_link, id):
+    def owner(cls, user_id, project_id, process_id, xml_file_link, id):
         query = """SELECT id
                     FROM public.comment_on
                     WHERE user_id=%s AND project_id=%s AND xml_file_link=%s AND id=%s AND process_id=%s;
@@ -97,7 +97,7 @@ class CommentOn:
             raise Exception(e)
 
     @classmethod
-    def delete(self, id):
+    def delete(cls, id):
         query = """DELETE FROM public.comment_on
                     WHERE id=%s;
                 """
@@ -113,7 +113,7 @@ class CommentOn:
             raise Exception(e)
 
     @classmethod
-    def get(self, user_id, project_id, process_id, xml_file_link):
+    def get(cls, user_id, project_id, process_id, xml_file_link):
         query = """SELECT comment_on.id, comment_on.project_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
                         bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.comment_on
@@ -152,7 +152,7 @@ class CommentOn:
             raise Exception(e)
 
     @classmethod
-    def get_by_bpmn_file(self, project_id, process_id, xml_file_link):
+    def get_by_bpmn_file(cls, project_id, process_id, xml_file_link):
         query = """SELECT comment_on.id, comment_on.project_id, comment_on.process_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
                         bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.comment_on
@@ -194,8 +194,9 @@ class CommentOn:
             raise Exception(e)
 
     @classmethod
-    def get_by_user(self, user_id):
-        query = """SELECT comment_on.id, comment_on.project_id, comment_on.process_id, comment_on.xml_file_link, comment_on."content", comment_on.create_at,
+    def get_by_user(cls, user_id):
+        query = """SELECT comment_on.id, comment_on.project_id, comment_on.process_id, comment_on.xml_file_link, 
+        comment_on."content", comment_on.create_at,
                         bpe_user.id, bpe_user.email, bpe_user.phone, bpe_user.avatar
                     FROM public.comment_on
                         JOIN public.bpe_user ON comment_on.user_id=bpe_user.id

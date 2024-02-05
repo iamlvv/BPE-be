@@ -1,5 +1,4 @@
 from data.repositories.utils import *
-from datetime import date
 from bpsky import socketio
 import json
 
@@ -10,7 +9,8 @@ class FindDuplicateRequest:
         cls, requestType, content, status, createdAt, workspaceId, senderId, recipientId
     ):
         # find duplicate request
-        # if after sending request, user be kicked out of workspace, then the request is deleted, so it is not a duplicate request
+        # if after sending request, user be kicked out of workspace, then the request is deleted, so it is not a
+        # duplicate request
         # if createdAt is different, if the discrepancy is less than 1 day, then it is a duplicate request
         query = f"""SELECT r.createdAt, r.status, jw.isDeleted
                     FROM public.request r, public.join_workspace jw
@@ -46,23 +46,22 @@ class FindDuplicateRequest:
 class Request_Get:
     @classmethod
     def getAllRequests(
-        cls, workspaceId, page, limit, keyword=None, type=None, status=None
+        cls, workspaceId, page, limit, keyword=None, request_type=None, status=None
     ):
-        query = f"""SELECT id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission
+        query = f"""SELECT id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, 
+        fr_permission, to_permission, rcp_permission
                     FROM public.request
                     WHERE workspaceId='{workspaceId}' AND isDeleted=false AND isWorkspaceDeleted=false
                 """
 
         if keyword:
             query += f""" AND LOWER(content) LIKE LOWER('%{keyword}%')"""
-        if type:
-            query += f""" AND type='{type}'"""
+        if request_type:
+            query += f""" AND type='{request_type}'"""
         if status:
             query += f""" AND status='{status}'"""
 
         query += f""" ORDER BY createdAt DESC"""
-
-        total = 0
 
         connection = DatabaseConnector.get_connection()
         try:
@@ -142,9 +141,13 @@ class Request_Insert(FindDuplicateRequest):
             rcp_permission,
         )
         query = f"""INSERT INTO public.request
-                    (type, content, createdAt, status, isDeleted, isWorkspaceDeleted, workspaceId, senderId, recipientId, handlerId, fr_permission, to_permission, rcp_permission)
-                    VALUES('{requestType}', '{content}', '{createdAt}', '{status}', false, false, '{workspaceId}', '{senderId}', '{recipientId}', '{handlerId}', '{fr_permission}', '{to_permission}', '{rcp_permission}')
-                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, recipientId, handlerId, fr_permission, to_permission, rcp_permission;
+                    (type, content, createdAt, status, isDeleted, isWorkspaceDeleted, workspaceId, senderId, 
+                    recipientId, handlerId, fr_permission, to_permission, rcp_permission)
+                    VALUES('{requestType}', '{content}', '{createdAt}', '{status}', false, false, '{workspaceId}', 
+                    '{senderId}', '{recipientId}', '{handlerId}', '{fr_permission}', '{to_permission}', 
+                    '{rcp_permission}')
+                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, recipientId, handlerId, 
+                    fr_permission, to_permission, rcp_permission;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -205,7 +208,8 @@ class Request_Update:
             query = f"""UPDATE public.request
                         SET status='approved', handlerId='{handlerId}'
                         WHERE id='{requestId}' AND workspaceId='{workspaceId}'
-                        RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
+                        RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, 
+                        recipientId, fr_permission, to_permission, rcp_permission;
                     """
             connection = DatabaseConnector.get_connection()
             try:
@@ -243,14 +247,16 @@ class Request_Update:
             query = f"""UPDATE public.request
                     SET status='declined', handlerId='{handlerId}'
                     WHERE id='{requestId}' AND workspaceId='{workspaceId}'
-                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
+                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, 
+                    recipientId, fr_permission, to_permission, rcp_permission;
                 """
             connection = DatabaseConnector.get_connection()
             try:
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     # connection.commit()
-                    # rename column, fr_permission -> frPermission, to_permission -> toPermission, rcp_permission -> rcpPermission
+                    # rename column, fr_permission -> frPermission, to_permission -> toPermission,
+                    # rcp_permission -> rcpPermission
                     data = cursor.fetchone()
                     result.append(
                         {
@@ -282,7 +288,8 @@ class Request_Delete:
             query = f"""UPDATE public.request
                     SET isDeleted=true, deletedAt='{deletedAt}'
                     WHERE id='{requestId}' AND workspaceId='{workspaceId}'
-                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
+                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, 
+                    recipientId, fr_permission, to_permission, rcp_permission;
                 """
             connection = DatabaseConnector.get_connection()
             try:
@@ -302,7 +309,8 @@ class Request_Delete:
             query = f"""UPDATE public.request
                     SET isDeleted=true, deletedAt='{deletedAt}'
                     WHERE workspaceId='{workspaceId}' AND senderId = '{memberId}'
-                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, recipientId, fr_permission, to_permission, rcp_permission;
+                    RETURNING id, type, content, createdAt, status, workspaceId, senderId, handlerId, 
+                    recipientId, fr_permission, to_permission, rcp_permission;
                 """
             connection = DatabaseConnector.get_connection()
             try:

@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 
 
 class ProcessVersion:
@@ -36,7 +36,7 @@ class ProcessVersion:
             raise Exception(e)
 
     @classmethod
-    def update_version(self, project_id, process_id, version):
+    def update_version(cls, project_id, process_id, version):
         query = f"""UPDATE public.process_version
                     SET last_saved=NOW()
                     WHERE project_id={project_id} AND process_id={process_id} AND version='{version}';
@@ -86,7 +86,7 @@ class ProcessVersion:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
-                if result == None:
+                if result is None:
                     raise Exception("version doesn't exist")
                 return dict(
                     zip(["xml_file_link", "version", "num", "last_saved"], result)
@@ -96,7 +96,7 @@ class ProcessVersion:
             raise Exception(e)
 
     @classmethod
-    def get_by_process(self, project_id, process_id):
+    def get_by_process(cls, project_id, process_id):
         query = f"""SELECT xml_file_link, "version", num, last_saved
                     FROM public.process_version
                     WHERE project_id={project_id} AND process_id={process_id}
@@ -107,7 +107,7 @@ class ProcessVersion:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchall()
-                if result == None:
+                if result is None:
                     raise Exception("version doesn't exist")
                 return list_tuple_to_dict(
                     ["xml_file_link", "version", "num", "last_saved"], result
@@ -117,7 +117,7 @@ class ProcessVersion:
             raise Exception(e)
 
     @classmethod
-    def delete(self, project_id, process_id, version):
+    def delete(cls, project_id, process_id, version):
         query = f"""DELETE FROM public.process_version
                     WHERE version='{version}' AND project_id={project_id} AND process_id={process_id}
                     RETURNING xml_file_link;
@@ -136,7 +136,7 @@ class ProcessVersion:
             raise Exception(e)
 
     @classmethod
-    def delete_by_process(self, project_id, process_id):
+    def delete_by_process(cls, project_id, process_id):
         query = f"""DELETE FROM public.process_version
                     WHERE AND project_id={project_id} AND process_id={process_id}
                     RETURNING xml_file_link;
@@ -155,10 +155,11 @@ class ProcessVersion:
             raise Exception(e)
 
     @classmethod
-    def delete_oldest_version(self, project_id, process_id):
+    def delete_oldest_version(cls, project_id, process_id):
         query = f"""DELETE FROM public.process_version
                     WHERE project_id={project_id} AND process_id={process_id}
-                        AND last_saved=(SELECT MIN(last_saved) FROM public.process_version WHERE project_id={project_id} AND process_id={process_id});
+                        AND last_saved=(SELECT MIN(last_saved) FROM public.process_version 
+                        WHERE project_id={project_id} AND process_id={process_id});
                 """
         connection = DatabaseConnector.get_connection()
         try:

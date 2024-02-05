@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 
 
 class HistoryImage:
@@ -10,7 +10,7 @@ class HistoryImage:
     image_link = ""
 
     @classmethod
-    def insert(self, project_id, process_id, xml_file_link, image_link):
+    def insert(cls, project_id, process_id, xml_file_link, image_link):
         query = """INSERT INTO public.history_image
                     (xml_file_link, project_id, process_id, save_at, image_link)
                     VALUES(%s, %s, %s, NOW(), %s);
@@ -33,7 +33,7 @@ class HistoryImage:
             raise Exception(e)
 
     @classmethod
-    def get_all_image_by_bpmn_file(self, project_id, process_id, xml_file_link):
+    def get_all_image_by_bpmn_file(cls, project_id, process_id, xml_file_link):
         query = """SELECT image_link, save_at
                     FROM public.history_image
                     WHERE xml_file_link=%s AND project_id=%s AND process_id=%s;
@@ -55,7 +55,7 @@ class HistoryImage:
             raise Exception(e)
 
     @classmethod
-    def count_all_image_by_bpmn_file(self, project_id, process_id, xml_file_link):
+    def count_all_image_by_bpmn_file(cls, project_id, process_id, xml_file_link):
         query = """SELECT image_link, save_at
                     FROM public.history_image
                     WHERE xml_file_link=%s AND project_id=%s AND process_id=%s;
@@ -77,7 +77,7 @@ class HistoryImage:
             raise Exception(e)
 
     @classmethod
-    def delete(self, project_id, process_id, xml_file_link, image_link):
+    def delete(cls, project_id, process_id, xml_file_link, image_link):
         query = """DELETE FROM public.history_image
                     WHERE xml_file_link=%s AND project_id=%s AND image_link=%s AND process_id=%s;
                 """
@@ -99,10 +99,11 @@ class HistoryImage:
             raise Exception(e)
 
     @classmethod
-    def delete_oldest(self, project_id, process_id, xml_file_link):
+    def delete_oldest(cls, project_id, process_id, xml_file_link):
         query = """DELETE FROM public.history_image
                     WHERE xml_file_link=%s AND project_id=%s AND process_id=%s
-                        AND save_at=(SELECT MIN(save_at) FROM public.history_image WHERE xml_file_link=%s AND project_id=%s AND process_id=%s);
+                        AND save_at=(SELECT MIN(save_at) FROM public.history_image WHERE xml_file_link=%s 
+                        AND project_id=%s AND process_id=%s);
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -124,7 +125,7 @@ class HistoryImage:
             raise Exception(e)
 
     @classmethod
-    def dif_last_saved(self, project_id, process_id, xml_file_link):
+    def dif_last_saved(cls, project_id, process_id, xml_file_link):
         query = """SELECT MIN(save_at)
                     FROM public.history_image
                     WHERE xml_file_link=%s AND project_id=%s AND process_id=%s;
@@ -141,7 +142,7 @@ class HistoryImage:
                     ),
                 )
                 result = cursor.fetchone()
-                if result == None or result[0] == None:
+                if result is None or result[0] is None:
                     return True
                 last_saved = result[0]
                 return last_saved + timedelta(seconds=10) < datetime.now()

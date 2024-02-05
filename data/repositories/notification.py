@@ -43,7 +43,8 @@ class Notification_Get(Notification_Item_Return):
     def getAllNotifications(
         cls, userId, page, limit, isStarred, keyword=None, notificationType=None
     ):
-        query = f"""SELECT id, userId, createdAt, content, isStarred, isRead, notificationType, status, workspaceId, permission
+        query = f"""SELECT id, userId, createdAt, content, isStarred, isRead, notificationType, status, 
+                    workspaceId, permission
                     FROM public.notification
                     WHERE userId='{userId}' AND isDeleted=false
                 """
@@ -54,7 +55,6 @@ class Notification_Get(Notification_Item_Return):
         if keyword:
             query += f" AND LOWER(content) LIKE LOWER('%{keyword}%')"
         query += " ORDER BY createdAt DESC"
-        total = 0
 
         connection = DatabaseConnector.get_connection()
         try:
@@ -83,7 +83,8 @@ class Notification_Get(Notification_Item_Return):
 
     @classmethod
     def getStarredNotifications(cls, userId: str):
-        query = f"""SELECT id, userId, createdAt, content, isStarred, isRead, notificationType, status, workspaceId, permission 
+        query = f"""SELECT id, userId, createdAt, content, isStarred, isRead, notificationType, status, 
+                    workspaceId, permission 
                     FROM public.notification
                     WHERE userId='{userId}' AND isDeleted=false AND isStarred=true
                     ORDER BY createdAt DESC;
@@ -108,7 +109,8 @@ class Notification_Update(Notification_Item_Return):
         query = f"""UPDATE public.notification
                     SET isStarred={isStarred}
                     WHERE id='{notificationId}' AND isDeleted=false
-                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, workspaceId, permission;
+                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, 
+                    workspaceId, permission;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -126,7 +128,8 @@ class Notification_Update(Notification_Item_Return):
         query = f"""UPDATE public.notification
                     SET isRead=true
                     WHERE id='{notificationId}'
-                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, workspaceId, permission;
+                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, 
+                    workspaceId, permission;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -144,7 +147,8 @@ class Notification_Update(Notification_Item_Return):
         query = f"""UPDATE public.notification
                     SET status='{status}'
                     WHERE id='{notificationId}' AND isDeleted=false
-                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, workspaceId, permission;
+                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, 
+                    workspaceId, permission;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -165,7 +169,8 @@ class Notification_Delete(Notification_Item_Return):
             query = f"""UPDATE public.notification
                     SET isDeleted=true, deletedAt='{deletedAt}'
                     WHERE id='{notificationId}'
-                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, workspaceId, permission;
+                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, 
+                    workspaceId, permission;
                 """
             connection = DatabaseConnector.get_connection()
             try:
@@ -196,9 +201,12 @@ class Notification_Insert(Notification_Item_Return):
         permission: str = None,
     ):
         query = f"""INSERT INTO public.notification
-                    (userId, createdAt, content, isDeleted, isStarred, isRead, notificationType, status, workspaceId, permission)
-                    VALUES('{userId}', '{createdAt}', '{content}', {isDeleted}, {isStarred}, {isRead}, '{notificationType}', '{status}', '{workspaceId}', '{permission}')
-                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, workspaceId, permission;
+                    (userId, createdAt, content, isDeleted, isStarred, isRead, notificationType, status, 
+                    workspaceId, permission)
+                    VALUES('{userId}', '{createdAt}', '{content}', {isDeleted}, {isStarred}, {isRead}, 
+                    '{notificationType}', '{status}', '{workspaceId}', '{permission}')
+                    RETURNING id, userId, createdAt, content, isStarred, isRead, notificationType, status, 
+                    workspaceId, permission;
                 """
         connection = DatabaseConnector.get_connection()
         try:

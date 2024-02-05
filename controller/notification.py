@@ -121,6 +121,7 @@ def handleNotification():
         body = load_request_body(request)
         notificationId = body["notificationId"]
         status = body["status"]
+        data = 0
         if status == "declined":
             data = NotificationService.declineNotification(notificationId, status)
         elif status == "accepted":

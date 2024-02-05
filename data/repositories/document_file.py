@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 
 
 class DocumentFile:
@@ -28,7 +28,7 @@ class DocumentFile:
             raise Exception(e)
 
     @classmethod
-    def update(self, document_link):
+    def update(cls, document_link):
         query = """UPDATE public.document_file
                     SET last_saved=NOW()
                     WHERE document_link=%s;
@@ -43,7 +43,7 @@ class DocumentFile:
             raise Exception(e)
 
     @classmethod
-    def get(self, project_id):
+    def get(cls, project_id):
         query = """SELECT document_link, project_id, last_saved
                     FROM public.document_file
                     WHERE project_id=%s;
@@ -53,7 +53,7 @@ class DocumentFile:
             with connection.cursor() as cursor:
                 cursor.execute(query, (project_id,))
                 result = cursor.fetchone()
-                if result == None:
+                if result is None:
                     raise Exception("project_id incorrect")
                 return {
                     "document_link": result[0],

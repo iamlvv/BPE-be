@@ -78,9 +78,7 @@ class JoinWorkspaceService_Update:
         )
         if len(newMemberIdList) == 0:
             return None
-        list_new_permission = Join_Workspace.updatePermission(
-            workspaceId, newMemberIdList, None, permission
-        )
+        Join_Workspace.updatePermission(workspaceId, newMemberIdList, None, permission)
         # when member permission is updated, update all work on project of that member
         WorkOnService.updateMemberPermission(
             newMemberIdList,

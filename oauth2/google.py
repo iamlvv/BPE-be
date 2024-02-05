@@ -6,9 +6,7 @@ from oauthlib.oauth2 import WebApplicationClient
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI", None)
-GOOGLE_DISCOVERY_URL = (
-    "https://accounts.google.com/.well-known/openid-configuration"
-)
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
@@ -19,7 +17,7 @@ def get_google_provider_cfg():
 
 class LoginWithGoogle:
     @classmethod
-    def login(self):
+    def login(cls):
         google_provider_cfg = get_google_provider_cfg()
         authorization_endpoint = google_provider_cfg["authorization_endpoint"]
 
@@ -33,8 +31,8 @@ class LoginWithGoogle:
         return request_uri
 
     @classmethod
-    def get(self, request_url, code):
-        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    def get(cls, request_url, code):
+        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
         google_provider_cfg = get_google_provider_cfg()
         token_endpoint = google_provider_cfg["token_endpoint"]
 
@@ -43,7 +41,7 @@ class LoginWithGoogle:
             authorization_response=request_url,
             # authorization_response="http://localhost:5173",
             redirect_url=GOOGLE_REDIRECT_URI,
-            code=code
+            code=code,
         )
 
         token_response = requests.post(
@@ -66,6 +64,5 @@ class LoginWithGoogle:
             users_name = userinfo_response.json()["given_name"]
 
         else:
-            raise Exception(
-                "User email not available or not verified by Google.")
+            raise Exception("User email not available or not verified by Google.")
         return [unique_id, users_email, picture, users_name]

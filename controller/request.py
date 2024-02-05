@@ -1,5 +1,4 @@
-from bpsky import bpsky
-from .utils import *
+from controller.utils import *
 import jsonpickle
 
 
@@ -8,12 +7,12 @@ def getAllRequests():
     try:
         workspaceId = request.args.get("workspaceId")
         keyword = request.args.get("keyword", None)
-        type = request.args.get("type", None)
+        request_type = request.args.get("type", None)
         status = request.args.get("status", None)
         page = request.args.get("page", 0)
         limit = request.args.get("limit", 10)
         data = RequestService.getAllRequests(
-            workspaceId, page, limit, keyword, type, status
+            workspaceId, page, limit, keyword, request_type, status
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),

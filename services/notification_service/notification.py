@@ -36,7 +36,7 @@ class NotificationService_Update:
     def acceptNotification(
         cls, userId, workspaceId, joinedAt, permission, notificationId, status
     ):
-        newMember = JoinWorkspaceService.insertNewMember(
+        JoinWorkspaceService.insertNewMember(
             memberId=userId,
             workspaceId=workspaceId,
             joinedAt=joinedAt,
@@ -46,7 +46,7 @@ class NotificationService_Update:
             notificationId, status
         )
         return updatedNotification
-    
+
     @classmethod
     def declineNotification(cls, notificationId, status):
         updatedNotification = Notification.updateNotificationStatus(

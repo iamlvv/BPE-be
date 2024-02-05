@@ -1,5 +1,5 @@
 import json
-from .utils import *
+from data.repositories.utils import *
 
 
 class EvaluatedResult:
@@ -12,7 +12,7 @@ class EvaluatedResult:
     create_at = datetime.now()
 
     @classmethod
-    def insert(self, xml_file_link, project_id, process_id, name, result, description):
+    def insert(cls, xml_file_link, project_id, process_id, name, result, description):
         query = """INSERT INTO public.evaluated_result
                     (xml_file_link, project_id, process_id, "name", "result", description, create_at)
                     VALUES(%s, %s, %s, %s, %s::jsonb, %s, NOW());
@@ -37,7 +37,7 @@ class EvaluatedResult:
             raise Exception(e)
 
     @classmethod
-    def get_result_by_bpmn_file(self, xml_file_link, project_id, process_id):
+    def get_result_by_bpmn_file(cls, xml_file_link, project_id, process_id):
         query = """SELECT "name", "result", description, create_at
                     FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND process_id=%s;
@@ -61,7 +61,7 @@ class EvaluatedResult:
             raise Exception(e)
 
     @classmethod
-    def get(self, xml_file_link, project_id, process_id, name):
+    def get(cls, xml_file_link, project_id, process_id, name):
         query = """SELECT "name", "result", description, create_at
                     FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND "name"=%s AND process_id=%s;
@@ -89,7 +89,7 @@ class EvaluatedResult:
             raise Exception(e)
 
     @classmethod
-    def delete(self, xml_file_link, project_id, process_id, name):
+    def delete(cls, xml_file_link, project_id, process_id, name):
         query = """DELETE FROM public.evaluated_result
                     WHERE xml_file_link=%s AND project_id=%s AND "name"=%s AND process_id=%s;
                 """

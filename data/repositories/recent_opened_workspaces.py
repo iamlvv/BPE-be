@@ -40,7 +40,8 @@ class Recent_Opened_Workspaces_Insert(Recent_Opened_Workspaces_Returning_Type):
                         RETURNING workspaceId, userId, openedAt;
                     """
         else:
-            query = f"""INSERT INTO public.recent_opened_workspace(workspaceId, userId, openedAt, isHided, isPinned, isUserDeletedFromWorkspace)
+            query = f"""INSERT INTO public.recent_opened_workspace(workspaceId, userId, openedAt, isHided, 
+                        isPinned, isUserDeletedFromWorkspace)
                         VALUES('{workspaceId}', '{userId}', '{openedAt}', false, false, false)
                         RETURNING workspaceId, userId, openedAt;
                     """
@@ -69,7 +70,7 @@ class Recent_Opened_Workspaces_Update(Recent_Opened_Workspaces_Returning_Type):
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 connection.commit()
-                result = cursor.fetchone()
+                cursor.fetchone()
                 return Recent_Opened_Workspaces_Update.hide_workspace_message(True)
 
         except Exception as e:
@@ -87,7 +88,6 @@ class Recent_Opened_Workspaces_Update(Recent_Opened_Workspaces_Returning_Type):
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
-                status = True
                 if result[0]:
                     query = f"""UPDATE public.recent_opened_workspace
                                 SET isPinned=false
@@ -104,7 +104,7 @@ class Recent_Opened_Workspaces_Update(Recent_Opened_Workspaces_Returning_Type):
                     status = True
                 cursor.execute(query)
                 connection.commit()
-                result = cursor.fetchone()
+                cursor.fetchone()
                 return Recent_Opened_Workspaces_Update.pin_workspace_message(status)
         except Exception as e:
             connection.rollback()

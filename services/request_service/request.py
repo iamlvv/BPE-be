@@ -106,7 +106,7 @@ class RequestService_Update(NewMemberIdList, NotificationContent):
             notificationType = "invitation"
             status = "pending"
             isDeleted = False
-            content = RequestService_Update.generateContents(
+            content = RequestService_Update.generateContent(
                 requestType, permission, None, None, workspaceId, senderId
             )
             print(content)
