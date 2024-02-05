@@ -124,11 +124,12 @@ class JoinWorkspaceService_Insert:
             from services.project_service.project import ProjectService
 
             list_project = ProjectService.getAllProjectsInWorkspace(workspaceId)
+            print("list_project", list_project)
             # when new member join workspace, insert all work on project of that member
             for project in list_project:
                 WorkOnService.insert(
                     memberId,
-                    project,
+                    project[0],
                     PermissionConverter.convert_permission_to_role(permission),
                 )
             return newMember

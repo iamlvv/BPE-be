@@ -32,3 +32,22 @@ class PermissionConverter:
             return "editor"
         else:
             return "owner"
+
+    @classmethod
+    def compare_permission(cls, project_role, workspace_permission):
+        project_permission = cls.convert_role_to_permission(project_role)
+        if workspace_permission == "owner":
+            return True
+        elif workspace_permission == "editor" and project_permission not in [
+            "editor",
+            "owner",
+        ]:
+            return False
+        elif workspace_permission == "sharer" and project_permission not in [
+            "sharer",
+            "editor",
+            "owner",
+        ]:
+            return False
+        else:
+            return True

@@ -118,7 +118,17 @@ class ProjectService_Update(Validate):
                 WorkOnService.insert_many(users, project_id)
                 return "Success"
             else:
-                raise Exception("member exist")
+                # compare_permission = PermissionConverter.compare_permission(
+                #     project_role, workspace_permission
+                # )
+                # if compare_permission:
+                #     WorkOnService.update_many_role(users, project_id)
+                #     return "Success"
+                # else:
+                #     raise Exception(
+                #         "role in project must be higher or equal to permission in workspace"
+                #     )
+                raise Exception("permission denied")
         else:
             raise Exception("permission denied")
 
