@@ -1,5 +1,5 @@
-from .utils import *
-from .constant import Role
+from data.repositories.utils import *
+from data.repositories.constant import Role
 
 
 class WorkOn:
@@ -124,21 +124,24 @@ class WorkOn:
         ownerId=None,
         keyword=None,
     ):
-        # query = f"""SELECT project.id, project.description, project.name, project.create_at, wo.role,
-        #             bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
-        #             FROM work_on wo, bpe_user, project, workspace
-        #             WHERE wo.user_id={user_id} AND bpe_user.id=wo.user_id AND project.id = wo.project_id
-        #             AND project.is_delete=false AND workspace.id=project.workspaceId AND workspace.id={workspaceId}
-        #         """
+        query = f"""SELECT project.id, project.description, project.name, project.create_at, wo.role,
+                    bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
+                    FROM work_on wo, bpe_user, project, workspace
+                    WHERE wo.user_id={user_id} AND bpe_user.id=wo.user_id AND project.id = wo.project_id
+                    AND project.is_delete=false AND workspace.id=project.workspaceId AND workspace.id={workspaceId}
+                    AND (wo.isDeleted=false OR wo.isDeleted IS NULL)
+                """
 
         # fix: all projects in workspace is visible to user, not only projects that user is working on
-        query = f"""SELECT project.id, project.description, project.name, project.create_at,
-                            bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
-                            FROM bpe_user, project, workspace
-                            WHERE project.is_delete=false 
-                            AND workspace.id=project.workspaceId 
-                            AND workspace.id={workspaceId}
-                        """
+        # query = f"""SELECT project.id, project.description, project.name, project.create_at,
+        #                     bpe_user.id, bpe_user.email, bpe_user.name, bpe_user.phone, bpe_user.avatar
+        #                     FROM bpe_user, project, workspace
+        #                     WHERE wo.user_id={user_id} AND bpe_user.id=wo.user_id
+        #                     AND project.id = wo.project_id
+        #                     AND project.is_delete=false
+        #                     AND workspace.id=project.workspaceId
+        #                     AND workspace.id={workspaceId}
+        #                 """
         if keyword:
             query += f""" AND (LOWER(project.name) LIKE LOWER('%{keyword}%') 
             OR LOWER(project.description) LIKE LOWER('%{keyword}%') 
@@ -151,7 +154,6 @@ class WorkOn:
             query += f""" AND wo2.user_id={ownerId}"""
             # run the query to get the total number of records first, then run the query to get the data with limit
             # and offset
-        total = 0
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
@@ -309,14 +311,17 @@ class WorkOn:
         query = f"""SELECT work_on.id
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id=project.id
-                    WHERE project_id={project_id} AND user_id={user_id} AND role={Role.OWNER.value} AND project.is_delete=false;
+                    WHERE project_id={project_id} 
+                    AND user_id={user_id} 
+                    AND role={Role.OWNER.value} AND 
+                    project.is_delete=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
-                return result != None
+                return result is not None
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -334,7 +339,7 @@ class WorkOn:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
-                return result != None
+                return result is not None
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -352,7 +357,7 @@ class WorkOn:
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 result = cursor.fetchone()
-                return result != None
+                return result is not None
         except Exception as e:
             connection.rollback()
             raise Exception(e)
@@ -361,8 +366,10 @@ class WorkOn:
     def can_view(cls, user_id, project_id):
         query = f"""SELECT public.work_on.id
                     FROM public.work_on, public.project
-                    WHERE project.id=work_on.project_id AND project.is_delete=false AND work_on.project_id={project_id} AND work_on.user_id={user_id}
-                    AND role IN ('{Role.OWNER.value}', '{Role.CAN_EDIT.value}', '{Role.CAN_SHARE.value}', '{Role.CAN_VIEW.value}') AND project.is_delete=false;
+                    WHERE project.id=work_on.project_id AND project.is_delete=false AND work_on.project_id={project_id} 
+                    AND work_on.user_id={user_id}
+                    AND role IN ('{Role.OWNER.value}', '{Role.CAN_EDIT.value}', '{Role.CAN_SHARE.value}', 
+                    '{Role.CAN_VIEW.value}') AND project.is_delete=false;
 
                 """
         connection = DatabaseConnector.get_connection()
@@ -375,6 +382,68 @@ class WorkOn:
                     return True
                 else:
                     return False
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def updateMemberPermission(cls, newMemberIdList, permission, workspaceId):
+        query = f"""UPDATE public.work_on
+                    SET "role"={permission}
+                    WHERE user_id IN ({",".join(str(memberId) for memberId in newMemberIdList)}) 
+                    AND project_id IN (SELECT id FROM public.project WHERE workspaceId={workspaceId});
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def checkIfMemberAlreadyJoined(cls, user_id, project_id):
+        query = f"""SELECT id
+                    FROM public.work_on
+                    WHERE user_id={user_id} AND project_id={project_id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                result = cursor.fetchone()
+                return result is not None
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def undoDeleteMember(cls, user_id, project_id):
+        query = f"""UPDATE public.work_on
+                    SET isDeleted=false
+                    WHERE user_id={user_id} AND project_id={project_id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def delete_all(cls, project_id):
+        query = f"""UPDATE public.work_on
+                    SET isDeleted=true
+                    WHERE project_id={project_id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
         except Exception as e:
             connection.rollback()
             raise Exception(e)

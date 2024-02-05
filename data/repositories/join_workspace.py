@@ -87,10 +87,10 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
     def getAllMembers(
         cls, workspaceId: str, page: int, limit: int, keyword=None, permission=None
     ):
-        print(limit, page)
         query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
                     FROM public.join_workspace jw, public.bpe_user u
-                    WHERE jw.workspaceId = {workspaceId} AND jw.isDeleted=false AND jw.isWorkspaceDeleted=false AND u.id = jw.memberId
+                    WHERE jw.workspaceId = {workspaceId} AND jw.isDeleted=false AND jw.isWorkspaceDeleted=false 
+                    AND u.id = jw.memberId
                 """
 
         if keyword:
@@ -99,7 +99,6 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
             query += f""" AND jw.permission='{permission}'"""
 
         query += f""" ORDER BY jw.joinedAt DESC"""
-        total = 0
 
         connection = DatabaseConnector.get_connection()
         try:
@@ -141,12 +140,27 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
             connection.rollback()
             raise Exception(e)
 
+    @classmethod
+    def getListMemberIdAndPermissionInWorkspace(cls, workspaceId) -> list:
+        query = f"""SELECT memberId, permission FROM public.join_workspace
+                    WHERE workspaceId='{workspaceId}' AND isDeleted=false AND isWorkspaceDeleted=false;
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                results = cursor.fetchall()
+                return results
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
 
 class Join_Workspace_Update(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
     @classmethod
     def updatePermission(
         cls, workspaceId, newMemberIdList, currentPermission, newPermission
-    ) -> None:
+    ) -> list:
         print("this is current permission", currentPermission, newPermission)
         connection = DatabaseConnector.get_connection()
         try:
@@ -173,7 +187,8 @@ class Join_Workspace_Update(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
             # return list of members in tuple but do not have comma in the end that have been updated
             query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
                         FROM public.join_workspace jw, public.bpe_user u
-                        WHERE jw.workspaceId='{workspaceId}' AND jw.memberId IN ({','.join(newMemberIdList)}) AND u.id = jw.memberId;
+                        WHERE jw.workspaceId='{workspaceId}' AND jw.memberId IN ({','.join(newMemberIdList)}) 
+                        AND u.id = jw.memberId;
                     """
 
             connection = DatabaseConnector.get_connection()
@@ -258,9 +273,10 @@ class Join_Workspace_Insert(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
                     cursor.execute(query)
                     connection.commit()
                     # return the updated member
-                    query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, jw.permission
-                            FROM public.join_workspace jw, public.bpe_user u
-                            WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
+                    query = f"""SELECT u.name, u.email, u.avatar, jw.memberId, jw.workspaceId, jw.joinedAt, 
+                                jw.permission
+                                FROM public.join_workspace jw, public.bpe_user u
+                                WHERE jw.memberId='{memberId}' AND jw.workspaceId='{workspaceId}' AND u.id = jw.memberId;
                         """
                     cursor.execute(query)
                     result = cursor.fetchone()

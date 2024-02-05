@@ -183,3 +183,20 @@ class Project:
         except Exception as e:
             connection.rollback()
             raise Exception(e)
+
+    @classmethod
+    def getAllProjectsInWorkspace(cls, workspaceId) -> list:
+        query = f"""SELECT id
+                    FROM public.project
+                    WHERE workspaceId='{workspaceId}' AND is_delete=false
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+                result = cursor.fetchall()
+                return result
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)

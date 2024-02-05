@@ -3,15 +3,15 @@ import shutil
 import uuid
 from data.repositories.process_version import ProcessVersion
 from data.repositories.process import Process
-from data.repositories.work_on import WorkOn
 from data.repositories.comment_on import CommentOn
 from fileIO.file import FileIO
+from services.project_service.work_on import WorkOnService
 
 
 class OldestVersionOperation:
     @classmethod
     def delete_oldest_version(cls, user_id, project_id, process_id):
-        if not WorkOn.can_edit(user_id, project_id):
+        if not WorkOnService.can_edit(user_id, project_id):
             raise Exception("permission denied")
         ProcessVersion.delete_oldest_version(project_id, process_id)
 
@@ -19,7 +19,7 @@ class OldestVersionOperation:
 class ProcessVersionService_Delete:
     @classmethod
     def delete_version(cls, user_id, project_id, process_id, version):
-        if not WorkOn.can_edit(user_id, project_id):
+        if not WorkOnService.can_edit(user_id, project_id):
             raise Exception("permission denied")
         if len(ProcessVersion.get_by_process(project_id, process_id)) == 1:
             Process.delete(project_id, process_id)
@@ -30,7 +30,7 @@ class ProcessVersionService_Delete:
 
     @classmethod
     def delete_comment(cls, user_id, project_id, process_id, xml_file_link, id):
-        if not WorkOn.can_view(user_id, project_id):
+        if not WorkOnService.can_view(user_id, project_id):
             raise Exception("permission denied")
         if not CommentOn.owner(user_id, project_id, process_id, xml_file_link, id):
             raise Exception("permission denied")
@@ -45,7 +45,7 @@ class ProcessVersionService_Get:
 
     @classmethod
     def get_by_version(cls, user_id, project_id, process_id, version):
-        if not WorkOn.can_view(user_id, project_id):
+        if not WorkOnService.can_view(user_id, project_id):
             raise Exception("permission denied")
         bpmn_files = ProcessVersion.get_by_version(project_id, process_id, version)[
             "xml_file_link"
@@ -54,7 +54,7 @@ class ProcessVersionService_Get:
 
     @classmethod
     def get_content_by_version(cls, user_id, project_id, process_id, version):
-        if not WorkOn.can_view(user_id, project_id):
+        if not WorkOnService.can_view(user_id, project_id):
             raise Exception("permission denied")
         file_link = ProcessVersion.get_by_version(project_id, process_id, version)[
             "xml_file_link"
@@ -64,14 +64,14 @@ class ProcessVersionService_Get:
 
     @classmethod
     def get_by_process(cls, user_id, project_id, process_id):
-        if not WorkOn.can_view(user_id, project_id):
+        if not WorkOnService.can_view(user_id, project_id):
             raise Exception("permission denied")
         bpmn_files = ProcessVersion.get_by_process(project_id, process_id)
         return bpmn_files
 
     @classmethod
     def get_comment_by_bpmn_file(cls, user_id, project_id, process_id, xml_file_link):
-        if not WorkOn.can_view(user_id, project_id):
+        if not WorkOnService.can_view(user_id, project_id):
             raise Exception("permission denied")
         return CommentOn.get_by_bpmn_file(project_id, process_id, xml_file_link)
 
@@ -83,7 +83,7 @@ class ProcessVersionService_Get:
 class ProcessVersionService_Update:
     @classmethod
     def save(cls, xml_file_link, file, user_id, project_id, process_id, version):
-        if not WorkOn.can_edit(user_id, project_id):
+        if not WorkOnService.can_edit(user_id, project_id):
             raise Exception("permission denied")
         FileIO.save_bpmn_file(xml_file_link, file)
         ProcessVersion.update_version(project_id, process_id, version)
@@ -92,7 +92,7 @@ class ProcessVersionService_Update:
     def bulk_save(cls, user_id, files, data):
         for file in files:
             project_id = data[file.filename]["project_id"]
-            if not WorkOn.can_edit(user_id, project_id):
+            if not WorkOnService.can_edit(user_id, project_id):
                 raise Exception("permission denied")
 
         for file in files:
@@ -105,7 +105,7 @@ class ProcessVersionService_Update:
 
     @classmethod
     def edit_comment(cls, user_id, project_id, process_id, xml_file_link, id, content):
-        if not WorkOn.can_view(user_id, project_id):
+        if not WorkOnService.can_view(user_id, project_id):
             raise Exception("permission denied")
         if not CommentOn.owner(user_id, project_id, process_id, xml_file_link, id):
             raise Exception("permission denied")
@@ -124,7 +124,7 @@ class ProcessVersionService_Insert(OldestVersionOperation):
 
     @classmethod
     def create_new_version(cls, user_id, file, project_id, process_id):
-        if not WorkOn.can_edit(user_id, project_id):
+        if not WorkOnService.can_edit(user_id, project_id):
             raise Exception("permission denied")
         if len(ProcessVersion.get_by_process(project_id, process_id)) == 5:
             raise Exception("current number of versions is equal to 5")
@@ -141,7 +141,7 @@ class ProcessVersionService_Insert(OldestVersionOperation):
     def create_new_version_permanently(
         cls, user_id, xml_file_link, project_id, process_id
     ):
-        if not WorkOn.can_edit(user_id, project_id):
+        if not WorkOnService.can_edit(user_id, project_id):
             raise Exception("permission denied")
         if len(ProcessVersion.get_by_process(project_id, process_id)) == 5:
             ProcessVersionService_Insert.delete_oldest_version(project_id)
@@ -151,7 +151,7 @@ class ProcessVersionService_Insert(OldestVersionOperation):
 
     @classmethod
     def comment(cls, user_id, project_id, process_id, xml_file_link, content):
-        if not WorkOn.can_view(user_id, project_id):
+        if not WorkOnService.can_view(user_id, project_id):
             raise Exception("permission denied")
         return CommentOn.insert(user_id, project_id, process_id, xml_file_link, content)
 

@@ -1,4 +1,4 @@
-from .utils import *
+from data.repositories.utils import *
 
 
 class User:
@@ -42,7 +42,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def create(self, hash_password, email, name, phone, avatar, verified=False):
+    def create(cls, hash_password, email, name, phone, avatar, verified=False):
         query = """INSERT INTO public.bpe_user
                 ("password", email, "name", phone, avatar, verified)
                 VALUES(%s, %s, %s, %s, %s, %s)
@@ -70,7 +70,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def change_password(self, email, new_hash_password):
+    def change_password(cls, email, new_hash_password):
         query = """UPDATE public.bpe_user
                     SET "password"=%s
                     WHERE email=%s;
@@ -91,7 +91,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def verify(self, email):
+    def verify(cls, email):
         query = """UPDATE public.bpe_user
                     SET verified=true
                     WHERE email=%s;
@@ -110,7 +110,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def verify_token(self, id, email, hash_password):
+    def verify_token(cls, id, email, hash_password):
         query = """SELECT id
                     FROM public.bpe_user
                     WHERE email=%s and id=%s and password=%s;
@@ -126,14 +126,14 @@ class User:
                         hash_password,
                     ),
                 )
-                result = cursor.fetchone()
+                cursor.fetchone()
                 return "Verify successfully"
         except Exception as e:
             connection.rollback()
             raise Exception(e)
 
     @classmethod
-    def get_by_email(self, email):
+    def get_by_email(cls, email):
         query = """SELECT id, email, password, verified
                     FROM public.bpe_user
                     WHERE email=%s;
@@ -143,7 +143,7 @@ class User:
             with connection.cursor() as cursor:
                 cursor.execute(query, (email,))
                 result = cursor.fetchone()
-                if result == None:
+                if result is None:
                     raise Exception("Email is incorrect")
                 if result[-1]:
                     raise Exception("Your account was verified")
@@ -153,7 +153,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def get_by_email_permanently(self, email):
+    def get_by_email_permanently(cls, email):
         query = """SELECT id, email, password
                     FROM public.bpe_user
                     WHERE email=%s;
@@ -163,7 +163,7 @@ class User:
             with connection.cursor() as cursor:
                 cursor.execute(query, (email,))
                 result = cursor.fetchone()
-                if result == None:
+                if result is None:
                     raise Exception("Email is incorrect")
                 return User(id=result[0], email=result[1], password=result[2])
         except Exception as e:
@@ -171,7 +171,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def get(self, email, hash_password):
+    def get(cls, email, hash_password):
         query = """SELECT id, email, password, verified
                     FROM public.bpe_user
                     WHERE email=%s and password=%s;
@@ -187,7 +187,7 @@ class User:
                     ),
                 )
                 result = cursor.fetchone()
-                if result == None:
+                if result is None:
                     raise Exception("Email or password is incorrect")
                 if not result[-1]:
                     raise Exception("Your account has not been verified")
@@ -197,7 +197,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def get_all(self):
+    def get_all(cls):
         query = """SELECT id, email, "name", phone, avatar
                     FROM public.bpe_user;
                 """
@@ -214,7 +214,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def get_by_id(self, id, workspaceId=None):
+    def get_by_id(cls, id, workspaceId=None):
         if workspaceId:
             query = f"""SELECT u.id, u.email, u.name, u.phone, u.avatar, jw.permission
                         FROM public.join_workspace jw, public.bpe_user u
@@ -229,22 +229,33 @@ class User:
         connection = DatabaseConnector.get_connection()
         try:
             with connection.cursor() as cursor:
-                cursor.execute(query, (id,))
+                # cursor.execute(query, (id,))
+                cursor.execute(query)
                 result = cursor.fetchone()
+                if result is None:
+                    raise Exception("User not found")
+                if len(result) == 6:
+                    return {
+                        "id": result[0],
+                        "email": result[1],
+                        "name": result[2],
+                        "phone": result[3],
+                        "avatar": result[4],
+                        "permission": result[5] if len(result) == 6 else None,
+                    }
                 return {
                     "id": result[0],
                     "email": result[1],
                     "name": result[2],
                     "phone": result[3],
                     "avatar": result[4],
-                    "permission": result[5] if len(result) == 6 else None,
                 }
         except Exception as e:
             connection.rollback()
             raise Exception(e)
 
     @classmethod
-    def get_many(self, user_ids):
+    def get_many(cls, user_ids):
         query = f"""SELECT name, phone, avatar
                     FROM public.bpe_user
                     WHERE id IN ({",".join(str(user_id) for user_id in user_ids)});
@@ -260,7 +271,7 @@ class User:
             raise Exception(e)
 
     @classmethod
-    def check_exist(self, email):
+    def check_exist(cls, email):
         query = """SELECT id
                     FROM public.bpe_user
                     WHERE email=%s;
@@ -270,13 +281,13 @@ class User:
             with connection.cursor() as cursor:
                 cursor.execute(query, (email,))
                 result = cursor.fetchone()
-                return result != None
+                return result is not None
         except Exception as e:
             connection.rollback()
             raise Exception(e)
 
     @classmethod
-    def search(self, s, email, workspaceId=None):
+    def search(cls, s, email, workspaceId=None):
         # search user in the whole system
         # return users in workspace and users not in workspace
         # if users in workspace, return their permission
@@ -304,10 +315,12 @@ class User:
                         for user in result
                     ]
                 else:
-                    # if workspaceId is note None, return all users in system, but with users in workspace, return including their permission
+                    # if workspaceId is note None, return all users in system, but with users in workspace,
+                    # return including their permission
                     query = f"""SELECT u.id, u.email, u.name, u.phone, u.avatar, jw.permission
                                 FROM public.join_workspace jw, public.bpe_user u
-                                WHERE jw.workspaceId='{workspaceId}' and u.email != '{email}' and u.id=jw.memberId and jw.isDeleted=false;
+                                WHERE jw.workspaceId='{workspaceId}' and u.email != '{email}' and u.id=jw.memberId 
+                                and jw.isDeleted=false;
                             """
                     cursor.execute(
                         query,

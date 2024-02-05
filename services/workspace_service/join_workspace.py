@@ -1,6 +1,7 @@
 from data.repositories.join_workspace import Join_Workspace
-from data.repositories.work_on import WorkOn
 from data.repositories.request import Request
+from services.project_service.work_on import WorkOnService
+from services.utils import PermissionConverter
 from services.workspace_service.recent_opened_workspace import (
     RecentOpenedWorkspaceService,
 )
@@ -43,6 +44,10 @@ class JoinWorkspaceService_Get:
             return None
         return member
 
+    @classmethod
+    def getListMemberIdAndPermissionInWorkspace(cls, workspaceId: str) -> list:
+        return Join_Workspace.getListMemberIdAndPermissionInWorkspace(workspaceId)
+
 
 class JoinWorkspaceService_Update:
     @classmethod
@@ -59,10 +64,9 @@ class JoinWorkspaceService_Update:
             # when member left workspace, delete all work on project of that member
             # and delete all requests of that member
 
-            deleteWorkOnProject = WorkOn.deleteMember(newMemberList, leftAt)
-            deleteRequest = Request.deleteRequestsWhenDeletingUser(
-                workspaceId, newMemberList, leftAt
-            )
+            delete_work_on_status = WorkOnService.deleteMember(newMemberList, leftAt)
+            print("delete_work_on_status", delete_work_on_status)
+            Request.deleteRequestsWhenDeletingUser(workspaceId, newMemberList, leftAt)
             return deleteJoinWorkspace
         except Exception as e:
             raise Exception(e)
@@ -74,6 +78,15 @@ class JoinWorkspaceService_Update:
         )
         if len(newMemberIdList) == 0:
             return None
+        list_new_permission = Join_Workspace.updatePermission(
+            workspaceId, newMemberIdList, None, permission
+        )
+        # when member permission is updated, update all work on project of that member
+        WorkOnService.updateMemberPermission(
+            newMemberIdList,
+            permission=PermissionConverter.convert_permission_to_role(permission),
+            workspaceId=workspaceId,
+        )
         return Join_Workspace.updatePermission(
             workspaceId, newMemberIdList, None, permission
         )
@@ -104,9 +117,20 @@ class JoinWorkspaceService_Insert:
             newMember = Join_Workspace.insertNewMember(
                 memberId, workspaceId, joinedAt, permission, isDeleted=isDeleted
             )
-            newRecentOpenedWorkspace = RecentOpenedWorkspaceService.insert(
+            RecentOpenedWorkspaceService.insert(
                 workspaceId, memberId, joinedAt, isDeleted=isDeleted
             )
+            # get list all projects in workspace
+            from services.project_service.project import ProjectService
+
+            list_project = ProjectService.getAllProjectsInWorkspace(workspaceId)
+            # when new member join workspace, insert all work on project of that member
+            for project in list_project:
+                WorkOnService.insert(
+                    memberId,
+                    project,
+                    PermissionConverter.convert_permission_to_role(permission),
+                )
             return newMember
         return None
 

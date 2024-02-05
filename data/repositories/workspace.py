@@ -113,7 +113,7 @@ class Workspace_Get(Workspace_Returning_Type):
         ownerId=None,
         keyword=None,
         pinned=None,
-    ) -> list:
+    ) -> dict:
         # return all workspaces that user joined or owned, sort by openedAt from latest to oldest
         # if keyword is not empty, search in name and description
         # if ownerId is not empty, search by ownerId
@@ -263,7 +263,8 @@ class Workspace_Get(Workspace_Returning_Type):
         # get pinned workspace by owner, which join with recent_opened_workspace
         query = f"""SELECT id, name, description, createdAt, ownerId, background, icon, isPinned
                     FROM public.workspace, public.recent_opened_workspace
-                    WHERE workspace.id=recent_opened_workspace.workspaceId AND recent_opened_workspace.isPinned=true AND userId = '{userId}' AND isDeleted=false AND isHided=false;
+                    WHERE workspace.id=recent_opened_workspace.workspaceId AND recent_opened_workspace.isPinned=true 
+                    AND userId = '{userId}' AND isDeleted=false AND isHided=false;
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -335,7 +336,8 @@ class Workspace_Insert:
     ):
         query = f"""INSERT INTO public.workspace
                     (name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted)
-                    VALUES('{name}', '{description}', '{createdAt}', '{ownerId}', '{background}', '{icon}', '{isPersonal}', '{isDeleted}')
+                    VALUES('{name}', '{description}', '{createdAt}', '{ownerId}', '{background}', '{icon}', 
+                    '{isPersonal}', '{isDeleted}')
                     RETURNING id, name, description, createdAt, ownerId, background, icon, isPersonal, isDeleted;
                 """
         connection = DatabaseConnector.get_connection()
@@ -364,10 +366,10 @@ class Workspace_Insert:
 
 class Workspace_Update:
     @classmethod
-    def updateWorkspaceDescription(cls, id: str, description: str) -> str:
+    def updateWorkspaceDescription(cls, workspaceId: str, description: str) -> str:
         query = f"""UPDATE public.workspace
                     SET description='{description}'
-                    WHERE id={id};
+                    WHERE id={workspaceId};
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -380,10 +382,10 @@ class Workspace_Update:
             raise Exception(e)
 
     @classmethod
-    def updateWorkspaceName(cls, id: str, name: str) -> str:
+    def updateWorkspaceName(cls, workspaceId: str, name: str) -> str:
         query = f"""UPDATE public.workspace
                     SET name='{name}'
-                    WHERE id={id};
+                    WHERE id={workspaceId};
                 """
         connection = DatabaseConnector.get_connection()
         try:

@@ -8,13 +8,13 @@ from services.utils import *
 
 class UserService:
     @classmethod
-    def create(self, password, email, name, phone, avatar, verified=False):
+    def create(cls, password, email, name, phone, avatar, verified=False):
         return User.create(
             hash_password(password), email, name, phone, avatar, verified
         )
 
     @classmethod
-    def signin(self, email, password):
+    def signin(cls, email, password):
         result = User.get(email, hash_password(password))
         print(
             encode(
@@ -26,7 +26,7 @@ class UserService:
         )
 
     @classmethod
-    def signup(self, password, email, name, phone, avatar):
+    def signup(cls, password, email, name, phone, avatar):
         if not UserService.check_exist(email):
             result = UserService.create(password, email, name, phone, avatar)
             Thread(
@@ -46,11 +46,11 @@ class UserService:
             return "Account exist"
 
     @classmethod
-    def verify_token(self, id, email, password):
-        User.verify_token(id, email, hash_password(password))
+    def verify_token(cls, user_id, email, password):
+        User.verify_token(user_id, email, hash_password(password))
 
     @classmethod
-    def resend_email(self, email):
+    def resend_email(cls, email):
         user = User.get_by_email(email)
         Thread(
             target=Email.verify_account,
@@ -63,11 +63,11 @@ class UserService:
         return "Resend successfully"
 
     @classmethod
-    def change_password(self, email, new_password):
+    def change_password(cls, email, new_password):
         User.change_password(email, hash_password(new_password))
 
     @classmethod
-    def reset_password(self, email):
+    def reset_password(cls, email):
         user = User.get_by_email_permanently(email)
         Thread(
             target=Email.reset_password,
@@ -79,41 +79,39 @@ class UserService:
         ).start()
 
     @classmethod
-    def verify(self, email):
+    def verify(cls, email):
         user = User.verify(email)
         return user
 
     @classmethod
-    def get(self, id, workspaceId=None):
-        user = User.get_by_id(id, workspaceId)
+    def get(cls, user_id, workspaceId=None):
+        user = User.get_by_id(user_id, workspaceId)
         return user
 
     @classmethod
-    def get_all(self):
+    def get_all(cls):
         return User.get_all()
 
     @classmethod
-    def get_many(self, user_ids):
+    def get_many(cls, user_ids):
         return User.get_many(user_ids)
 
     @classmethod
-    def check_exist(self, email):
+    def check_exist(cls, email):
         return User.check_exist(email)
 
     @classmethod
-    def search(self, s, email, workspaceId=None):
+    def search(cls, s, email, workspaceId=None):
         return User.search(s, email, workspaceId)
 
     @classmethod
-    def auth_with_google(self, email, picture, name):
-        if self.check_exist(email):
+    def auth_with_google(cls, email, picture, name):
+        if cls.check_exist(email):
             User.verify(email)
             result = User.get_by_email_permanently(email)
         else:
             password = str(uuid.uuid1())[:10]
-            result = self.create(
-                hash_password(password), email, name, "", picture, True
-            )
+            result = cls.create(hash_password(password), email, name, "", picture, True)
         return encode(
             {"id": result.id, "email": result.email, "password": result.password}
         )
