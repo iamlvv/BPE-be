@@ -15,6 +15,10 @@ class WorkOnService_Insert:
     def insert_many(cls, users, project_id):
         return WorkOn.insert_many(users, project_id)
 
+    @classmethod
+    def insert_many_by_update_new_role(cls, users, project_id):
+        return WorkOn.insert_many_by_update_new_role(users, project_id)
+
 
 class WorkOnService_Update:
     @classmethod

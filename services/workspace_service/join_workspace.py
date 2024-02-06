@@ -48,6 +48,10 @@ class JoinWorkspaceService_Get:
     def getListMemberIdAndPermissionInWorkspace(cls, workspaceId: str) -> list:
         return Join_Workspace.getListMemberIdAndPermissionInWorkspace(workspaceId)
 
+    @classmethod
+    def get_permission_by_users_id_list(cls, user_ids, workspace_id):
+        return Join_Workspace.get_permission_by_users_id_list(user_ids, workspace_id)
+
 
 class JoinWorkspaceService_Update:
     @classmethod

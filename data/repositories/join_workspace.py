@@ -155,6 +155,27 @@ class Join_Workspace_Get(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
             connection.rollback()
             raise Exception(e)
 
+    @classmethod
+    def get_permission_by_users_id_list(cls, user_ids, workspace_id):
+        # memberId is currently int, need to convert to string
+        user_ids = [str(user_id) for user_id in user_ids]
+
+        query = f"""SELECT memberid, permission FROM public.join_workspace
+                    WHERE workspaceId='{workspace_id}' AND memberId IN ({','.join(user_ids)});
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                results = cursor.fetchall()
+                return [
+                    {"user_id": result[0], "permission": result[1]}
+                    for result in results
+                ]
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
 
 class Join_Workspace_Update(RemoveOwnerFromMemberList, JoinWorkspaceReturnType):
     @classmethod

@@ -24,7 +24,6 @@ class Validate:
                 Role.CAN_EDIT.value,
                 Role.CAN_SHARE.value,
                 Role.CAN_VIEW.value,
-                Role.OWNER.value,
             ]:
                 raise Exception("bad request")
 
@@ -87,6 +86,10 @@ class ProjectService_Get:
     def getAllProjectsInWorkspace(cls, workspaceId):
         return Project.getAllProjectsInWorkspace(workspaceId)
 
+    @classmethod
+    def get_workspace_id(cls, project_id):
+        return Project.get_workspace_id(project_id)
+
 
 class ProjectService_Update(Validate):
     @classmethod
@@ -111,6 +114,7 @@ class ProjectService_Update(Validate):
 
     @classmethod
     def grant_permission(cls, current_id, project_id, users):
+        # users include id and role
         ProjectService_Update.validate_members(users)
         user_ids = [user["user_id"] for user in users]
         if WorkOnService.is_project_owner(current_id, project_id):
@@ -118,17 +122,34 @@ class ProjectService_Update(Validate):
                 WorkOnService.insert_many(users, project_id)
                 return "Success"
             else:
-                # compare_permission = PermissionConverter.compare_permission(
-                #     project_role, workspace_permission
-                # )
-                # if compare_permission:
-                #     WorkOnService.update_many_role(users, project_id)
-                #     return "Success"
-                # else:
-                #     raise Exception(
-                #         "role in project must be higher or equal to permission in workspace"
-                #     )
-                raise Exception("permission denied")
+                # compare workspace permission with intended project permission
+                # if intended project permission is higher or equal to workspace permission, accept granting
+                # else, raise exception permission denied
+
+                # get workspace id of project
+                workspace_id = ProjectService.get_workspace_id(project_id)
+                print("workspace_id", workspace_id)
+                print("users", users)
+                # get list of workspace permission of users
+                member_id_and_workspace_permission_list = (
+                    JoinWorkspaceService.get_permission_by_users_id_list(
+                        user_ids, workspace_id
+                    )
+                )
+                print(
+                    "member_id_and_workspace_permission_list",
+                    member_id_and_workspace_permission_list,
+                )
+                # compare permission of workspace and project
+                check_if_granted = PermissionConverter.compare_permission(
+                    users, member_id_and_workspace_permission_list
+                )
+                print("check_if_granted", check_if_granted)
+                if check_if_granted:
+                    WorkOnService.insert_many_by_update_new_role(users, project_id)
+                    return "Success"
+                else:
+                    raise Exception("permission denied")
         else:
             raise Exception("permission denied")
 

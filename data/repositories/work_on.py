@@ -10,6 +10,13 @@ class WorkOn:
     leftAt = datetime.now()
 
     @classmethod
+    def join_value(cls, users, project_id):
+        return ",".join(
+            "(%s, %s, %s)" % (user["user_id"], project_id, user["role"])
+            for user in users
+        )
+
+    @classmethod
     def insert(cls, user_id, project_id, role):
         query = """INSERT INTO public.work_on
                     (user_id, project_id, "role")
@@ -33,10 +40,11 @@ class WorkOn:
 
     @classmethod
     def insert_many(cls, users, project_id):
-        values = ",".join(
-            "(%s, %s, %s)" % (user["user_id"], project_id, user["role"])
-            for user in users
-        )
+        # values = ",".join(
+        #     "(%s, %s, %s)" % (user["user_id"], project_id, user["role"])
+        #     for user in users
+        # )
+        values = cls.join_value(users, project_id)
         query = f"""INSERT INTO public.work_on
                     (user_id, project_id, "role")
                     VALUES{values};
@@ -439,6 +447,28 @@ class WorkOn:
         query = f"""UPDATE public.work_on
                     SET isDeleted=true
                     WHERE project_id={project_id};
+                """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def insert_many_by_update_new_role(cls, users, project_id):
+        # values = ",".join(
+        #     "(%s, %s, %s)" % (user["user_id"], project_id, user["role"])
+        #     for user in users
+        # )
+        values = cls.join_value(users, project_id)
+        query = f"""INSERT INTO public.work_on
+                    (user_id, project_id, "role")
+                    VALUES{values}
+                    ON CONFLICT (user_id, project_id) DO UPDATE
+                    SET "role" = EXCLUDED."role";
                 """
         connection = DatabaseConnector.get_connection()
         try:
