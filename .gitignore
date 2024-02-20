@@ -15,3 +15,5 @@ static/*/
 .env
 
 env1/
+
+requirements.txt

@@ -1,4 +1,4 @@
-FROM python:3.9-slim as bpsky-be-image
+FROM python:3.11-slim as bpsky-be-image
 
 WORKDIR /bpe
 
