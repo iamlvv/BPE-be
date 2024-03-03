@@ -6,7 +6,7 @@ HOST_DB_TEST = os.environ.get("HOST_DB_TEST")
 POSTGRES_USER = os.environ.get("POSTGRES_USER")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 POSTGRES_DB = os.environ.get("POSTGRES_DB")
-DATABASE_URL_TEST = "postgresql://postgres:1234@localhost:5432/bpe"
+DATABASE_URL_TEST = os.environ.get("DATABASE_URL_TEST")
 
 
 class DatabaseConnector:
