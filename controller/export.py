@@ -10,3 +10,6 @@ from .join_workspace import *
 from .request import *
 from .testsocket import *
 from .notification import *
+from .survey_features_controllers.survey import *
+from .survey_features_controllers.question import *
+from .survey_features_controllers.response import *

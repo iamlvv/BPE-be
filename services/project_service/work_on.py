@@ -77,7 +77,7 @@ class WorkOnService_Get:
         return WorkOn.is_exists(user_ids, project_id)
 
     @classmethod
-    def is_project_owner(cls, user_id, project_id):
+    def is_project_owner(cls, user_id, project_id) -> bool:
         return WorkOn.is_project_owner(user_id, project_id)
 
     @classmethod

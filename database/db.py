@@ -6,11 +6,13 @@ HOST_DB_TEST = os.environ.get("HOST_DB_TEST")
 POSTGRES_USER = os.environ.get("POSTGRES_USER")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 POSTGRES_DB = os.environ.get("POSTGRES_DB")
+DATABASE_URL_TEST = "postgresql://postgres:1234@localhost:5432/bpe"
 
 
 class DatabaseConnector:
     connection = None
     # connection: psycopg2.connection
+    engine = None
 
     @classmethod
     def get_connection(cls):
@@ -19,7 +21,8 @@ class DatabaseConnector:
             return cls.connection
 
         print("Connecting to the PostgreSQL database...")
-        database_url = os.environ.get("DATABASE_URL")
+        # database_url = os.environ.get("DATABASE_URL")
+        database_url = DATABASE_URL_TEST
         result = urlparse(database_url)
         username = result.username
         password = result.password
@@ -33,3 +36,19 @@ class DatabaseConnector:
             password=password,
         )
         return cls.connection
+
+    @classmethod
+    def get_engine(cls):
+        if cls.engine is None:
+            from sqlalchemy import create_engine
+
+            cls.engine = create_engine(DATABASE_URL_TEST, echo=True)
+        return cls.engine
+
+    @classmethod
+    def get_session(cls):
+        cls.get_engine()
+        from sqlalchemy.orm import sessionmaker
+
+        Session = sessionmaker(bind=cls.get_engine(), expire_on_commit=False)
+        return Session()

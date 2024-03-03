@@ -315,7 +315,7 @@ class WorkOn:
             raise Exception(e)
 
     @classmethod
-    def is_project_owner(cls, user_id, project_id):
+    def is_project_owner(cls, user_id, project_id) -> bool:
         query = f"""SELECT work_on.id
                     FROM public.work_on
                         JOIN public.project ON work_on.project_id=project.id
