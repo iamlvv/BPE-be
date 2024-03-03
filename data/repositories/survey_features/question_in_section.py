@@ -64,6 +64,7 @@ class Question_in_section:
                     {
                         "section_id": section["id"],
                         "section_name": section["name"],
+                        "order_in_survey": section["order_in_survey"],
                         "questions": [
                             {
                                 "question_options": (

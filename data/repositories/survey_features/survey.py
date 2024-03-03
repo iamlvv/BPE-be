@@ -12,25 +12,33 @@ class Survey:
         session = DatabaseConnector.get_session()
         try:
             survey = (
-                session.query(Survey_model)
+                session.query(
+                    Survey_model.id,
+                    Survey_model.name,
+                    Survey_model.description,
+                    Survey_model.created_at,
+                    Survey_model.is_deleted,
+                    Survey_model.start_date,
+                    Survey_model.end_date,
+                    Survey_model.is_published,
+                )
                 .filter(
-                    and_(Survey_model.id == survey_id, Survey_model.is_deleted is False)
+                    Survey_model.id == int(survey_id), Survey_model.is_deleted == False
                 )
                 .first()
             )
-            session.close()
-            if survey is None:
-                print("Survey not found")
+            session.commit()
+            if len(survey) == 0:
                 return None
             return {
-                "id": survey.id,
-                "name": survey.name,
-                "description": survey.description,
-                "createdAt": survey.created_at,
-                "isDeleted": survey.is_deleted,
-                "startDate": survey.start_date,
-                "endDate": survey.end_date,
-                "isPublished": survey.is_published,
+                "id": survey[0],
+                "name": survey[1],
+                "description": survey[2],
+                "createdAt": survey[3],
+                "isDeleted": survey[4],
+                "startDate": survey[5],
+                "endDate": survey[6],
+                "isPublished": survey[7],
             }
         except Exception as e:
             session.rollback()

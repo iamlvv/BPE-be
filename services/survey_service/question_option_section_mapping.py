@@ -1,15 +1,26 @@
-Class Question_option_section_mapping_service:
+from data.repositories.survey_features.question_option_section_mapping import (
+    Question_option_section_mapping,
+)
+
+
+class Question_option_section_mapping_service:
     @classmethod
-    def create_sample_question_option_section_mapping(cls, question_options_list, sections_list_in_survey):
-        # only create question option section mapping for multiple choice questions and branching questions
-        # they are the first 2 questions in the survey
-        question_option_section_mapping = []
-        for i in range(0, 2):
-            question = sections_list_in_survey[i]
-            if question["type"] in ["multiple_choice", "branching"]:
-                # create question option section mapping
-                question_option_section_mapping.append(
-                    Question_option_section_mapping.create_sample_question_option_section_mapping(question, i)
-                )
-                # add question option section mapping to the question
-        return question_option_section_mapping
+    def create_sample_question_option_section_mapping(
+        cls, question_options, sections_list_in_survey
+    ):
+        # if question option is yes, then map to section 1
+        # if question option is no, then map to section 2
+        current_section_index = 0
+        section_id = 0
+        for question_option in question_options:
+            if question_option.content == "Yes":
+                current_section_index = 1
+                section_id = sections_list_in_survey[1]["id"]
+
+            elif question_option.content == "No":
+                current_section_index = 2
+                section_id = sections_list_in_survey[2]["id"]
+
+            Question_option_section_mapping.create_sample_question_option_section_mapping(
+                question_option, section_id
+            )
