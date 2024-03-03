@@ -71,3 +71,7 @@ class Question_in_section_service:
                 # add order of them in section, weight, etc.
         # then return the list of questions in the survey
         return Question_in_section.get_questions_in_survey(sections_list_in_survey)
+
+    @classmethod
+    def get_questions_in_survey(cls, sections_list_in_survey):
+        return Question_in_section.get_questions_in_survey(sections_list_in_survey)

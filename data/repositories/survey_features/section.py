@@ -47,3 +47,29 @@ class Section:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_sections_in_survey(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            sections = (
+                session.query(Section_model)
+                .filter(Section_model.survey_id == survey_id)
+                .all()
+            )
+            section_list = []
+            for section in sections:
+                section_list.append(
+                    {
+                        "id": section.id,
+                        "name": section.name,
+                        "survey_id": section.survey_id,
+                        "isDeleted": section.is_deleted,
+                        "order_in_survey": section.order_in_survey,
+                    }
+                )
+            session.close()
+            return section_list
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

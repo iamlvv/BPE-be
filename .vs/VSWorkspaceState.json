@@ -2,13 +2,16 @@
   "ExpandedNodes": [
     "",
     "\\controller",
+    "\\controller\\survey_features_controllers",
     "\\data",
-    "\\database",
+    "\\data\\models",
+    "\\data\\models\\survey_feature_models",
     "\\data\\repositories",
     "\\data\\repositories\\survey_features",
     "\\services",
+    "\\services\\survey_service",
     "\\services\\workspace_service"
   ],
-  "SelectedNode": "\\data\\repositories\\survey_features\\question_in_section.py",
+  "SelectedNode": "\\services\\survey_service\\survey.py",
   "PreviewInSolutionExplorer": false
 }

@@ -51,3 +51,18 @@ class Survey_service:
     @classmethod
     def check_user_has_access_survey(cls, project_id, user_id):
         return WorkOnService.is_project_owner(user_id, project_id)
+
+    @classmethod
+    def get_survey_content(cls, user_id, project_id, survey_id):
+        is_user_has_access = cls.check_user_has_access_survey(project_id, user_id)
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+        sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
+        print("sections_list_in_survey: ", sections_list_in_survey)
+        questions_list_in_survey = Question_in_section_service.get_questions_in_survey(
+            sections_list_in_survey
+        )
+        return {
+            "sections": sections_list_in_survey,
+            "questions": questions_list_in_survey,
+        }

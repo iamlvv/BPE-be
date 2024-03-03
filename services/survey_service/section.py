@@ -9,3 +9,7 @@ class Section_service:
     @classmethod
     def create_sample_sections(cls, survey_id):
         return Section.create_sample_sections(survey_id)
+
+    @classmethod
+    def get_sections_in_survey(cls, survey_id):
+        return Section.get_sections_in_survey(survey_id)
