@@ -103,3 +103,45 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def config_survey_general(
+        cls,
+        survey_id,
+        survey_name,
+        survey_description,
+        nps_weight,
+        ces_weight,
+        csat_weight,
+    ):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
+                .first()
+            )
+            if survey_name is not None:
+                survey.name = survey_name
+            if survey_description is not None:
+                survey.description = survey_description
+            if nps_weight is not None:
+                survey.nps_weight = nps_weight
+            if ces_weight is not None:
+                survey.ces_weight = ces_weight
+            if csat_weight is not None:
+                survey.csat_weight = csat_weight
+            session.commit()
+            return {
+                "id": survey.id,
+                "name": survey.name,
+                "description": survey.description,
+                "createdAt": survey.created_at,
+                "isDeleted": survey.is_deleted,
+                "npsWeight": survey.nps_weight,
+                "cesWeight": survey.ces_weight,
+                "csatWeight": survey.csat_weight,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

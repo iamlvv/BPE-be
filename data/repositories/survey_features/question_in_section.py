@@ -46,7 +46,10 @@ class Question_in_section:
             for section in sections_list_in_survey:
                 questions_in_section = (
                     session.query(Question_in_section_model)
-                    .filter(Question_in_section_model.section_id == section["id"])
+                    .filter(
+                        Question_in_section_model.section_id == section["id"],
+                        Question_in_section_model.is_deleted == False,
+                    )
                     .order_by(Question_in_section_model.order_in_section)
                     .all()
                 )
@@ -62,19 +65,17 @@ class Question_in_section:
 
                 questions_in_survey.append(
                     {
-                        "section_id": section["id"],
-                        "section_name": section["name"],
-                        "order_in_survey": section["order_in_survey"],
+                        "sectionId": section["id"],
+                        "sectionName": section["name"],
+                        "orderInSurvey": section["order_in_survey"],
                         "questions": [
                             {
-                                "question_options": (
+                                "questionOptions": (
                                     [
                                         {
                                             "id": question_option_item[0],
                                             "content": question_option_item[1],
-                                            "order_in_question": question_option_item[
-                                                2
-                                            ],
+                                            "orderInQuestion": question_option_item[2],
                                         }
                                         for question_option in question_options_list
                                         for question_option_item in question_option
@@ -86,11 +87,11 @@ class Question_in_section:
                                 ),
                                 "id": question.id,
                                 "content": question.content,
-                                "is_deleted": question.is_deleted,
-                                "is_required": question.is_required,
-                                "order_in_section": question.order_in_section,
+                                "isDeleted": question.is_deleted,
+                                "isRequired": question.is_required,
+                                "orderInSection": question.order_in_section,
                                 "weight": question.weight,
-                                "question_type": question.question_type,
+                                "questionType": question.question_type,
                             }
                             for question in questions_in_section
                         ],

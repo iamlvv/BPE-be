@@ -59,3 +59,31 @@ def delete_survey():
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/general", methods=["PUT"])
+def config_survey_general():
+    user_id = get_id_from_token(get_token(request))
+    body = load_request_body(request)
+    project_id = body["projectId"]
+    survey_id = body["surveyId"]
+    survey_name = body["name"] if "name" in body else None
+    survey_description = body["description"] if "description" in body else None
+    nps_weight = body["npsWeight"] if "npsWeight" in body else None
+    ces_weight = body["cesWeight"] if "cesWeight" in body else None
+    csat_weight = body["csatWeight"] if "csatWeight" in body else None
+    data = Survey_service.config_survey_general(
+        survey_id,
+        user_id,
+        project_id,
+        survey_name,
+        survey_description,
+        nps_weight,
+        ces_weight,
+        csat_weight,
+    )
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

@@ -78,3 +78,30 @@ class Survey_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
         return Survey.delete_survey(survey_id)
+
+    @classmethod
+    def config_survey_general(
+        cls,
+        survey_id,
+        user_id,
+        project_id,
+        survey_name=None,
+        survey_description=None,
+        nps_weight=None,
+        ces_weight=None,
+        csat_weight=None,
+    ):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
+        return Survey.config_survey_general(
+            survey_id,
+            survey_name,
+            survey_description,
+            nps_weight,
+            ces_weight,
+            csat_weight,
+        )
