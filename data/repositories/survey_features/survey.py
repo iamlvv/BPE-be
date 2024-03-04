@@ -145,3 +145,43 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def config_survey_response(
+        cls,
+        survey_id,
+        incomplete_survey_action,
+        allow_duplicate_respondent,
+        send_result_to_respondent,
+        start_date,
+        end_date,
+    ):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
+                .first()
+            )
+            if incomplete_survey_action is not None:
+                survey.incomplete_survey_action = incomplete_survey_action
+            if allow_duplicate_respondent is not None:
+                survey.allow_duplicate_respondent = allow_duplicate_respondent
+            if send_result_to_respondent is not None:
+                survey.send_result_to_respondent = send_result_to_respondent
+            if start_date is not None:
+                survey.start_date = start_date
+            if end_date is not None:
+                survey.end_date = end_date
+            session.commit()
+            return {
+                "id": survey.id,
+                "incompleteSurveyAction": survey.incomplete_survey_action,
+                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
+                "sendResultToRespondent": survey.send_result_to_respondent,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

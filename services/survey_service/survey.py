@@ -105,3 +105,30 @@ class Survey_service:
             ces_weight,
             csat_weight,
         )
+
+    @classmethod
+    def config_survey_response(
+        cls,
+        survey_id,
+        user_id,
+        project_id,
+        incomplete_survey_action=None,
+        allow_duplicate_respondent=None,
+        send_result_to_respondent=None,
+        start_date=None,
+        end_date=None,
+    ):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
+        return Survey.config_survey_response(
+            survey_id,
+            incomplete_survey_action,
+            allow_duplicate_respondent,
+            send_result_to_respondent,
+            start_date,
+            end_date,
+        )

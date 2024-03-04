@@ -61,7 +61,7 @@ def delete_survey():
     )
 
 
-@bpsky.route("/api/v1/survey/general", methods=["PUT"])
+@bpsky.route("/api/v1/survey/general_configuration", methods=["PUT"])
 def config_survey_general():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
@@ -81,6 +81,41 @@ def config_survey_general():
         nps_weight,
         ces_weight,
         csat_weight,
+    )
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )
+
+
+@bpsky.route("/api/v1/survey/response_configuration", methods=["PUT"])
+def config_survey_response():
+    user_id = get_id_from_token(get_token(request))
+    body = load_request_body(request)
+    project_id = body["projectId"]
+    survey_id = body["surveyId"]
+    incomplete_survey_action = (
+        body["incompleteSurveyAction"] if "incompleteSurveyAction" in body else None
+    )
+    allow_duplicate_respondent = (
+        body["allowDuplicateRespondent"] if "allowDuplicateRespondent" in body else None
+    )
+    send_result_to_respondent = (
+        body["sendResultToRespondent"] if "sendResultToRespondent" in body else None
+    )
+    start_date = body["startDate"] if "startDate" in body else None
+    end_date = body["endDate"] if "endDate" in body else None
+
+    data = Survey_service.config_survey_response(
+        survey_id,
+        user_id,
+        project_id,
+        incomplete_survey_action,
+        allow_duplicate_respondent,
+        send_result_to_respondent,
+        start_date,
+        end_date,
     )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
