@@ -1,7 +1,5 @@
-import uuid
 from datetime import datetime
-
-from sqlalchemy import ForeignKey, ForeignKeyConstraint, PrimaryKeyConstraint
+from sqlalchemy import ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from data.models.meta_data import Base
 from database.db import DatabaseConnector

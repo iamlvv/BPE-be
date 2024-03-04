@@ -4,13 +4,16 @@ from services.survey_service.question_in_section import (
     Question_in_section_service,
 )
 from services.survey_service.section import Section_service
+from services.utils import Permission_check
 
 
 class Survey_service:
     @classmethod
     def get_survey_detail(cls, survey_id, project_id, user_id):
         # check if user has access to the survey
-        is_user_has_access = cls.check_user_has_access_survey(project_id, user_id)
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
         # get survey detail
@@ -26,7 +29,9 @@ class Survey_service:
         process_version_version,
     ):
         # check if user has access to the survey
-        is_user_has_access = cls.check_user_has_access_survey(project_id, user_id)
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
         # create new survey
@@ -49,12 +54,10 @@ class Survey_service:
         }
 
     @classmethod
-    def check_user_has_access_survey(cls, project_id, user_id):
-        return WorkOnService.is_project_owner(user_id, project_id)
-
-    @classmethod
     def get_survey_content(cls, user_id, project_id, survey_id):
-        is_user_has_access = cls.check_user_has_access_survey(project_id, user_id)
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
@@ -69,7 +72,9 @@ class Survey_service:
 
     @classmethod
     def delete_survey(cls, user_id, project_id, survey_id):
-        is_user_has_access = cls.check_user_has_access_survey(project_id, user_id)
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
         return Survey.delete_survey(survey_id)

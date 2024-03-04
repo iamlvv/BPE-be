@@ -101,3 +101,27 @@ class Question_in_section:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_question_detail_in_survey(cls, question_in_section_id):
+        session = DatabaseConnector.get_session()
+        try:
+            question_in_section = (
+                session.query(Question_in_section_model)
+                .filter(Question_in_section_model.id == question_in_section_id)
+                .first()
+            )
+            session.close()
+            return {
+                "id": question_in_section.id,
+                "content": question_in_section.content,
+                "isDeleted": question_in_section.is_deleted,
+                "isRequired": question_in_section.is_required,
+                "orderInSection": question_in_section.order_in_section,
+                "weight": question_in_section.weight,
+                "questionType": question_in_section.question_type,
+                "sectionId": question_in_section.section_id,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

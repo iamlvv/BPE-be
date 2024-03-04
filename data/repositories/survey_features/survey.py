@@ -28,7 +28,7 @@ class Survey:
                 .first()
             )
             session.commit()
-            if len(survey) == 0:
+            if survey is None:
                 return None
             return {
                 "id": survey[0],

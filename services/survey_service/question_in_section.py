@@ -6,6 +6,7 @@ from services.survey_service.question_option_section_mapping import (
     Question_option_section_mapping_service,
 )
 from services.survey_service.section import Section_service
+from services.utils import Permission_check
 
 
 class Question_in_section_service:
@@ -75,3 +76,13 @@ class Question_in_section_service:
     @classmethod
     def get_questions_in_survey(cls, sections_list_in_survey):
         return Question_in_section.get_questions_in_survey(sections_list_in_survey)
+
+    @classmethod
+    def get_question_detail_in_survey(cls, question_in_section_id, project_id, user_id):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
+        return Question_in_section.get_question_detail_in_survey(question_in_section_id)
