@@ -85,3 +85,21 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def delete_survey(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
+                .first()
+            )
+            survey.is_deleted = True
+            print(survey)
+            session.commit()
+            session.close()
+            return {"message": "Survey is deleted"}
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

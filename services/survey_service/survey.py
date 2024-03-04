@@ -66,3 +66,10 @@ class Survey_service:
             "sections": sections_list_in_survey,
             "questions": questions_list_in_survey,
         }
+
+    @classmethod
+    def delete_survey(cls, user_id, project_id, survey_id):
+        is_user_has_access = cls.check_user_has_access_survey(project_id, user_id)
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+        return Survey.delete_survey(survey_id)
