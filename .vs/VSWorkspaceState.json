@@ -12,5 +12,6 @@
     "\\services\\survey_service",
     "\\services\\workspace_service"
   ],
+  "SelectedNode": "\\controller\\survey_features_controllers\\survey.py",
   "PreviewInSolutionExplorer": false
 }

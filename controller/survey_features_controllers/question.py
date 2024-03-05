@@ -17,3 +17,29 @@ def get_question_detail_in_survey(question_in_section_id):
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/question", methods=["PUT"])
+def update_question_detail_in_survey():
+    user_id = get_id_from_token(get_token(request))
+    body = load_request_body(request)
+    question_type = body["questionType"] if "questionType" in body else None
+    is_required = body["isRequired"] if "isRequired" in body else None
+    order_in_section = body["orderInSection"] if "orderInSection" in body else None
+    project_id = body["projectId"]
+    weight = body["weight"] if "weight" in body else None
+    question_in_section_id = body["questionInSectionId"]
+    data = Question_in_section_service.update_question_detail_in_survey(
+        user_id,
+        project_id,
+        question_in_section_id,
+        question_type,
+        is_required,
+        order_in_section,
+        weight,
+    )
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

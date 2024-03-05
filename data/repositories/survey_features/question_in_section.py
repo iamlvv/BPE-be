@@ -126,3 +126,43 @@ class Question_in_section:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def update_question_detail_in_survey(
+        cls,
+        question_in_section_id,
+        question_type,
+        is_required,
+        order_in_section,
+        weight,
+    ):
+        session = DatabaseConnector.get_session()
+        try:
+            question_in_section = (
+                session.query(Question_in_section_model)
+                .filter(Question_in_section_model.id == question_in_section_id)
+                .first()
+            )
+            if question_type:
+                question_in_section.question_type = question_type
+            if is_required:
+                question_in_section.is_required = is_required
+            if order_in_section:
+                question_in_section.order_in_section = order_in_section
+            if weight:
+                question_in_section.weight = weight
+
+            session.commit()
+            return {
+                "id": question_in_section.id,
+                "content": question_in_section.content,
+                "isDeleted": question_in_section.is_deleted,
+                "isRequired": question_in_section.is_required,
+                "orderInSection": question_in_section.order_in_section,
+                "weight": question_in_section.weight,
+                "questionType": question_in_section.question_type,
+                "sectionId": question_in_section.section_id,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

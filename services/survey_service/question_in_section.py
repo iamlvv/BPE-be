@@ -86,3 +86,24 @@ class Question_in_section_service:
             return {"message": "User has no access to the survey"}
 
         return Question_in_section.get_question_detail_in_survey(question_in_section_id)
+
+    @classmethod
+    def update_question_detail_in_survey(
+        cls,
+        user_id,
+        project_id,
+        question_in_section_id,
+        question_type=None,
+        is_required=None,
+        order_in_section=None,
+        weight=None,
+    ):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
+        return Question_in_section.update_question_detail_in_survey(
+            question_in_section_id, question_type, is_required, order_in_section, weight
+        )
