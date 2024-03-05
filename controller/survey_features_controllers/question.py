@@ -2,6 +2,7 @@ import jsonpickle
 
 from bpsky import bpsky
 from controller.utils import *
+from services.survey_service.question import Question_service
 from services.survey_service.question_in_section import Question_in_section_service
 
 
@@ -38,6 +39,17 @@ def update_question_detail_in_survey():
         order_in_section,
         weight,
     )
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )
+
+
+@bpsky.route("/api/v1/survey/init", methods=["POST"])
+def initialize_sample_questions():
+    user_id = get_id_from_token(get_token(request))
+    data = Question_service.initialize_sample_questions()
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
         status=200,

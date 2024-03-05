@@ -1,5 +1,4 @@
 from data.repositories.survey_features.survey import Survey
-from services.project_service.work_on import WorkOnService
 from services.survey_service.question_in_section import (
     Question_in_section_service,
 )
@@ -132,3 +131,7 @@ class Survey_service:
             start_date,
             end_date,
         )
+
+    @classmethod
+    def check_if_survey_exists(cls, process_version_version):
+        return Survey.check_if_survey_exists(process_version_version)

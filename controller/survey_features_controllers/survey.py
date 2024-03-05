@@ -25,6 +25,17 @@ def create_new_survey():
     survey_description = body["description"]
     process_version_version = body["processVersionVersion"]
     project_id = body["projectId"]
+
+    # check if the survey has been created for the process version before, because a process version
+    # only have 1 existing survey
+    survey_id_exists = Survey_service.check_if_survey_exists(process_version_version)
+    if survey_id_exists:
+        data = Survey_service.get_survey_content(user_id, project_id, survey_id_exists)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
     data = Survey_service.create_new_survey(
         project_id, user_id, survey_name, survey_description, process_version_version
     )

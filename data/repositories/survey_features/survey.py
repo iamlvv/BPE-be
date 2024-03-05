@@ -185,3 +185,23 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def check_if_survey_exists(cls, process_version_version):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(
+                    Survey_model.process_version_version == process_version_version,
+                    Survey_model.is_deleted == False,
+                )
+                .first()
+            )
+            session.commit()
+            if survey is None:
+                return None
+            return survey.id
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
