@@ -23,8 +23,6 @@ class Survey_service:
         cls,
         project_id,
         user_id,
-        survey_name,
-        survey_description,
         process_version_version,
     ):
         # check if user has access to the survey
@@ -33,10 +31,10 @@ class Survey_service:
         )
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
-        # create new survey
-        new_survey = Survey.create_new_survey(
-            survey_name, survey_description, process_version_version
-        )
+        # create new survey with default name and description
+        # default name is: "Survey for process version: {process_version_version}"
+
+        new_survey = Survey.create_new_survey(process_version_version)
         # create sections for the survey
         sections_list_in_survey = Section_service.create_sample_sections(
             new_survey["id"]
@@ -59,13 +57,15 @@ class Survey_service:
         )
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
+        survey_info = Survey.get_survey_detail(survey_id)
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
         print("sections_list_in_survey: ", sections_list_in_survey)
         questions_list_in_survey = Question_in_section_service.get_questions_in_survey(
             sections_list_in_survey
         )
         return {
-            "sections": sections_list_in_survey,
+            # "sections": sections_list_in_survey,
+            "survey": survey_info,
             "questions": questions_list_in_survey,
         }
 

@@ -21,8 +21,8 @@ def get_survey_detail(survey_id):
 def create_new_survey():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
-    survey_name = body["name"]
-    survey_description = body["description"]
+    # survey_name = body["name"]
+    # survey_description = body["description"]
     process_version_version = body["processVersionVersion"]
     project_id = body["projectId"]
 
@@ -37,7 +37,7 @@ def create_new_survey():
             mimetype="application/json",
         )
     data = Survey_service.create_new_survey(
-        project_id, user_id, survey_name, survey_description, process_version_version
+        project_id, user_id, process_version_version
     )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),

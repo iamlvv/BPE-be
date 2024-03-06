@@ -45,15 +45,13 @@ class Survey:
             raise Exception(e)
 
     @classmethod
-    def create_new_survey(
-        cls, survey_name, survey_description, process_version_version
-    ):
+    def create_new_survey(cls, process_version_version):
         # create new survey
         session = DatabaseConnector.get_session()
         try:
             survey = Survey_model(
-                name=survey_name,
-                description=survey_description,
+                name="Survey for Process Version: " + process_version_version,
+                description="This is the default description for the survey.",
                 process_version_version=process_version_version,
                 created_at=datetime.now(),
                 is_deleted=False,
@@ -75,10 +73,10 @@ class Survey:
                 "id": survey.id,
                 "name": survey.name,
                 "description": survey.description,
-                "createdAt": survey.created_at,
-                "isDeleted": survey.is_deleted,
-                "startDate": survey.start_date,
-                "endDate": survey.end_date,
+                # "createdAt": survey.created_at,
+                # "isDeleted": survey.is_deleted,
+                # "startDate": survey.start_date,
+                # "endDate": survey.end_date,
                 "isPublished": survey.is_published,
                 "processVersionVersion": survey.process_version_version,
             }
