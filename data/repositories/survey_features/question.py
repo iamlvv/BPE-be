@@ -4,33 +4,6 @@ from database.db import DatabaseConnector
 
 class Question:
     @classmethod
-    def create_ces_question(cls, survey_id):
-        # create CES question for the survey
-        pass
-
-    @classmethod
-    def create_nps_question(cls, survey_id):
-        # create NPS question for the survey
-        pass
-
-    @classmethod
-    def create_csat_question(cls, survey_id):
-        # create CSAT question for the survey
-        pass
-
-    @classmethod
-    def create_multiple_choice_question(cls, survey_id):
-        pass
-
-    @classmethod
-    def create_open_ended_question(cls, survey_id):
-        pass
-
-    @classmethod
-    def create_sample_questions(cls, survey_id):
-        pass
-
-    @classmethod
     def get_sample_questions(cls):
         # get list of prepared questions from Question table
         # question is marked prepared if the origin field is "system" and "domain" is "general"
@@ -60,6 +33,7 @@ class Question:
             )
             .all()
         )
+        session.commit()
         return len(sample_questions_list) > 0
 
 
