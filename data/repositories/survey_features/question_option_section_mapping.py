@@ -20,3 +20,22 @@ class Question_option_section_mapping:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def delete_question_option_section_mapping(cls, question_in_section_id):
+        session = DatabaseConnector.get_session()
+        try:
+            question_option_section_mapping = (
+                session.query(Question_option_section_mapping_model)
+                .filter(
+                    Question_option_section_mapping_model.question_option_id
+                    == question_in_section_id
+                )
+                .first()
+            )
+            question_option_section_mapping.is_deleted = True
+            session.commit()
+            return question_option_section_mapping
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

@@ -36,6 +36,26 @@ class Question:
         session.commit()
         return len(sample_questions_list) > 0
 
+    @classmethod
+    def create_question(cls, content, question_type):
+        session = DatabaseConnector.get_session()
+        try:
+            question = Question_model(
+                content=content,
+                question_type=question_type,
+                origin="user",
+                domain="general",
+                is_deleted=False,
+                contributor_id=None,
+                usage_count=0,
+            )
+            session.add(question)
+            session.commit()
+            return question
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
 
 # insert sample questions into table question
 # insert sample sections into table section

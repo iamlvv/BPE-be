@@ -73,3 +73,38 @@ class Question_option:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def delete_question_option(cls, question_in_section_id):
+        session = DatabaseConnector.get_session()
+        try:
+            question_option = (
+                session.query(Question_option_model)
+                .filter(
+                    Question_option_model.question_in_section_id
+                    == question_in_section_id
+                )
+                .update({"is_deleted": True})
+            )
+            session.commit()
+            return question_option
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def create_question_option(cls, question_in_section, question_option):
+        session = DatabaseConnector.get_session()
+        try:
+            question_option = Question_option_model(
+                question_in_section_id=question_in_section.id,
+                content=question_option["content"],
+                order_in_question=question_option["order_in_question"],
+                is_deleted=question_in_section.is_deleted,
+            )
+            session.add(question_option)
+            session.commit()
+            return question_option
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

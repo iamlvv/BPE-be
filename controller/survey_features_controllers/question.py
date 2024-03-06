@@ -25,20 +25,24 @@ def get_question_detail_in_survey():
 def update_question_detail_in_survey():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
+    content = body["content"] if "content" in body else None
     question_type = body["questionType"] if "questionType" in body else None
     is_required = body["isRequired"] if "isRequired" in body else None
     order_in_section = body["orderInSection"] if "orderInSection" in body else None
     project_id = body["projectId"]
     weight = body["weight"] if "weight" in body else None
     question_in_section_id = body["questionInSectionId"]
+    section_id = body["sectionId"]
     data = Question_in_section_service.update_question_detail_in_survey(
         user_id,
         project_id,
+        section_id,
         question_in_section_id,
         question_type,
         is_required,
         order_in_section,
         weight,
+        content,
     )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
@@ -51,6 +55,23 @@ def update_question_detail_in_survey():
 def initialize_sample_questions():
     user_id = get_id_from_token(get_token(request))
     data = Question_service.initialize_sample_questions()
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )
+
+
+@bpsky.route("/api/v1/survey/question", methods=["DELETE"])
+def delete_question_in_survey():
+    user_id = get_id_from_token(get_token(request))
+    body = load_request_body(request)
+    project_id = body["projectId"]
+    question_in_section_id = body["questionInSectionId"]
+    section_id = body["sectionId"]
+    data = Question_in_section_service.delete_question_in_survey(
+        user_id, project_id, section_id, question_in_section_id
+    )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
         status=200,

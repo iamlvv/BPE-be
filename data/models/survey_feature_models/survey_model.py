@@ -31,6 +31,7 @@ class Survey_model(Base):
     csat_weight: Mapped[float] = mapped_column(nullable=True, default=round(1 / 3, 3))
     domain: Mapped[str] = mapped_column(nullable=False, default="general")
     incomplete_survey_action: Mapped[str] = mapped_column(nullable=True, default=None)
+    last_saved: Mapped[datetime] = mapped_column(nullable=True, default=None)
     # foreign key
     process_version_version: Mapped[str] = mapped_column(
         ForeignKey("process_version.version")

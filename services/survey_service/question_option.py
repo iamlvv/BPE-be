@@ -20,3 +20,14 @@ class Question_option_service:
                 # add question options to the question
 
         return question_options
+
+    @classmethod
+    def create_question_options(cls, question_in_section, question_options):
+        # create question options for multiple choice questions and branching questions
+        question_options_list = []
+        for i in range(0, len(question_options)):
+            question_option = Question_option.create_question_option(
+                question_in_section, question_options[i]
+            )
+            question_options_list.append(question_option)
+        return question_options_list

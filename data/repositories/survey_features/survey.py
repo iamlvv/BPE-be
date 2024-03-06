@@ -66,6 +66,8 @@ class Survey:
                 nps_weight=1,
                 csat_weight=1,
                 domain="general",
+                incomplete_survey_action="delete",
+                last_saved=None,
             )
             session.add(survey)
             session.commit()

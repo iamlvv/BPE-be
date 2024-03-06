@@ -24,3 +24,9 @@ class Question_option_section_mapping_service:
             Question_option_section_mapping.create_sample_question_option_section_mapping(
                 question_option, section_id
             )
+
+    @classmethod
+    def delete_question_option_section_mapping(cls, question_in_section_id):
+        return Question_option_section_mapping.delete_question_option_section_mapping(
+            question_in_section_id
+        )
