@@ -7,7 +7,7 @@ from database.db import DatabaseConnector
 
 class Survey:
     @classmethod
-    def get_survey_detail(cls, survey_id):
+    def get_survey_detail(cls, process_version_version):
         # get survey detail
         session = DatabaseConnector.get_session()
         try:
@@ -23,7 +23,8 @@ class Survey:
                     Survey_model.is_published,
                 )
                 .filter(
-                    Survey_model.id == int(survey_id), Survey_model.is_deleted == False
+                    Survey_model.process_version_version == process_version_version,
+                    Survey_model.is_deleted == False,
                 )
                 .first()
             )

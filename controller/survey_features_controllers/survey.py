@@ -5,11 +5,14 @@ from controller.utils import *
 from services.survey_service.survey import Survey_service
 
 
-@bpsky.route("/api/v1/survey/<survey_id>", methods=["GET"])
-def get_survey_detail(survey_id):
+@bpsky.route("/api/v1/survey", methods=["GET"])
+def get_survey_detail():
     user_id = get_id_from_token(get_token(request))
+    process_version_version = request.args.get("processVersionVersion", None)
     project_id = request.args.get("projectId", None)
-    data = Survey_service.get_survey_detail(survey_id, project_id, user_id)
+    data = Survey_service.get_survey_detail(
+        process_version_version, project_id, user_id
+    )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
         status=200,
@@ -49,9 +52,11 @@ def create_new_survey():
 @bpsky.route("/api/v1/survey/edit", methods=["GET"])
 def get_survey_content():
     user_id = get_id_from_token(get_token(request))
-    survey_id = request.args.get("surveyId", None)
+    process_version_version = request.args.get("processVersionVersion", None)
     project_id = request.args.get("projectId", None)
-    data = Survey_service.get_survey_content(user_id, project_id, survey_id)
+    data = Survey_service.get_survey_content(
+        user_id, project_id, process_version_version
+    )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
         status=200,

@@ -8,7 +8,7 @@ from services.utils import Permission_check
 
 class Survey_service:
     @classmethod
-    def get_survey_detail(cls, survey_id, project_id, user_id):
+    def get_survey_detail(cls, process_version_version, project_id, user_id):
         # check if user has access to the survey
         is_user_has_access = Permission_check.check_user_has_access_survey(
             project_id, user_id
@@ -16,7 +16,7 @@ class Survey_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
         # get survey detail
-        return Survey.get_survey_detail(survey_id)
+        return Survey.get_survey_detail(process_version_version)
 
     @classmethod
     def create_new_survey(
@@ -51,13 +51,16 @@ class Survey_service:
         }
 
     @classmethod
-    def get_survey_content(cls, user_id, project_id, survey_id):
+    def get_survey_content(cls, user_id, project_id, process_version_version):
         is_user_has_access = Permission_check.check_user_has_access_survey(
             project_id, user_id
         )
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
-        survey_info = Survey.get_survey_detail(survey_id)
+        survey_info = Survey.get_survey_detail(process_version_version)
+        if survey_info is None:
+            return {"message": "Survey does not exist."}
+        survey_id = survey_info["id"]
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
         print("sections_list_in_survey: ", sections_list_in_survey)
         questions_list_in_survey = Question_in_section_service.get_questions_in_survey(
