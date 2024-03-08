@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from data.repositories.survey_features.survey import Survey
 from services.survey_service.question_in_section import (
     Question_in_section_service,
@@ -126,6 +128,13 @@ class Survey_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
 
+        if start_date is not None and end_date is not None:
+            if start_date > end_date:
+                return {"message": "Start date must be before end date"}
+            if start_date < datetime.now():
+                return {"message": "Start date must be in the future"}
+            if end_date < datetime.now():
+                return {"message": "End date must be in the future"}
         return Survey.config_survey_response(
             survey_id,
             incomplete_survey_action,

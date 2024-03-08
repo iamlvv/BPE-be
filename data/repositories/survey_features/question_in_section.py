@@ -132,9 +132,7 @@ class Question_in_section:
     def update_question_detail_in_survey(
         cls,
         question_in_section_id,
-        question_type,
         is_required,
-        order_in_section,
         weight,
         content,
     ):
@@ -145,12 +143,8 @@ class Question_in_section:
                 .filter(Question_in_section_model.id == question_in_section_id)
                 .first()
             )
-            if question_type:
-                question_in_section.question_type = question_type
             if is_required:
                 question_in_section.is_required = is_required
-            if order_in_section:
-                question_in_section.order_in_section = order_in_section
             if weight:
                 question_in_section.weight = weight
             if content:
@@ -198,7 +192,7 @@ class Question_in_section:
                 .order_by(Question_in_section_model.order_in_section)
                 .all()
             )
-            session.close()
+            session.commit()
             return questions_in_section
         except Exception as e:
             session.rollback()

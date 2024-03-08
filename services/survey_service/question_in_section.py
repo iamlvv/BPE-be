@@ -5,7 +5,6 @@ from services.survey_service.question_option import Question_option_service
 from services.survey_service.question_option_section_mapping import (
     Question_option_section_mapping_service,
 )
-from services.survey_service.section import Section_service
 from services.utils import Permission_check
 
 
@@ -113,14 +112,13 @@ class Question_in_section_service:
         if question_type:
             cls.change_question_type(question_in_section_id, question_type)
 
-        return Question_in_section.update_question_detail_in_survey(
+        updated_question = Question_in_section.update_question_detail_in_survey(
             question_in_section_id,
-            question_type,
             is_required,
-            order_in_section,
             weight,
             content,
         )
+        return updated_question
 
     @classmethod
     def reorder_questions_in_section_when_delete_question(
@@ -139,14 +137,14 @@ class Question_in_section_service:
         question_in_section = Question_in_section.get_question_in_section_by_id(
             question_in_section_id
         )
-        order_of_question = question_in_section["orderInSection"]
+        order_of_question = question_in_section.order_in_section
         # get the list of questions in the section
         questions_in_section = Question_in_section.get_questions_in_section(section_id)
         # update the order of the questions in the section
         for question in questions_in_section:
-            if question["orderInSection"] > order_of_question:
+            if question.order_in_section > order_of_question:
                 Question_in_section.update_order_of_question_in_section(
-                    question["id"], question["orderInSection"] - 1
+                    question.id, question.order_in_section - 1
                 )
 
         return {"message": "Questions in section have been reordered"}
@@ -159,18 +157,18 @@ class Question_in_section_service:
         question_in_section = Question_in_section.get_question_in_section_by_id(
             question_in_section_id
         )
-        order_of_question = question_in_section["orderInSection"]
+        order_of_question = question_in_section.order_in_section
         # get the list of questions in the section
         questions_in_section = Question_in_section.get_questions_in_section(section_id)
         # update the order of the questions in the section
         for question in questions_in_section:
-            if order_of_question < question["orderInSection"] < new_order:
+            if order_of_question < question.order_in_section <= new_order:
                 Question_in_section.update_order_of_question_in_section(
-                    question["id"], question["orderInSection"] - 1
+                    question.id, question.order_in_section - 1
                 )
-            elif order_of_question > question["orderInSection"] >= new_order:
+            elif order_of_question > question.order_in_section >= new_order:
                 Question_in_section.update_order_of_question_in_section(
-                    question["id"], question["orderInSection"] + 1
+                    question.id, question.order_in_section + 1
                 )
 
         # update the order of the question that is being changed position
@@ -212,7 +210,7 @@ class Question_in_section_service:
         question_in_section = Question_in_section.get_question_in_section_by_id(
             question_in_section_id
         )
-        current_question_type = question_in_section["question_type"]
+        current_question_type = question_in_section.question_type
         # if the question is branching or multiple choice, then add question options to the question
         if new_question_type in ["branching", "multiple_choice"]:
             if current_question_type not in ["branching", "multiple_choice"]:
@@ -249,17 +247,63 @@ class Question_in_section_service:
         # add question to the question table which is like a library of questions
         question = Question.create_question(content, question_type)
         # add question to the section
-        question_in_section = Question_in_section.add_new_question_to_section(
+        new_question_in_section = Question_in_section.add_new_question_to_section(
             section_id, question, order_in_section, weight, is_required
         )
         # if the question_type is branching or multiple choice, then add question options to the question
         if question_options:
             question_options = Question_option_service.create_question_options(
-                question_in_section, question_options
+                new_question_in_section, question_options
             )
             # # for this branching question, create a sample mapping of question options to the next sections
             # question_options_section_mapping = Question_option_section_mapping_service.create_sample_question_option_section_mapping(
             #     question_options, Section_service.get_sections_in_survey()
             # )
+        # when the question is added to the section, reorder the questions in the section
+        cls.reorder_questions_in_section_when_add_new_question(
+            section_id, new_question_in_section.id, order_in_section
+        )
+        return new_question_in_section
 
-        return question_in_section
+    @classmethod
+    def contribute_question(
+        cls, user_id, project_id, question_in_section, user_action=None
+    ):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
+        # check if question is already in the library of questions
+        question_in_library = Question.check_if_question_exists(question_in_section.id)
+        if question_in_library.contributor_id is not None:
+            # if contributor is None ->  contribute question
+            # if contributor is not None and user_action is None -> return this question has been contributed
+            # if contributor is not None and user_action is not None -> update the question with the new content
+            if user_action is None:
+                return "This question is already contributed"
+        else:
+            return Question.add_and_contribute_question(question_in_section, user_id)
+        return Question.contribute_question(question_in_section, user_id)
+
+    @classmethod
+    def reorder_questions_in_section_when_add_new_question(
+        cls, section_id, new_question_in_section_id, order_in_section
+    ):
+        # get the list of questions in the section
+        questions_in_section = Question_in_section.get_questions_in_section(section_id)
+        # update the order of the questions in the section
+        for question in questions_in_section:
+            if (
+                question.order_in_section >= order_in_section
+                and question.id != new_question_in_section_id
+            ):
+                Question_in_section.update_order_of_question_in_section(
+                    question.id, question.order_in_section + 1
+                )
+        # update the order of the new question in the section - already added
+        # Question_in_section.update_order_of_question_in_section(
+        #     new_question_in_section_id, order_in_section
+        # )
+        return {"message": "Questions in section have been reordered"}
