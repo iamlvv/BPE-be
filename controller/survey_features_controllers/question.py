@@ -77,3 +77,29 @@ def delete_question_in_survey():
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/question/contribution", methods=["POST"])
+def contribute_question_in_survey():
+    user_id = get_id_from_token(get_token(request))
+    body = load_request_body(request)
+    project_id = body["projectId"]
+    question_type = body["questionType"]
+    content = body["content"]
+    question_id = body["questionId"]
+    question_in_section_id = body["questionInSectionId"]
+    question_options = body["questionOptions"] if "questionOptions" in body else None
+    data = Question_in_section_service.contribute_question(
+        user_id,
+        project_id,
+        question_id,
+        question_in_section_id,
+        question_type,
+        content,
+        question_options,
+    )
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

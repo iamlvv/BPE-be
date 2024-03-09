@@ -267,7 +267,14 @@ class Question_in_section_service:
 
     @classmethod
     def contribute_question(
-        cls, user_id, project_id, question_in_section, user_action=None
+        cls,
+        user_id,
+        project_id,
+        question_id,
+        question_in_section_id,
+        question_type,
+        content,
+        question_options=None,
     ):
         is_user_has_access = Permission_check.check_user_has_access_survey(
             project_id, user_id
@@ -275,17 +282,13 @@ class Question_in_section_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
 
-        # check if question is already in the library of questions
-        question_in_library = Question.check_if_question_exists(question_in_section.id)
-        if question_in_library.contributor_id is not None:
-            # if contributor is None ->  contribute question
-            # if contributor is not None and user_action is None -> return this question has been contributed
-            # if contributor is not None and user_action is not None -> update the question with the new content
-            if user_action is None:
-                return "This question is already contributed"
-        else:
-            return Question.add_and_contribute_question(question_in_section, user_id)
-        return Question.contribute_question(question_in_section, user_id)
+        # check if the question exists
+        question = Question.get_question_by_id(question_id)
+        if question is not None:
+            return Question.update_contributed_question(
+                question_id, question_type, content, user_id
+            )
+        return Question.contribute_question(question_type, content, user_id)
 
     @classmethod
     def reorder_questions_in_section_when_add_new_question(

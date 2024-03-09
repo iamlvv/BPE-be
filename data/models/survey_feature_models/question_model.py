@@ -34,7 +34,7 @@ class Question_in_section_model(Base):
     is_required: Mapped[bool] = mapped_column(nullable=False, default=False)
     question_type: Mapped[str] = mapped_column(nullable=True)
     # foreign key
-    question_id: Mapped[int] = mapped_column(ForeignKey("question.id"), nullable=False)
+    question_id: Mapped[int] = mapped_column(ForeignKey("question.id"), nullable=True)
     section_id: Mapped[int] = mapped_column(ForeignKey("section.id"), nullable=False)
 
     # relationship

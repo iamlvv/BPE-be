@@ -134,7 +134,7 @@ class Question:
             raise Exception(e)
 
     @classmethod
-    def add_and_contribute_question(cls, question_in_section, user_id):
+    def add_and_contribute_question(cls, content, type, user_id):
         session = DatabaseConnector.get_session()
         try:
             question = Question_model(
@@ -170,6 +170,23 @@ class Question:
             question.question_type = question_in_section.question_type
             question.content = question_in_section.content
 
+            session.commit()
+            return question
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_question_by_id(cls, question_id):
+        session = DatabaseConnector.get_session()
+        try:
+            question = (
+                session.query(Question_model)
+                .filter(
+                    Question_model.id == question_id, Question_model.is_deleted == False
+                )
+                .first()
+            )
             session.commit()
             return question
         except Exception as e:
