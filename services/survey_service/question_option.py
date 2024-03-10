@@ -31,3 +31,19 @@ class Question_option_service:
             )
             question_options_list.append(question_option)
         return question_options_list
+
+    @classmethod
+    def update_question_option(cls, question_option):
+        return Question_option.update_question_option(question_option)
+
+    @classmethod
+    def add_new_question_option(
+        cls, question_in_section_id: int, question_option: object
+    ) -> object:
+        return Question_option.add_new_question_option(
+            question_in_section_id, question_option
+        )
+
+    @classmethod
+    def delete_question_option(cls, question_option):
+        return Question_option.delete_question_option(question_option)

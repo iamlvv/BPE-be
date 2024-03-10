@@ -103,3 +103,22 @@ def contribute_question_in_survey():
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/question", methods=["POST"])
+def create_new_question_in_survey():
+    user_id = get_id_from_token(get_token(request))
+    body = load_request_body(request)
+    project_id = body["projectId"]
+    question_type = body["questionType"]
+    content = body["content"]
+    section_id = body["sectionId"]
+    question_options = body["questionOptions"] if "questionOptions" in body else None
+    data = Question_in_section_service.add_new_question_to_section(
+        user_id, project_id, section_id, question_type, content, question_options
+    )
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

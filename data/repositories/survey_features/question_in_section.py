@@ -247,19 +247,19 @@ class Question_in_section:
 
     @classmethod
     def add_new_question_to_section(
-        cls, section_id, question, order_in_section, weight, is_required
+        cls, section_id, content, order_in_section, weight, is_required, question_type
     ):
         session = DatabaseConnector.get_session()
         try:
             question_in_section = Question_in_section_model(
                 section_id=section_id,
-                question_id=question.id,
-                content=question.content,
-                is_deleted=question.is_deleted,
+                question_id=None,
+                content=content,
+                is_deleted=False,
                 is_required=is_required,
                 order_in_section=order_in_section,
                 weight=weight,
-                question_type=question.question_type,
+                question_type=question_type,
             )
             session.add(question_in_section)
             session.commit()

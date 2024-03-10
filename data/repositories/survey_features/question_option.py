@@ -75,7 +75,7 @@ class Question_option:
             raise Exception(e)
 
     @classmethod
-    def delete_question_option(cls, question_in_section_id):
+    def delete_question_option(cls, question_in_section_id: object) -> object:
         session = DatabaseConnector.get_session()
         try:
             question_option = (
@@ -101,6 +101,48 @@ class Question_option:
                 content=question_option["content"],
                 order_in_question=question_option["order_in_question"],
                 is_deleted=question_in_section.is_deleted,
+            )
+            session.add(question_option)
+            session.commit()
+            return question_option
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def update_question_option(cls, question_option):
+        session = DatabaseConnector.get_session()
+        try:
+            question_option = (
+                session.query(Question_option_model)
+                .filter(
+                    Question_option_model.id == question_option.id,
+                    Question_option_model.is_deleted == False,
+                )
+                .update(
+                    {
+                        "content": question_option["content"],
+                        "order_in_question": question_option["orderInQuestion"],
+                    }
+                )
+            )
+            session.commit()
+            return question_option
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def add_new_question_option(
+        cls, question_in_section_id: object, question_option: object
+    ) -> object:
+        session = DatabaseConnector.get_session()
+        try:
+            question_option = Question_option_model(
+                question_in_section_id=question_in_section_id,
+                content=question_option["content"],
+                order_in_question=question_option["orderInQuestion"],
+                is_deleted=False,
             )
             session.add(question_option)
             session.commit()

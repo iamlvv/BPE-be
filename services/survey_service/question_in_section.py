@@ -98,6 +98,7 @@ class Question_in_section_service:
         order_in_section=None,
         weight=None,
         content=None,
+        question_options=None,
     ):
         is_user_has_access = Permission_check.check_user_has_access_survey(
             project_id, user_id
@@ -105,13 +106,15 @@ class Question_in_section_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
 
-        if order_in_section:
+        if order_in_section:  # means the question is being changed position
             cls.reorder_questions_in_section_when_change_position(
                 section_id, question_in_section_id, order_in_section
             )
-        if question_type:
+        if question_type:  # means the question type is being changed
             cls.change_question_type(question_in_section_id, question_type)
 
+        if question_options:
+            cls.handle_question_options(question_in_section_id, question_options)
         updated_question = Question_in_section.update_question_detail_in_survey(
             question_in_section_id,
             is_required,
@@ -119,6 +122,39 @@ class Question_in_section_service:
             content,
         )
         return updated_question
+
+    @classmethod
+    def handle_question_options(cls, question_in_section_id, new_question_options):
+        # check if the question_option is being deleted or added
+        # if the question_option is deleted, then delete the question_option
+        # if the question_option is added, then add the question_option
+        # if the question_option is updated, then update the question_option
+        for question_option in new_question_options:
+            # if type id is int, then the question_option is being updated
+            if isinstance(question_option["id"], int):
+                Question_option_service.update_question_option(question_option)
+            elif (
+                question_option["id"] == "new"
+            ):  # means the new question_option is being added
+                Question_option_service.add_new_question_option(
+                    question_in_section_id, question_option
+                )
+        # check if the question_option is being deleted
+        # get the list of current question options of the question
+        # if any question_option in the current list is not in the list passed in, then delete the question_option
+        current_question_options = (
+            Question_option.get_question_options_in_question_in_section(
+                question_in_section_id
+            )
+        )
+        for current_question_option in current_question_options:
+            # if the current question_option is not in the list passed in, then delete the question_option
+            # the list passed in is the list of new question options, each question_option has an id
+            if current_question_option.id not in [
+                new_question_option["id"]
+                for new_question_option in new_question_options
+            ]:
+                Question_option_service.delete_question_option(current_question_option)
 
     @classmethod
     def reorder_questions_in_section_when_delete_question(
@@ -236,6 +272,8 @@ class Question_in_section_service:
     @classmethod
     def add_new_question_to_section(
         cls,
+        user_id,
+        project_id,
         content,
         order_in_section,
         weight,
@@ -244,11 +282,20 @@ class Question_in_section_service:
         section_id,
         question_options=None,
     ):
-        # add question to the question table which is like a library of questions
-        question = Question.create_question(content, question_type)
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
         # add question to the section
         new_question_in_section = Question_in_section.add_new_question_to_section(
-            section_id, question, order_in_section, weight, is_required
+            section_id,
+            content,
+            order_in_section,
+            weight,
+            is_required,
+            question_type,
         )
         # if the question_type is branching or multiple choice, then add question options to the question
         if question_options:
