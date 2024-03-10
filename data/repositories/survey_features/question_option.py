@@ -50,7 +50,9 @@ class Question_option:
             raise Exception(e)
 
     @classmethod
-    def get_question_options_in_question_in_section(cls, question_in_section_id):
+    def get_question_options_in_question_in_section(
+        cls, question_in_section_id: int
+    ) -> list:
         session = DatabaseConnector.get_session()
         try:
             question_options = (
@@ -68,24 +70,25 @@ class Question_option:
                 .order_by(Question_option_model.order_in_question)
                 .all()
             )
-            session.close()
+            session.commit()
             return question_options
         except Exception as e:
             session.rollback()
             raise Exception(e)
 
     @classmethod
-    def delete_question_option(cls, question_in_section_id: object) -> object:
+    def delete_question_option(cls, question_option):
         session = DatabaseConnector.get_session()
         try:
             question_option = (
                 session.query(Question_option_model)
                 .filter(
-                    Question_option_model.question_in_section_id
-                    == question_in_section_id
+                    Question_option_model.id == question_option["id"],
+                    Question_option_model.is_deleted == False,
                 )
-                .update({"is_deleted": True})
+                .first()
             )
+            question_option.is_deleted = True
             session.commit()
             return question_option
         except Exception as e:
@@ -116,7 +119,7 @@ class Question_option:
             question_option = (
                 session.query(Question_option_model)
                 .filter(
-                    Question_option_model.id == question_option.id,
+                    Question_option_model.id == question_option["id"],
                     Question_option_model.is_deleted == False,
                 )
                 .update(

@@ -29,6 +29,7 @@ def update_question_detail_in_survey():
     question_type = body["questionType"] if "questionType" in body else None
     is_required = body["isRequired"] if "isRequired" in body else None
     order_in_section = body["orderInSection"] if "orderInSection" in body else None
+    question_options = body["questionOptions"] if "questionOptions" in body else None
     project_id = body["projectId"]
     weight = body["weight"] if "weight" in body else None
     question_in_section_id = body["questionInSectionId"]
@@ -43,6 +44,7 @@ def update_question_detail_in_survey():
         order_in_section,
         weight,
         content,
+        question_options,
     )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),

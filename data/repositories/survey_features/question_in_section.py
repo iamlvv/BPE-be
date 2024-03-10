@@ -35,6 +35,25 @@ class Question_in_section:
             raise Exception(e)
 
     @classmethod
+    def get_questions_in_section(cls, section_id):
+        session = DatabaseConnector.get_session()
+        try:
+            questions_in_section = (
+                session.query(Question_in_section_model)
+                .filter(
+                    Question_in_section_model.section_id == section_id,
+                    Question_in_section_model.is_deleted == False,
+                )
+                .order_by(Question_in_section_model.order_in_section)
+                .all()
+            )
+            session.commit()
+            return questions_in_section
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
     def get_questions_in_survey(cls, sections_list_in_survey):
         session = DatabaseConnector.get_session()
         try:
@@ -45,15 +64,7 @@ class Question_in_section:
             # get question_options for first two question
             question_options_list = []
             for section in sections_list_in_survey:
-                questions_in_section = (
-                    session.query(Question_in_section_model)
-                    .filter(
-                        Question_in_section_model.section_id == section["id"],
-                        Question_in_section_model.is_deleted == False,
-                    )
-                    .order_by(Question_in_section_model.order_in_section)
-                    .all()
-                )
+                questions_in_section = cls.get_questions_in_section(section["id"])
                 # only get question options for multiple choice and branching questions
                 for question in questions_in_section:
                     if question.question_type in ["multiple_choice", "branching"]:
@@ -63,7 +74,7 @@ class Question_in_section:
                             )
                         )
                         question_options_list.append(question_options)
-
+                print("question_options_list: ", question_options_list)
                 questions_in_survey.append(
                     {
                         "sectionId": section["id"],
@@ -113,17 +124,20 @@ class Question_in_section:
                 .filter(Question_in_section_model.id == question_in_section_id)
                 .first()
             )
-            session.close()
-            return {
-                "id": question_in_section.id,
-                "content": question_in_section.content,
-                "isDeleted": question_in_section.is_deleted,
-                "isRequired": question_in_section.is_required,
-                "orderInSection": question_in_section.order_in_section,
-                "weight": question_in_section.weight,
-                "questionType": question_in_section.question_type,
-                "sectionId": question_in_section.section_id,
-            }
+            session.commit()
+            if question_in_section:
+                return {
+                    "id": question_in_section.id,
+                    "content": question_in_section.content,
+                    "isDeleted": question_in_section.is_deleted,
+                    "isRequired": question_in_section.is_required,
+                    "orderInSection": question_in_section.order_in_section,
+                    "weight": question_in_section.weight,
+                    "questionType": question_in_section.question_type,
+                    "sectionId": question_in_section.section_id,
+                }
+            else:
+                return None
         except Exception as e:
             session.rollback()
             raise Exception(e)

@@ -84,7 +84,33 @@ class Question_in_section_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
 
-        return Question_in_section.get_question_detail_in_survey(question_in_section_id)
+        question_in_section = Question_in_section.get_question_detail_in_survey(
+            question_in_section_id
+        )
+        # if question_in_section.question_type in ["branching", "multiple_choice"]:
+        question_options = Question_option.get_question_options_in_question_in_section(
+            question_in_section_id
+        )
+        # return question_in_section and question_options, but question_options is a field of question_in_section
+        return {
+            "id": question_in_section["id"],
+            "content": question_in_section["content"],
+            "questionType": question_in_section["questionType"],
+            "isRequired": question_in_section["isRequired"],
+            "orderInSection": question_in_section["orderInSection"],
+            "weight": question_in_section["weight"],
+            "sectionId": question_in_section["sectionId"],
+            "isDeleted": question_in_section["isDeleted"],
+            "questionOptions": [
+                {
+                    "id": question_option[0],
+                    "content": question_option[1],
+                    "orderInQuestion": question_option[2],
+                    "questionInSectionId": question_option[3],
+                }
+                for question_option in question_options
+            ],
+        }
 
     @classmethod
     def update_question_detail_in_survey(
@@ -106,7 +132,19 @@ class Question_in_section_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
 
+        if content == "":
+            return {"message": "Question content cannot be empty"}
+
         if order_in_section:  # means the question is being changed position
+            # get number of questions in the section
+            number_of_questions_in_section = len(
+                Question_in_section.get_questions_in_section(section_id)
+            )
+            if (
+                order_in_section > number_of_questions_in_section - 1
+                or order_in_section < 0
+            ):
+                return {"message": "Invalid order in section"}
             cls.reorder_questions_in_section_when_change_position(
                 section_id, question_in_section_id, order_in_section
             )
@@ -121,7 +159,10 @@ class Question_in_section_service:
             weight,
             content,
         )
-        return updated_question
+
+        return cls.get_question_detail_in_survey(
+            question_in_section_id, project_id, user_id
+        )
 
     @classmethod
     def handle_question_options(cls, question_in_section_id, new_question_options):
@@ -129,19 +170,6 @@ class Question_in_section_service:
         # if the question_option is deleted, then delete the question_option
         # if the question_option is added, then add the question_option
         # if the question_option is updated, then update the question_option
-        for question_option in new_question_options:
-            # if type id is int, then the question_option is being updated
-            if isinstance(question_option["id"], int):
-                Question_option_service.update_question_option(question_option)
-            elif (
-                question_option["id"] == "new"
-            ):  # means the new question_option is being added
-                Question_option_service.add_new_question_option(
-                    question_in_section_id, question_option
-                )
-        # check if the question_option is being deleted
-        # get the list of current question options of the question
-        # if any question_option in the current list is not in the list passed in, then delete the question_option
         current_question_options = (
             Question_option.get_question_options_in_question_in_section(
                 question_in_section_id
@@ -150,11 +178,23 @@ class Question_in_section_service:
         for current_question_option in current_question_options:
             # if the current question_option is not in the list passed in, then delete the question_option
             # the list passed in is the list of new question options, each question_option has an id
-            if current_question_option.id not in [
+            if current_question_option[0] not in [
                 new_question_option["id"]
                 for new_question_option in new_question_options
             ]:
                 Question_option_service.delete_question_option(current_question_option)
+
+        for question_option in new_question_options:
+            # if type id is int, then the question_option is being updated
+            if isinstance(question_option["id"], int):
+                Question_option_service.update_question_option(question_option)
+            else:  # means the new question_option is being added
+                Question_option_service.add_new_question_option(
+                    question_in_section_id, question_option
+                )
+        # check if the question_option is being deleted
+        # get the list of current question options of the question
+        # if any question_option in the current list is not in the list passed in, then delete the question_option
 
     @classmethod
     def reorder_questions_in_section_when_delete_question(
