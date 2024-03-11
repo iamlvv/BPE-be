@@ -201,16 +201,11 @@ class Question_in_section_service:
 
     @classmethod
     def reorder_questions_in_section_when_delete_question(
-        cls, user_id, project_id, section_id, question_in_section_id
+        cls, section_id, question_in_section_id
     ):
         # question_in_section_id is the id of the question that is being changed position or deleted
         # when the question is being deleted, the order of the remaining questions in the section should be updated
         # when the question is being changed position, the order of the questions in the section should be updated
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            return {"message": "User has no access to the survey"}
 
         # get the order of the question that is being changed position or deleted
         question_in_section = Question_in_section.get_question_in_section_by_id(
@@ -221,7 +216,10 @@ class Question_in_section_service:
         questions_in_section = Question_in_section.get_questions_in_section(section_id)
         # update the order of the questions in the section
         for question in questions_in_section:
-            if question.order_in_section > order_of_question:
+            if (
+                question.order_in_section > order_of_question
+                and question.id != question_in_section_id
+            ):
                 Question_in_section.update_order_of_question_in_section(
                     question.id, question.order_in_section - 1
                 )
@@ -270,14 +268,14 @@ class Question_in_section_service:
         # delete the question in the section
         Question_in_section.delete_question_in_section(question_in_section_id)
         # delete the question options of the question if it has any
-        Question_option.delete_question_option(question_in_section_id)
+        Question_option.delete_question_options(question_in_section_id)
         # delete the question options section mapping of the question
         Question_option_section_mapping_service.delete_question_option_section_mapping(
             question_in_section_id
         )
         # reorder the questions in the section
         cls.reorder_questions_in_section_when_delete_question(
-            user_id, project_id, section_id, question_in_section_id
+            section_id, question_in_section_id
         )
         return {"message": "Question has been deleted from the survey"}
 
