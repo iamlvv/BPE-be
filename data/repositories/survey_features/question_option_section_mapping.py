@@ -33,7 +33,8 @@ class Question_option_section_mapping:
                 )
                 .first()
             )
-            question_option_section_mapping.is_deleted = True
+            if question_option_section_mapping:
+                question_option_section_mapping.is_deleted = True
             session.commit()
             return question_option_section_mapping
         except Exception as e:

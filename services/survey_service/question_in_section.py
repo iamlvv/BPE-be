@@ -303,7 +303,7 @@ class Question_in_section_service:
         # if the question is already branching or multiple choice, then delete question options of the question
         else:
             if current_question_type in ["branching", "multiple_choice"]:
-                Question_option.delete_question_option(question_in_section_id)
+                Question_option.delete_question_options(question_in_section_id)
                 # delete the question options section mapping of the question
                 Question_option_section_mapping_service.delete_question_option_section_mapping(
                     question_in_section_id

@@ -77,18 +77,21 @@ class Question_option:
             raise Exception(e)
 
     @classmethod
-    def delete_question_option(cls, question_option):
+    def delete_question_options(cls, question_in_section_id: int):
         session = DatabaseConnector.get_session()
         try:
             question_option = (
                 session.query(Question_option_model)
                 .filter(
-                    Question_option_model.id == question_option[0],
+                    Question_option_model.question_in_section_id
+                    == question_in_section_id,
                     Question_option_model.is_deleted == False,
                 )
-                .first()
+                .all()
             )
-            question_option.is_deleted = True
+            for option in question_option:
+                option.is_deleted = True
+
             session.commit()
             return question_option
         except Exception as e:
