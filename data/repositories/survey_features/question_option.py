@@ -105,7 +105,7 @@ class Question_option:
             question_option = Question_option_model(
                 question_in_section_id=question_in_section.id,
                 content=question_option["content"],
-                order_in_question=question_option["order_in_question"],
+                order_in_question=question_option["orderInQuestion"],
                 is_deleted=question_in_section.is_deleted,
             )
             session.add(question_option)

@@ -316,12 +316,12 @@ class Question_in_section_service:
         cls,
         user_id,
         project_id,
+        section_id,
         content,
         order_in_section,
         weight,
         is_required,
         question_type,
-        section_id,
         question_options=None,
     ):
         is_user_has_access = Permission_check.check_user_has_access_survey(
@@ -340,8 +340,9 @@ class Question_in_section_service:
             question_type,
         )
         # if the question_type is branching or multiple choice, then add question options to the question
+        question_options_list = []
         if question_options:
-            question_options = Question_option_service.create_question_options(
+            question_options_list = Question_option_service.create_question_options(
                 new_question_in_section, question_options
             )
             # # for this branching question, create a sample mapping of question options to the next sections
@@ -352,7 +353,24 @@ class Question_in_section_service:
         cls.reorder_questions_in_section_when_add_new_question(
             section_id, new_question_in_section.id, order_in_section
         )
-        return new_question_in_section
+        return {
+            "id": new_question_in_section.id,
+            "content": new_question_in_section.content,
+            "questionType": new_question_in_section.question_type,
+            "isRequired": new_question_in_section.is_required,
+            "orderInSection": new_question_in_section.order_in_section,
+            "weight": new_question_in_section.weight,
+            "sectionId": new_question_in_section.section_id,
+            "questionOptions": [
+                {
+                    "id": question_option.id,
+                    "content": question_option.content,
+                    "orderInQuestion": question_option.order_in_question,
+                    "questionInSectionId": question_option.question_in_section_id,
+                }
+                for question_option in question_options_list
+            ],
+        }
 
     @classmethod
     def contribute_question(

@@ -64,7 +64,6 @@ class Survey_service:
             return {"message": "Survey does not exist."}
         survey_id = survey_info["id"]
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
-        print("sections_list_in_survey: ", sections_list_in_survey)
         questions_list_in_survey = Question_in_section_service.get_questions_in_survey(
             sections_list_in_survey
         )

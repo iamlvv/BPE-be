@@ -115,9 +115,20 @@ def create_new_question_in_survey():
     question_type = body["questionType"]
     content = body["content"]
     section_id = body["sectionId"]
+    order_in_section = body["orderInSection"]
+    weight = body["weight"] if "weight" in body else 1
+    is_required = body["isRequired"] if "isRequired" in body else False
     question_options = body["questionOptions"] if "questionOptions" in body else None
     data = Question_in_section_service.add_new_question_to_section(
-        user_id, project_id, section_id, question_type, content, question_options
+        user_id,
+        project_id,
+        section_id,
+        content,
+        order_in_section,
+        weight,
+        is_required,
+        question_type,
+        question_options,
     )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
