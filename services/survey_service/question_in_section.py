@@ -184,6 +184,7 @@ class Question_in_section_service:
                 new_question_option["id"]
                 for new_question_option in new_question_options
             ]:
+                print("current_question_option: ", current_question_option)
                 Question_option_service.delete_question_option(current_question_option)
 
         for question_option in new_question_options:
