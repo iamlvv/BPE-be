@@ -87,6 +87,7 @@ class Question_in_section_service:
         question_in_section = Question_in_section.get_question_detail_in_survey(
             question_in_section_id
         )
+        print("question_in_section: ", question_in_section)
         # if question_in_section.question_type in ["branching", "multiple_choice"]:
         question_options = Question_option.get_question_options_in_question_in_section(
             question_in_section_id
@@ -135,12 +136,12 @@ class Question_in_section_service:
         if content == "":
             return {"message": "Question content cannot be empty"}
 
-        if order_in_section:  # means the question is being changed position
+        if order_in_section is not None:  # means the question is being changed position
             # get number of questions in the section
             number_of_questions_in_section = len(
                 Question_in_section.get_questions_in_section(section_id)
             )
-            if (
+            if order_in_section != 0 and (
                 order_in_section > number_of_questions_in_section - 1
                 or order_in_section < 0
             ):
@@ -153,13 +154,14 @@ class Question_in_section_service:
 
         if question_options:
             cls.handle_question_options(question_in_section_id, question_options)
+        print("weight: ", weight)
         updated_question = Question_in_section.update_question_detail_in_survey(
             question_in_section_id,
             is_required,
             weight,
             content,
         )
-
+        print("updated_question: ", updated_question)
         return cls.get_question_detail_in_survey(
             question_in_section_id, project_id, user_id
         )
@@ -234,6 +236,7 @@ class Question_in_section_service:
             question_in_section_id
         )
         order_of_question = question_in_section.order_in_section
+        print("order_of_question: ", order_of_question)
         # get the list of questions in the section
         questions_in_section = Question_in_section.get_questions_in_section(section_id)
         # update the order of the questions in the section

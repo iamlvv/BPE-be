@@ -83,7 +83,7 @@ class Question_option:
             question_option = (
                 session.query(Question_option_model)
                 .filter(
-                    Question_option_model.id == question_option["id"],
+                    Question_option_model.id == question_option[0],
                     Question_option_model.is_deleted == False,
                 )
                 .first()

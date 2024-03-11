@@ -157,12 +157,13 @@ class Question_in_section:
                 .filter(Question_in_section_model.id == question_in_section_id)
                 .first()
             )
-            if is_required:
+            if is_required is not None:
                 question_in_section.is_required = is_required
-            if weight:
+            if weight is not None:
                 question_in_section.weight = weight
-            if content:
+            if content is not None:
                 question_in_section.content = content
+
             session.commit()
             return {
                 "id": question_in_section.id,

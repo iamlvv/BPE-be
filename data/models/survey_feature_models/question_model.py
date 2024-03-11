@@ -30,7 +30,7 @@ class Question_in_section_model(Base):
     content: Mapped[str] = mapped_column(nullable=False)
     is_deleted: Mapped[bool] = mapped_column(nullable=False, default=False)
     order_in_section: Mapped[int] = mapped_column(nullable=False)
-    weight: Mapped[int] = mapped_column(nullable=False)
+    weight: Mapped[float] = mapped_column(nullable=False)
     is_required: Mapped[bool] = mapped_column(nullable=False, default=False)
     question_type: Mapped[str] = mapped_column(nullable=True)
     # foreign key
