@@ -40,11 +40,7 @@ class Question_in_section:
         session = DatabaseConnector.get_session()
         try:
             questions_in_section = (
-                session.query(Question_in_section_model, Question_model.origin)
-                .outerjoin(
-                    Question_model,
-                    Question_model.id == Question_in_section_model.question_id,
-                )
+                session.query(Question_in_section_model)
                 .filter(
                     Question_in_section_model.section_id == section_id,
                     Question_in_section_model.is_deleted == False,
@@ -109,7 +105,6 @@ class Question_in_section:
                                 "orderInSection": question.order_in_section,
                                 "weight": question.weight,
                                 "questionType": question.question_type,
-                                "origin": question.origin if question.origin else None,
                             }
                             for question in questions_in_section
                         ],
