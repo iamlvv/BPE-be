@@ -206,3 +206,53 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_survey_general_config(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
+                .first()
+            )
+            session.commit()
+            if survey is None:
+                return None
+            return {
+                "id": survey.id,
+                "name": survey.name,
+                "description": survey.description,
+                "createdAt": survey.created_at,
+                "isDeleted": survey.is_deleted,
+                "npsWeight": survey.nps_weight,
+                "cesWeight": survey.ces_weight,
+                "csatWeight": survey.csat_weight,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_survey_response_config(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
+                .first()
+            )
+            session.commit()
+            if survey is None:
+                return None
+            return {
+                "id": survey.id,
+                "incompleteSurveyAction": survey.incomplete_survey_action,
+                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
+                "sendResultToRespondent": survey.send_result_to_respondent,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

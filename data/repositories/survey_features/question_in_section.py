@@ -136,6 +136,7 @@ class Question_in_section:
                     "weight": question_in_section.weight,
                     "questionType": question_in_section.question_type,
                     "sectionId": question_in_section.section_id,
+                    "questionId": question_in_section.question_id,
                 }
             else:
                 return None
@@ -191,25 +192,6 @@ class Question_in_section:
             )
             session.close()
             return question_in_section
-        except Exception as e:
-            session.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def get_questions_in_section(cls, section_id):
-        session = DatabaseConnector.get_session()
-        try:
-            questions_in_section = (
-                session.query(Question_in_section_model)
-                .filter(
-                    Question_in_section_model.section_id == section_id,
-                    Question_in_section_model.is_deleted == False,
-                )
-                .order_by(Question_in_section_model.order_in_section)
-                .all()
-            )
-            session.commit()
-            return questions_in_section
         except Exception as e:
             session.rollback()
             raise Exception(e)
@@ -278,6 +260,24 @@ class Question_in_section:
                 question_type=question_type,
             )
             session.add(question_in_section)
+            session.commit()
+            return question_in_section
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def update_question_id_in_question_in_section(
+        cls, question_in_section_id, question_id
+    ):
+        session = DatabaseConnector.get_session()
+        try:
+            question_in_section = (
+                session.query(Question_in_section_model)
+                .filter(Question_in_section_model.id == question_in_section_id)
+                .first()
+            )
+            question_in_section.question_id = question_id
             session.commit()
             return question_in_section
         except Exception as e:

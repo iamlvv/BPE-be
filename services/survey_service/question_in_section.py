@@ -101,6 +101,7 @@ class Question_in_section_service:
             "orderInSection": question_in_section["orderInSection"],
             "weight": question_in_section["weight"],
             "sectionId": question_in_section["sectionId"],
+            "questionId": question_in_section["questionId"],
             "isDeleted": question_in_section["isDeleted"],
             "questionOptions": [
                 {
@@ -154,14 +155,12 @@ class Question_in_section_service:
 
         if question_options:
             cls.handle_question_options(question_in_section_id, question_options)
-        print("weight: ", weight)
         updated_question = Question_in_section.update_question_detail_in_survey(
             question_in_section_id,
             is_required,
             weight,
             content,
         )
-        print("updated_question: ", updated_question)
         return cls.get_question_detail_in_survey(
             question_in_section_id, project_id, user_id
         )
@@ -377,9 +376,14 @@ class Question_in_section_service:
         cls,
         user_id,
         project_id,
+        survey_domain,
+        section_id,
         question_id,
         question_in_section_id,
         question_type,
+        is_required,
+        order_in_section,
+        weight,
         content,
         question_options=None,
     ):
@@ -389,13 +393,32 @@ class Question_in_section_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
 
+        updated_question = cls.update_question_detail_in_survey(
+            user_id,
+            project_id,
+            section_id,
+            question_in_section_id,
+            question_type,
+            is_required,
+            order_in_section,
+            weight,
+            content,
+            question_options,
+        )
         # check if the question exists
         question = Question.get_question_by_id(question_id)
         if question is not None:
             return Question.update_contributed_question(
                 question_id, question_type, content, user_id
             )
-        return Question.contribute_question(question_type, content, user_id)
+        contributed_question = Question.contribute_question(
+            question_type, content, user_id, survey_domain
+        )
+        # add the contributed question id to the question_in_section
+        Question_in_section.update_question_id_in_question_in_section(
+            question_in_section_id, contributed_question.id
+        )
+        return contributed_question
 
     @classmethod
     def reorder_questions_in_section_when_add_new_question(

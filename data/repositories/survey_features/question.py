@@ -134,42 +134,19 @@ class Question:
             raise Exception(e)
 
     @classmethod
-    def add_and_contribute_question(cls, content, type, user_id):
+    def contribute_question(cls, question_type, content, user_id, survey_domain):
         session = DatabaseConnector.get_session()
         try:
             question = Question_model(
-                id=question_in_section.id,
-                content=question_in_section.content,
-                question_type=question_in_section.question_type,
+                content=content,
+                question_type=question_type,
                 origin="user",
-                domain="general",
+                domain=survey_domain,
                 is_deleted=False,
                 contributor_id=user_id,
                 usage_count=0,
             )
             session.add(question)
-            session.commit()
-            return question
-        except Exception as e:
-            session.rollback()
-            raise Exception(e)
-
-    @classmethod
-    def contribute_question(cls, question_in_section, user_id):
-        session = DatabaseConnector.get_session()
-        try:
-            question = (
-                session.query(Question_model)
-                .filter(
-                    Question_model.id == question_in_section.id,
-                    Question_model.is_deleted == False,
-                )
-                .first()
-            )
-            question.contributor_id = user_id
-            question.question_type = question_in_section.question_type
-            question.content = question_in_section.content
-
             session.commit()
             return question
         except Exception as e:
@@ -187,6 +164,26 @@ class Question:
                 )
                 .first()
             )
+            session.commit()
+            return question
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def update_contributed_question(cls, question_id, question_type, content, user_id):
+        session = DatabaseConnector.get_session()
+        try:
+            question = (
+                session.query(Question_model)
+                .filter(
+                    Question_model.id == question_id, Question_model.is_deleted == False
+                )
+                .first()
+            )
+            question.content = content
+            question.question_type = question_type
+            question.contributor_id = user_id
             session.commit()
             return question
         except Exception as e:

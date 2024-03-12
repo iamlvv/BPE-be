@@ -86,6 +86,12 @@ def contribute_question_in_survey():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
     project_id = body["projectId"]
+    survey_domain = body["surveyDomain"]
+    section_id = body["sectionId"]
+    is_required = body["isRequired"]
+    order_in_section = body["orderInSection"]
+    weight = body["weight"]
+    content = body["content"]
     question_type = body["questionType"]
     content = body["content"]
     question_id = body["questionId"]
@@ -94,9 +100,14 @@ def contribute_question_in_survey():
     data = Question_in_section_service.contribute_question(
         user_id,
         project_id,
+        survey_domain,
+        section_id,
         question_id,
         question_in_section_id,
         question_type,
+        is_required,
+        order_in_section,
+        weight,
         content,
         question_options,
     )

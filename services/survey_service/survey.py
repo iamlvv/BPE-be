@@ -146,3 +146,22 @@ class Survey_service:
     @classmethod
     def check_if_survey_exists(cls, process_version_version):
         return Survey.check_if_survey_exists(process_version_version)
+
+    @classmethod
+    def get_survey_general_config(cls, survey_id, user_id, project_id):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+        return Survey.get_survey_general_config(survey_id)
+
+    @classmethod
+    def get_survey_response_config(cls, survey_id, user_id, project_id):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
+        return Survey.get_survey_response_config(survey_id)

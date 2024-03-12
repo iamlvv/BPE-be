@@ -77,6 +77,19 @@ def delete_survey():
     )
 
 
+@bpsky.route("/api/v1/survey/general_configuration", methods=["GET"])
+def get_survey_general_config():
+    user_id = get_id_from_token(get_token(request))
+    survey_id = request.args.get("surveyId")
+    project_id = request.args.get("projectId")
+    data = Survey_service.get_survey_general_config(survey_id, user_id, project_id)
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )
+
+
 @bpsky.route("/api/v1/survey/general_configuration", methods=["PUT"])
 def config_survey_general():
     user_id = get_id_from_token(get_token(request))
@@ -98,6 +111,19 @@ def config_survey_general():
         ces_weight,
         csat_weight,
     )
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )
+
+
+@bpsky.route("/api/v1/survey/response_configuration", methods=["GET"])
+def get_survey_response_config():
+    user_id = get_id_from_token(get_token(request))
+    survey_id = request.args.get("surveyId")
+    project_id = request.args.get("projectId")
+    data = Survey_service.get_survey_response_config(survey_id, user_id, project_id)
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
         status=200,
