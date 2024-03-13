@@ -41,7 +41,7 @@ class Initialize:
                     content=sample_question_option["content"],
                     is_deleted=sample_question_option["is_deleted"],
                     order_in_question=sample_question_option["order_in_question"],
-                    question_id=sample_question_option["question_id"],
+                    question_in_section_id=sample_question_option["question_id"],
                 )
                 session.add(question_option)
             session.commit()
@@ -50,6 +50,3 @@ class Initialize:
         except Exception as e:
             session.rollback()
             raise Exception(e)
-
-
-Initialize.initialize_questions()

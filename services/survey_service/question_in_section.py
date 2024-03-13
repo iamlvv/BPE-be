@@ -440,3 +440,56 @@ class Question_in_section_service:
         #     new_question_in_section_id, order_in_section
         # )
         return {"message": "Questions in section have been reordered"}
+
+    @classmethod
+    def pick_question_from_suggestions(
+        cls,
+        user_id,
+        project_id,
+        section_id,
+        question_id,
+        order_in_section,
+        user_action=None,
+    ):
+        # get question from table Question
+        # check if the question is already in the section
+        # if not, add the question to the section
+        # if yes, return message "Question already in the section"
+        # if the question is a multiple choice or branching, get the question options from table QuestionOption
+        # if question is contributed by user, update the usage count
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
+        question = Question.get_question_by_id(question_id)
+
+        existing_question_in_section = Question_in_section.check_if_question_exists(
+            section_id, question_id
+        )
+
+        if existing_question_in_section and user_action is None:
+            return {"message": "Question already in the section"}
+        elif existing_question_in_section and user_action is not None:
+            new_question_in_section = Question_in_section.add_new_question_to_section(
+                section_id,
+                question.content,
+                order_in_section,
+                1,
+                False,
+                question.question_type,
+                question_id,
+            )
+            if question.question_type in ["branching", "multiple_choice"]:
+                question_options = (
+                    Question_option.get_question_options_with_question_id(
+                        existing_question_in_section.id
+                    )
+                )
+                for question_option in question_options:
+                    Question_option_service.add_new_question_option(
+                        new_question_in_section.id, question_option
+                    )
+        Question.update_usage_count(question_id)
+        return {}

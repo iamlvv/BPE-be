@@ -245,13 +245,20 @@ class Question_in_section:
 
     @classmethod
     def add_new_question_to_section(
-        cls, section_id, content, order_in_section, weight, is_required, question_type
+        cls,
+        section_id,
+        content,
+        order_in_section,
+        weight,
+        is_required,
+        question_type,
+        question_id=None,
     ):
         session = DatabaseConnector.get_session()
         try:
             question_in_section = Question_in_section_model(
                 section_id=section_id,
-                question_id=None,
+                question_id=question_id,
                 content=content,
                 is_deleted=False,
                 is_required=is_required,
@@ -278,6 +285,25 @@ class Question_in_section:
                 .first()
             )
             question_in_section.question_id = question_id
+            session.commit()
+            return question_in_section
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def check_if_question_exists(cls, section_id, question_id):
+        session = DatabaseConnector.get_session()
+        try:
+            question_in_section = (
+                session.query(Question_in_section_model)
+                .filter(
+                    Question_in_section_model.section_id == section_id,
+                    Question_in_section_model.question_id == question_id,
+                    Question_in_section_model.is_deleted == False,
+                )
+                .first()
+            )
             session.commit()
             return question_in_section
         except Exception as e:

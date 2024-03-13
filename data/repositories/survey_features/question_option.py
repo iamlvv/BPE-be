@@ -175,3 +175,22 @@ class Question_option:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_question_options_with_question_id(cls, question_in_section_id):
+        session = DatabaseConnector.get_session()
+        try:
+            question_options = (
+                session.query(Question_option_model)
+                .filter(
+                    Question_option_model.question_in_section_id
+                    == question_in_section_id,
+                    Question_option_model.is_deleted == False,
+                )
+                .all()
+            )
+            session.commit()
+            return question_options
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

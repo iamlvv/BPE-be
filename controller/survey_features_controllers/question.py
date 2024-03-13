@@ -146,3 +146,15 @@ def create_new_question_in_survey():
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/question/suggestion", methods=["GET"])
+def get_question_suggestion():
+    user_id = get_id_from_token(get_token(request))
+    project_id = request.args.get("projectId", None)
+    data = Question_service.get_all_questions(project_id, user_id)
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

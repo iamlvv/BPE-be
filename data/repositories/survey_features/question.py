@@ -190,6 +190,58 @@ class Question:
             session.rollback()
             raise Exception(e)
 
+    @classmethod
+    def get_all_questions(cls):
+        session = DatabaseConnector.get_session()
+        try:
+            questions = (
+                session.query(Question_model)
+                .filter(Question_model.is_deleted == False)
+                .all()
+            )
+            session.commit()
+            return questions
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_user_questions(cls):
+        session = DatabaseConnector.get_session()
+        try:
+            # group all questions contributed by users
+            questions = (
+                session.query(Question_model)
+                .filter(
+                    Question_model.origin == "user", Question_model.is_deleted == False
+                )
+                .order_by(Question_model.usage_count.desc())
+                .all()
+            )
+            session.commit()
+            return questions
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def update_usage_count(cls, question_id):
+        session = DatabaseConnector.get_session()
+        try:
+            question = (
+                session.query(Question_model)
+                .filter(
+                    Question_model.id == question_id, Question_model.is_deleted == False
+                )
+                .first()
+            )
+            question.usage_count += 1
+            session.commit()
+            return question
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
 
 # insert sample questions into table question
 # insert sample sections into table section
