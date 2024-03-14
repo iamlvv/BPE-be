@@ -54,7 +54,10 @@ class Section:
         try:
             sections = (
                 session.query(Section_model)
-                .filter(Section_model.survey_id == survey_id)
+                .filter(
+                    Section_model.survey_id == survey_id,
+                    Section_model.is_deleted == False,
+                )
                 .all()
             )
             section_list = []
@@ -63,9 +66,7 @@ class Section:
                     {
                         "id": section.id,
                         "name": section.name,
-                        "survey_id": section.survey_id,
-                        "isDeleted": section.is_deleted,
-                        "order_in_survey": section.order_in_survey,
+                        "orderInSurvey": section.order_in_survey,
                     }
                 )
             session.close()

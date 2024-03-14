@@ -209,3 +209,11 @@ class Survey_service:
                 for question in questions_in_section
             ],
         }
+
+    @classmethod
+    def get_sections_in_survey(cls, process_version_version):
+        survey_id = Survey.check_if_survey_exists(process_version_version)
+        if survey_id is None:
+            return {"message": "Survey does not exist."}
+        sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
+        return sections_list_in_survey
