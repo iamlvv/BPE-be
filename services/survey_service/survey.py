@@ -181,28 +181,31 @@ class Survey_service:
                     )
                 )
                 question_options_list.append(question_options)
-        return [
-            {
-                "questionOptions": (
-                    [
-                        {
-                            "id": question_option_item[0],
-                            "content": question_option_item[1],
-                            "orderInQuestion": question_option_item[2],
-                        }
-                        for question_option in question_options_list
-                        for question_option_item in question_option
-                        if question_option_item[3] == question.id
-                    ]
-                    if question.question_type in ["multiple_choice", "branching"]
-                    else []
-                ),
-                "id": question.id,
-                "content": question.content,
-                "isDeleted": question.is_deleted,
-                "isRequired": question.is_required,
-                "orderInSection": question.order_in_section,
-                "questionType": question.question_type,
-            }
-            for question in questions_in_section
-        ]
+        return {
+            "sectionId": int(section_id),
+            "questions": [
+                {
+                    "questionOptions": (
+                        [
+                            {
+                                "id": question_option_item[0],
+                                "content": question_option_item[1],
+                                "orderInQuestion": question_option_item[2],
+                            }
+                            for question_option in question_options_list
+                            for question_option_item in question_option
+                            if question_option_item[3] == question.id
+                        ]
+                        if question.question_type in ["multiple_choice", "branching"]
+                        else []
+                    ),
+                    "id": question.id,
+                    "content": question.content,
+                    "isDeleted": question.is_deleted,
+                    "isRequired": question.is_required,
+                    "orderInSection": question.order_in_section,
+                    "questionType": question.question_type,
+                }
+                for question in questions_in_section
+            ],
+        }
