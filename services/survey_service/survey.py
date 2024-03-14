@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from data.repositories.survey_features.question_option import Question_option
 from data.repositories.survey_features.survey import Survey
 from services.survey_service.question_in_section import (
     Question_in_section_service,
@@ -165,3 +166,43 @@ class Survey_service:
             return {"message": "User has no access to the survey"}
 
         return Survey.get_survey_response_config(survey_id)
+
+    @classmethod
+    def get_survey_questions_by_section_id(cls, section_id):
+        questions_in_section = Question_in_section_service.get_questions_in_section(
+            section_id
+        )
+        question_options_list = []
+        for question in questions_in_section:
+            if question.question_type in ["multiple_choice", "branching"]:
+                question_options = (
+                    Question_option.get_question_options_in_question_in_section(
+                        question.id
+                    )
+                )
+                question_options_list.append(question_options)
+        return [
+            {
+                "questionOptions": (
+                    [
+                        {
+                            "id": question_option_item[0],
+                            "content": question_option_item[1],
+                            "orderInQuestion": question_option_item[2],
+                        }
+                        for question_option in question_options_list
+                        for question_option_item in question_option
+                        if question_option_item[3] == question.id
+                    ]
+                    if question.question_type in ["multiple_choice", "branching"]
+                    else []
+                ),
+                "id": question.id,
+                "content": question.content,
+                "isDeleted": question.is_deleted,
+                "isRequired": question.is_required,
+                "orderInSection": question.order_in_section,
+                "questionType": question.question_type,
+            }
+            for question in questions_in_section
+        ]

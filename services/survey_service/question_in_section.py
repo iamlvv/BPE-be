@@ -493,3 +493,7 @@ class Question_in_section_service:
                     )
         Question.update_usage_count(question_id)
         return {}
+
+    @classmethod
+    def get_questions_in_section(cls, section_id):
+        return Question_in_section.get_questions_in_section(section_id)
