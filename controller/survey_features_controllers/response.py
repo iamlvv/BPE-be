@@ -2,6 +2,7 @@ import jsonpickle
 
 from bpsky import bpsky
 from controller.utils import *
+from services.survey_service.response import Response_service
 from services.survey_service.survey import Survey_service
 
 
@@ -20,6 +21,23 @@ def get_survey_questions_by_section_id():
 def get_survey_sections():
     process_version_version = request.args.get("processVersionVersion", None)
     data = Survey_service.get_sections_in_survey(process_version_version)
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )
+
+
+@bpsky.route("/api/v1/survey/submission", methods=["POST"])
+def submit_survey_form():
+    body = load_request_body(request)
+    process_version_version = body["processVersionVersion"]
+    answers = body["answers"]
+    email = body["email"]
+    full_name = body["fullName"]
+    data = Response_service.submit_survey_form(
+        answers, email, full_name, process_version_version
+    )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
         status=200,

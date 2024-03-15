@@ -217,3 +217,7 @@ class Survey_service:
             return {"message": "Survey does not exist."}
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
         return sections_list_in_survey
+
+    @classmethod
+    def get_survey_response_config_some(cls, survey_id):
+        return Survey.get_survey_response_config_some(survey_id)

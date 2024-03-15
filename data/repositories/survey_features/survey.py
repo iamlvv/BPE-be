@@ -256,3 +256,24 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_survey_response_config_some(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
+                .first()
+            )
+            session.commit()
+            if survey is None:
+                return None
+            return {
+                "incompleteSurveyAction": survey.incomplete_survey_action,
+                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
+                "sendResultToRespondent": survey.send_result_to_respondent,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

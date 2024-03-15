@@ -15,14 +15,15 @@ class Respondent_model(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     email: Mapped[str] = mapped_column(nullable=False)
     is_deleted: Mapped[bool] = mapped_column(nullable=False, default=False)
+    full_name: Mapped[str] = mapped_column(nullable=True)
 
 
 class Response_model(Base):
     __tablename__ = "response"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    start_date: Mapped[datetime] = mapped_column(nullable=False)
-    end_date: Mapped[datetime] = mapped_column(nullable=False)
+    start_date: Mapped[datetime] = mapped_column(nullable=True)
+    end_date: Mapped[datetime] = mapped_column(nullable=True)
     is_deleted: Mapped[bool] = mapped_column(nullable=False, default=False)
     deleted_at: Mapped[datetime] = mapped_column(nullable=True, default=None)
 
