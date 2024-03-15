@@ -80,7 +80,7 @@ class Question_in_section:
                     {
                         "sectionId": section["id"],
                         "sectionName": section["name"],
-                        "orderInSurvey": section["order_in_survey"],
+                        "orderInSurvey": section["orderInSurvey"],
                         "questions": [
                             {
                                 "questionOptions": (
