@@ -2,9 +2,12 @@ from datetime import datetime
 
 from data.repositories.survey_features.question_option import Question_option
 from data.repositories.survey_features.survey import Survey
+from services.survey_service.answer import Answer_service
 from services.survey_service.question_in_section import (
     Question_in_section_service,
 )
+from services.survey_service.question_option import Question_option_service
+from services.survey_service.response import Response_service
 from services.survey_service.section import Section_service
 from services.utils import Permission_check
 
@@ -81,6 +84,24 @@ class Survey_service:
         )
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
+
+        # delete all responses
+        deleted_responses = Response_service.delete_responses(survey_id)
+        # delete all sections
+        deleted_sections = Section_service.delete_sections(survey_id)
+        # delete all questions
+        for section in deleted_sections:
+            deleted_questions = Question_in_section_service.delete_questions_in_section(
+                section["id"]
+            )
+            for question in deleted_questions:
+                if question["question_type"] in ["multiple_choice", "branching"]:
+                    # delete all question options
+                    Question_option_service.delete_question_options(question["id"])
+        # delete all answers
+        for response in deleted_responses:
+            Answer_service.delete_answers(response["id"])
+
         return Survey.delete_survey(survey_id)
 
     @classmethod

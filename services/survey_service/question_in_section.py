@@ -497,3 +497,14 @@ class Question_in_section_service:
     @classmethod
     def get_questions_in_section(cls, section_id):
         return Question_in_section.get_questions_in_section(section_id)
+
+    @classmethod
+    def delete_questions_in_section(cls, section_id):
+        deleted_questions = Question_in_section.delete_questions_in_section(section_id)
+        return [
+            {
+                "id": question.id,
+                "question_type": question.question_type,
+            }
+            for question in deleted_questions
+        ]

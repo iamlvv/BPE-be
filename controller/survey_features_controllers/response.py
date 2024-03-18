@@ -43,3 +43,14 @@ def submit_survey_form():
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/response", methods=["GET"])
+def get_survey_response():
+    response_id = request.args.get("responseId", None)
+    data = Response_service.get_survey_response(response_id)
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

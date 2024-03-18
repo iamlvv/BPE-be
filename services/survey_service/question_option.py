@@ -47,3 +47,7 @@ class Question_option_service:
     @classmethod
     def delete_question_option(cls, question_option):
         return Question_option.delete_question_option(question_option)
+
+    @classmethod
+    def delete_question_options(cls, question_in_section_id):
+        return Question_option.delete_question_options(question_in_section_id)

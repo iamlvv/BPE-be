@@ -74,3 +74,23 @@ class Section:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def delete_sections(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            sections = (
+                session.query(Section_model)
+                .filter(
+                    Section_model.survey_id == survey_id,
+                    Section_model.is_deleted == False,
+                )
+                .all()
+            )
+            for section in sections:
+                section.is_deleted = True
+            session.commit()
+            return sections
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

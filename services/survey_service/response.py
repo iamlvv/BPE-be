@@ -1,9 +1,11 @@
 from datetime import datetime
 
 from data.repositories.survey_features.response import Response
+from data.repositories.survey_features.survey import Survey
 from services.survey_service.answer import Answer_service
 from services.survey_service.respondent import Respondent_service
-from services.survey_service.survey import Survey_service
+
+# from services.survey_service.survey import Survey_service
 from services.survey_service.survey_result import Survey_result_service
 
 
@@ -16,19 +18,19 @@ class Response_service:
         # add answers to table Answer. answers is a list of answer objects, each object contains question_id, value
         # calculate scores for the survey
         # return if survey allows respondent to see the result and send another response
-        survey_id = Survey_service.check_if_survey_exists(process_version_version)
-        # new_respondent = Respondent_service.create_respondent(email, full_name)
-        # respondent_id = new_respondent.id
-        # end_date = datetime.now()
-        # new_response = cls.create_response(
-        #     survey_id, respondent_id, end_date, start_date=None
-        # )
-        # # add answers
-        # response_id = new_response.id
-        # for answer in answers:
-        #     Answer_service.add_answer(
-        #         response_id, answer["questionInSectionId"], answer["value"]
-        #     )
+        survey_id = Survey.check_if_survey_exists(process_version_version)
+        new_respondent = Respondent_service.create_respondent(email, full_name)
+        respondent_id = new_respondent.id
+        end_date = datetime.now()
+        new_response = cls.create_response(
+            survey_id, respondent_id, end_date, start_date=None
+        )
+        # add answers
+        response_id = new_response.id
+        for answer in answers:
+            Answer_service.add_answer(
+                response_id, answer["questionInSectionId"], answer["value"]
+            )
 
         # get number of responses
         current_number_of_responses = cls.get_number_of_responses(survey_id)
@@ -38,8 +40,9 @@ class Response_service:
         )
 
         # return if survey allows respondent to see the result and send another response
-        survey_config = Survey_service.get_survey_response_config_some(survey_id)
+        survey_config = Survey.get_survey_response_config_some(survey_id)
         return {
+            "responseId": response_id,
             "message": "Survey form submitted successfully",
             "sendResultToRespondent": survey_config["sendResultToRespondent"],
             "allowDuplicateRespondent": survey_config["allowDuplicateRespondent"],
@@ -54,3 +57,36 @@ class Response_service:
     @classmethod
     def get_number_of_responses(cls, survey_id):
         return Response.get_number_of_responses(survey_id)
+
+    @classmethod
+    def get_survey_response(cls, response_id):
+        survey_response = Response.get_response(response_id)
+        answers_in_response = Answer_service.get_all_answers(survey_response.id)
+        return {
+            "response": {
+                "id": survey_response.id,
+                "surveyId": survey_response.survey_id,
+                "respondentId": survey_response.respondent_id,
+                "startDate": survey_response.start_date,
+                "endDate": survey_response.end_date,
+            },
+            "answers": [
+                {
+                    "id": answer.id,
+                    "responseId": answer.response_id,
+                    "questionId": answer.question_id,
+                    "value": answer.value,
+                }
+                for answer in answers_in_response
+            ],
+        }
+
+    @classmethod
+    def delete_responses(cls, survey_id):
+        deleted_responses = Response.delete_responses(survey_id)
+        return [
+            {
+                "id": response.id,
+            }
+            for response in deleted_responses
+        ]

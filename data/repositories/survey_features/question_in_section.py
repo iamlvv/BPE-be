@@ -309,3 +309,23 @@ class Question_in_section:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def delete_questions_in_section(cls, section_id):
+        session = DatabaseConnector.get_session()
+        try:
+            questions_in_section = (
+                session.query(Question_in_section_model)
+                .filter(
+                    Question_in_section_model.section_id == section_id,
+                    Question_in_section_model.is_deleted == False,
+                )
+                .all()
+            )
+            for question_in_section in questions_in_section:
+                question_in_section.is_deleted = True
+            session.commit()
+            return questions_in_section
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
