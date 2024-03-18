@@ -3,6 +3,7 @@ from data.models.survey_feature_models.question_model import (
     Section_model,
     Question_in_section_model,
 )
+from data.models.survey_feature_models.survey_model import Survey_model
 from database.db import DatabaseConnector
 
 
@@ -12,12 +13,14 @@ class Survey_result:
         pass
 
     @classmethod
-    def get_list_of_weight_of_ces_questions(cls, survey_id):
+    def get_list_of_weight_and_answers_of_questions_in_survey(
+        cls, survey_id, question_type
+    ):
         session = DatabaseConnector.get_session()
         try:
             # get all questions in all sections belong to survey_id
             # join question and section
-            list_weight_questions_and_answers = (
+            list_of_weight_and_answers_of_questions_in_survey = (
                 session.query(
                     Question_in_section_model.id,
                     Answer_model.value,
@@ -33,21 +36,36 @@ class Survey_result:
                 )
                 .filter(
                     Section_model.survey_id == survey_id,
-                    Question_in_section_model.question_type == "ces",
+                    Question_in_section_model.question_type == question_type,
                     Question_in_section_model.is_deleted == False,
                     Section_model.is_deleted == False,
                 )
                 .all()
             )
             session.commit()
-            return [
-                {
-                    "question_id": item.id,
-                    "value": item.value,
-                    "weight": item.weight,
-                }
-                for item in list_weight_questions_and_answers
-            ]
+            return list_of_weight_and_answers_of_questions_in_survey
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_weights_of_scores(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            weights_of_scores = (
+                session.query(
+                    Survey_model.ces_weight,
+                    Survey_model.csat_weight,
+                    Survey_model.nps_weight,
+                )
+                .filter(
+                    Survey_model.id == survey_id,
+                    Survey_model.is_deleted == False,
+                )
+                .first()
+            )
+            session.commit()
+            return weights_of_scores
         except Exception as e:
             session.rollback()
             raise Exception(e)
