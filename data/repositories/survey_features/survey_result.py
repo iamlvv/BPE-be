@@ -3,7 +3,10 @@ from data.models.survey_feature_models.question_model import (
     Section_model,
     Question_in_section_model,
 )
-from data.models.survey_feature_models.survey_model import Survey_model
+from data.models.survey_feature_models.survey_model import (
+    Survey_model,
+    Survey_result_model,
+)
 from database.db import DatabaseConnector
 
 
@@ -66,6 +69,79 @@ class Survey_result:
             )
             session.commit()
             return weights_of_scores
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_survey_result(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey_result = (
+                session.query(
+                    Survey_result_model.ces_score,
+                    Survey_result_model.csat_score,
+                    Survey_result_model.nps_score,
+                    Survey_result_model.total_score,
+                )
+                .filter(
+                    Survey_result_model.survey_id == survey_id,
+                )
+                .first()
+            )
+            session.commit()
+            return survey_result
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def update_scores(cls, survey_id, ces_score, nps_score, csat_score, total_score):
+        session = DatabaseConnector.get_session()
+        try:
+            survey_result = (
+                session.query(Survey_result_model)
+                .filter(Survey_result_model.survey_id == survey_id)
+                .first()
+            )
+            survey_result.ces_score = ces_score
+            survey_result.nps_score = nps_score
+            survey_result.csat_score = csat_score
+            survey_result.total_score = total_score
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def create_survey_result(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey_result = Survey_result_model(
+                survey_id=survey_id,
+                ces_score=0,
+                csat_score=0,
+                nps_score=0,
+                total_score=0,
+                is_visible=False,
+            )
+            session.add(survey_result)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def check_if_survey_result_exists(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey_result = (
+                session.query(Survey_result_model)
+                .filter(Survey_result_model.survey_id == survey_id)
+                .first()
+            )
+            session.commit()
+            return survey_result
         except Exception as e:
             session.rollback()
             raise Exception(e)

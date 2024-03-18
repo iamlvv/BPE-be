@@ -19,18 +19,18 @@ class Response_service:
         # calculate scores for the survey
         # return if survey allows respondent to see the result and send another response
         survey_id = Survey.check_if_survey_exists(process_version_version)
-        # new_respondent = Respondent_service.create_respondent(email, full_name)
-        # respondent_id = new_respondent.id
-        # end_date = datetime.now()
-        # new_response = cls.create_response(
-        #     survey_id, respondent_id, end_date, start_date=None
-        # )
-        # # add answers
-        # response_id = new_response.id
-        # for answer in answers:
-        #     Answer_service.add_answer(
-        #         response_id, answer["questionInSectionId"], answer["value"]
-        #     )
+        new_respondent = Respondent_service.create_respondent(email, full_name)
+        respondent_id = new_respondent.id
+        end_date = datetime.now()
+        new_response = cls.create_response(
+            survey_id, respondent_id, end_date, start_date=None
+        )
+        # add answers
+        response_id = new_response.id
+        for answer in answers:
+            Answer_service.add_answer(
+                response_id, answer["questionInSectionId"], answer["value"]
+            )
 
         # get number of responses
         current_number_of_responses = cls.get_number_of_responses(survey_id)
@@ -42,12 +42,12 @@ class Response_service:
         # return if survey allows respondent to see the result and send another response
         survey_config = Survey.get_survey_response_config_some(survey_id)
         return {
-            # "responseId": response_id,
+            "responseId": response_id,
             "message": "Survey form submitted successfully",
             "sendResultToRespondent": survey_config["sendResultToRespondent"],
             "allowDuplicateRespondent": survey_config["allowDuplicateRespondent"],
             "incompleteSurveyAction": survey_config["incompleteSurveyAction"],
-            "score": score,
+            # "score": score,
         }
 
     @classmethod

@@ -13,3 +13,4 @@ from .notification import *
 from .survey_features_controllers.survey import *
 from .survey_features_controllers.question import *
 from .survey_features_controllers.response import *
+from .survey_features_controllers.survey_result import *

@@ -18,16 +18,28 @@ class Survey_result_service:
         ces_weight = weights_of_scores.ces_weight
         nps_weight = weights_of_scores.nps_weight
         csat_weight = weights_of_scores.csat_weight
-        final_score = (
+        total_score = (
             ces_score["ces_score"] * ces_weight
             + nps_score["nps_score"] * nps_weight
             + csat_score["csat_score"] * csat_weight
         ) / (ces_weight + nps_weight + csat_weight)
+
+        # update survey with final score
+        survey_result = cls.check_if_survey_result_exists(survey_id)
+        if not survey_result:
+            cls.create_survey_result(survey_id)
+        cls.update_scores(
+            survey_id,
+            ces_score["ces_score"],
+            nps_score["nps_score"],
+            csat_score["csat_score"],
+            round(total_score, 3),
+        )
         return {
             "ces_score": ces_score["ces_score"],
             "nps_score": nps_score["nps_score"],
             "csat_score": csat_score["csat_score"],
-            "final_score": round(final_score, 3),
+            "total_score": round(total_score, 3),
         }
 
     @classmethod
@@ -167,3 +179,29 @@ class Survey_result_service:
             }
             for item in list_of_weight_and_answers_of_questions_in_survey
         ]
+
+    @classmethod
+    def get_survey_result(cls, survey_id):
+        survey_result = Survey_result.get_survey_result(survey_id)
+        if not survey_result:
+            return None
+        return {
+            "cesScore": survey_result.ces_score,
+            "npsScore": survey_result.nps_score,
+            "csatScore": survey_result.csat_score,
+            "totalScore": survey_result.total_score,
+        }
+
+    @classmethod
+    def update_scores(cls, survey_id, ces_score, nps_score, csat_score, total_score):
+        return Survey_result.update_scores(
+            survey_id, ces_score, nps_score, csat_score, total_score
+        )
+
+    @classmethod
+    def create_survey_result(cls, survey_id):
+        return Survey_result.create_survey_result(survey_id)
+
+    @classmethod
+    def check_if_survey_result_exists(cls, survey_id):
+        return Survey_result.check_if_survey_result_exists(survey_id)
