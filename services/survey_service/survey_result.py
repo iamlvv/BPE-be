@@ -42,9 +42,12 @@ class Survey_result_service:
         )
         return {
             "number_of_responses": current_number_of_responses,
-            "ces_score": ces_score["ces_score"],
-            "nps_score": nps_score["nps_score"],
-            "csat_score": csat_score["csat_score"],
+            "ces_score": ces_score,
+            "ces_weight": ces_weight,
+            "nps_score": nps_score,
+            "nps_weight": nps_weight,
+            "csat_score": csat_score,
+            "csat_weight": csat_weight,
             "total_score": round(total_score, 3),
         }
 
@@ -86,7 +89,9 @@ class Survey_result_service:
                 * dict_weight[index]
                 / (total_number_of_responses * sum_of_weight)
             )
-
+        sum_of_positive_answers = sum(
+            dict_positive_answers_for_each_question.values()
+        )  # sum of positive answers
         # return round(result, 3)
         return {
             "ces_score" if question_type == "ces" else "csat_score": round(result, 3),
@@ -95,6 +100,7 @@ class Survey_result_service:
             "sum_of_weight": sum_of_weight,
             "dict_positive_answers_for_each_question": dict_positive_answers_for_each_question,
             "dict_weight": dict_weight,
+            "sum_of_positive_answers": sum_of_positive_answers,
         }
 
     @classmethod
@@ -151,6 +157,9 @@ class Survey_result_service:
                 * dict_weight[index]
                 / (total_number_of_responses * sum_of_weight)
             )
+
+        sum_of_promoters = sum(dict_promoters_for_each_question.values())
+        sum_of_detractors = sum(dict_detractors_for_each_question.values())
         return {
             "nps_score": round(result, 3),
             "list_of_weight_and_answers_of_questions_in_survey": list_of_weight_and_answers_of_questions_in_survey,
@@ -160,6 +169,8 @@ class Survey_result_service:
             "dict_passives_for_each_question": dict_passives_for_each_question,
             "dict_detractors_for_each_question": dict_detractors_for_each_question,
             "dict_weight": dict_weight,
+            "sum_of_promoters": sum_of_promoters,
+            "sum_of_detractors": sum_of_detractors,
         }
 
     @classmethod
@@ -192,15 +203,31 @@ class Survey_result_service:
         if not survey:
             return None
         survey_id = survey.id
+        # recalculating scores for survey
+        current_number_of_responses = Response.get_number_of_responses(survey_id)
+        scores = cls.calculate_scores(survey_id, current_number_of_responses)
         survey_result = Survey_result.get_survey_result(survey_id)
         number_of_responses = Response.get_number_of_responses(survey_id)
         if not survey_result:
             return None
         return {
             "numberOfResponses": number_of_responses,
-            "cesScore": survey_result.ces_score,
-            "npsScore": survey_result.nps_score,
-            "csatScore": survey_result.csat_score,
+            "ces": {
+                "score": survey_result.ces_score,
+                "weight": scores["ces_weight"],
+                "sumOfPositiveAnswers": scores["ces_score"]["sum_of_positive_answers"],
+            },
+            "nps": {
+                "score": survey_result.nps_score,
+                "weight": scores["nps_weight"],
+                "sumOfPromoters": scores["nps_score"]["sum_of_promoters"],
+                "sumOfDetractors": scores["nps_score"]["sum_of_detractors"],
+            },
+            "csat": {
+                "score": survey_result.csat_score,
+                "weight": scores["csat_weight"],
+                "sumOfPositiveAnswers": scores["ces_score"]["sum_of_positive_answers"],
+            },
             "totalScore": survey_result.total_score,
         }
 
