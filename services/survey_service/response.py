@@ -18,7 +18,10 @@ class Response_service:
         # add answers to table Answer. answers is a list of answer objects, each object contains question_id, value
         # calculate scores for the survey
         # return if survey allows respondent to see the result and send another response
-        survey_id = Survey.check_if_survey_exists(process_version_version)
+        survey = Survey.check_if_survey_exists(process_version_version)
+        if not survey:
+            return {"message": "Survey not found"}
+        survey_id = survey.id
         new_respondent = Respondent_service.create_respondent(email, full_name)
         respondent_id = new_respondent.id
         end_date = datetime.now()

@@ -508,3 +508,21 @@ class Question_in_section_service:
             }
             for question in deleted_questions
         ]
+
+    @classmethod
+    def get_list_of_questions_in_survey(cls, survey_id):
+        list_of_questions_in_survey = (
+            Question_in_section.get_list_of_questions_in_survey(survey_id)
+        )
+        return [
+            {
+                "id": question.id,
+                "content": question.content,
+                "questionType": question.question_type,
+                "isRequired": question.is_required,
+                "orderInSection": question.order_in_section,
+                "weight": question.weight,
+                "sectionId": question.section_id,
+            }
+            for question in list_of_questions_in_survey
+        ]

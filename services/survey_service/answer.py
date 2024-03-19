@@ -13,3 +13,8 @@ class Answer_service:
     @classmethod
     def delete_answers(cls, response_id):
         return Answer.delete_answers(response_id)
+
+    @classmethod
+    def get_list_of_answers_for_question(cls, question_id):
+        list_of_answers = Answer.get_list_of_answers_for_question(question_id)
+        return list_of_answers

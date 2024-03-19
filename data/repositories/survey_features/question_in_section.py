@@ -1,6 +1,7 @@
 from data.models.survey_feature_models.question_model import (
     Question_in_section_model,
     Question_model,
+    Section_model,
 )
 from data.repositories.survey_features.question_option import Question_option
 from database.db import DatabaseConnector
@@ -326,6 +327,33 @@ class Question_in_section:
                 question_in_section.is_deleted = True
             session.commit()
             return questions_in_section
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_list_of_questions_in_survey(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            questions_in_survey = (
+                session.query(Question_in_section_model)
+                .join(
+                    Section_model,
+                    Question_in_section_model.section_id == Section_model.id,
+                )
+                .filter(
+                    Section_model.survey_id == survey_id,
+                    Question_in_section_model.is_deleted == False,
+                    Section_model.is_deleted == False,
+                )
+                .order_by(
+                    Section_model.order_in_survey,
+                    Question_in_section_model.order_in_section,
+                )
+                .all()
+            )
+            session.commit()
+            return questions_in_survey
         except Exception as e:
             session.rollback()
             raise Exception(e)

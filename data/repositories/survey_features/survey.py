@@ -202,7 +202,7 @@ class Survey:
             session.commit()
             if survey is None:
                 return None
-            return survey.id
+            return survey
         except Exception as e:
             session.rollback()
             raise Exception(e)

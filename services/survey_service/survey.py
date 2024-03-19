@@ -233,11 +233,19 @@ class Survey_service:
 
     @classmethod
     def get_sections_in_survey(cls, process_version_version):
-        survey_id = Survey.check_if_survey_exists(process_version_version)
-        if survey_id is None:
+        survey = Survey.check_if_survey_exists(process_version_version)
+        if survey is None:
             return {"message": "Survey does not exist."}
+        survey_id = survey.id
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
-        return sections_list_in_survey
+        return {
+            "survey": {
+                "id": survey_id,
+                "name": survey.name,
+                "description": survey.description,
+            },
+            "sections": sections_list_in_survey,
+        }
 
     @classmethod
     def get_survey_response_config_some(cls, survey_id):
