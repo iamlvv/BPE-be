@@ -89,7 +89,7 @@ class Survey_result_service:
                 * dict_weight[index]
                 / (total_number_of_responses * sum_of_weight)
             )
-        sum_of_positive_answers = sum(
+        num_of_positive_answers = sum(
             dict_positive_answers_for_each_question.values()
         )  # sum of positive answers
         # return round(result, 3)
@@ -100,7 +100,7 @@ class Survey_result_service:
             "sum_of_weight": sum_of_weight,
             "dict_positive_answers_for_each_question": dict_positive_answers_for_each_question,
             "dict_weight": dict_weight,
-            "sum_of_positive_answers": sum_of_positive_answers,
+            "num_of_positive_answers": num_of_positive_answers,
         }
 
     @classmethod
@@ -158,8 +158,8 @@ class Survey_result_service:
                 / (total_number_of_responses * sum_of_weight)
             )
 
-        sum_of_promoters = sum(dict_promoters_for_each_question.values())
-        sum_of_detractors = sum(dict_detractors_for_each_question.values())
+        num_of_promoters = sum(dict_promoters_for_each_question.values())
+        num_of_detractors = sum(dict_detractors_for_each_question.values())
         return {
             "nps_score": round(result, 3),
             "list_of_weight_and_answers_of_questions_in_survey": list_of_weight_and_answers_of_questions_in_survey,
@@ -169,8 +169,8 @@ class Survey_result_service:
             "dict_passives_for_each_question": dict_passives_for_each_question,
             "dict_detractors_for_each_question": dict_detractors_for_each_question,
             "dict_weight": dict_weight,
-            "sum_of_promoters": sum_of_promoters,
-            "sum_of_detractors": sum_of_detractors,
+            "num_of_promoters": num_of_promoters,
+            "num_of_detractors": num_of_detractors,
         }
 
     @classmethod
@@ -215,18 +215,18 @@ class Survey_result_service:
             "ces": {
                 "score": survey_result.ces_score,
                 "weight": scores["ces_weight"],
-                "sumOfPositiveAnswers": scores["ces_score"]["sum_of_positive_answers"],
+                "numOfPositiveAnswers": scores["ces_score"]["num_of_positive_answers"],
             },
             "nps": {
                 "score": survey_result.nps_score,
                 "weight": scores["nps_weight"],
-                "sumOfPromoters": scores["nps_score"]["sum_of_promoters"],
-                "sumOfDetractors": scores["nps_score"]["sum_of_detractors"],
+                "numOfPromoters": scores["nps_score"]["num_of_promoters"],
+                "numOfDetractors": scores["nps_score"]["num_of_detractors"],
             },
             "csat": {
                 "score": survey_result.csat_score,
                 "weight": scores["csat_weight"],
-                "sumOfPositiveAnswers": scores["ces_score"]["sum_of_positive_answers"],
+                "numOfPositiveAnswers": scores["ces_score"]["num_of_positive_answers"],
             },
             "totalScore": survey_result.total_score,
         }
