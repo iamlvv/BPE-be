@@ -291,7 +291,8 @@ class Survey_service:
             start_date = datetime.now()
 
         # send survey url to the email
-        cls.send_survey_url(email, survey_url, start_date, end_date)
+        if email is not None:
+            cls.send_survey_url(email, survey_url, start_date, end_date)
         # update end date and start date of the survey
         return Survey.publish_survey(survey_id, start_date, end_date, survey_url)
 
