@@ -172,3 +172,34 @@ def config_survey_response():
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/publish", methods=["POST"])
+def publish_survey():
+    user_id = get_id_from_token(get_token(request))
+    body = load_request_body(request)
+    survey_id = body["surveyId"]
+    project_id = body["projectId"]
+    start_date = body["startDate"] if "startDate" in body else None
+    end_date = body["endDate"] if "endDate" in body else None
+    email = body["email"] if "email" in body else None
+    survey_url = body["surveyUrl"]
+    if start_date is not None:
+        start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
+    if end_date is not None:
+        end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S")
+
+    data = Survey_service.publish_survey(
+        survey_id,
+        project_id,
+        user_id,
+        survey_url,
+        email,
+        start_date,
+        end_date,
+    )
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

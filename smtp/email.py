@@ -1,13 +1,14 @@
 import os
 import ssl
 import smtplib
+from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
 class Email:
     @classmethod
-    def send(self, sender_email, password, receiver_email, subject, content):
+    def send(cls, sender_email, password, receiver_email, subject, content):
         message = MIMEMultipart("alternative")
         message["Subject"] = subject
         message["From"] = sender_email
@@ -22,7 +23,7 @@ class Email:
             server.sendmail(sender_email, receiver_email, message.as_string())
 
     @classmethod
-    def verify_account(self, receiver_email, name, token):
+    def verify_account(cls, receiver_email, name, token):
         sender_email = os.environ.get("EMAIL")
         password = os.environ.get("PASSWORD")
         host = os.environ.get("HOST_BE")
@@ -40,10 +41,10 @@ class Email:
         </body>
         </html>
         """
-        self.send(sender_email, password, receiver_email, subject, html)
+        cls.send(sender_email, password, receiver_email, subject, html)
 
     @classmethod
-    def reset_password(self, receiver_email, name, token):
+    def reset_password(cls, receiver_email, name, token):
         sender_email = os.environ.get("EMAIL")
         password = os.environ.get("PASSWORD")
         host = os.environ.get("HOST")
@@ -62,4 +63,34 @@ class Email:
         </body>
         </html>
         """
-        self.send(sender_email, password, receiver_email, subject, html)
+        cls.send(sender_email, password, receiver_email, subject, html)
+
+    @classmethod
+    def send_survey_url(
+        cls, receiver_email_list, survey_url, start_date=None, end_date=None
+    ):
+        sender_email = os.environ.get("EMAIL")
+        password = os.environ.get("PASSWORD")
+        subject = "Survey URL"
+
+        # Create the plain-text and HTML version of your message
+        html = f"""\
+        <html>
+        <body>
+            <p>Hi there,</p>
+            <p>Please click <a href="{survey_url}">here</a> to access the survey or access this bellow link:<br>
+            [{survey_url}]</p>
+            <p>Start date: {start_date}</p>
+            {f"<p>End date: {end_date}</p>" if end_date else ""}
+            <p>Thank you so much,<br>
+            BPSky
+            </p>
+        </body>
+        </html>
+        """
+        for receiver_email in receiver_email_list:
+            cls.send(sender_email, password, receiver_email, subject, html)
+
+    @classmethod
+    def send_survey_result(cls):
+        pass

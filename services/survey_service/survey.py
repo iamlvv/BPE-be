@@ -10,9 +10,21 @@ from services.survey_service.question_option import Question_option_service
 from services.survey_service.response import Response_service
 from services.survey_service.section import Section_service
 from services.utils import Permission_check
+from smtp.email import Email
 
 
 class Survey_service:
+    @classmethod
+    def validate_start_date_end_date(cls, start_date, end_date):
+        if start_date is not None and end_date is not None:
+            if start_date > end_date:
+                return {"message": "Start date must be before end date"}
+            if start_date < datetime.now():
+                return {"message": "Start date must be in the future"}
+            if end_date < datetime.now():
+                return {"message": "End date must be in the future"}
+        return None
+
     @classmethod
     def get_survey_detail(cls, process_version_version, project_id, user_id):
         # check if user has access to the survey
@@ -250,3 +262,40 @@ class Survey_service:
     @classmethod
     def get_survey_response_config_some(cls, survey_id):
         return Survey.get_survey_response_config_some(survey_id)
+
+    @classmethod
+    def publish_survey(
+        cls,
+        survey_id,
+        project_id,
+        user_id,
+        survey_url,
+        email=None,
+        start_date=None,
+        end_date=None,
+    ):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
+        date_validation = cls.validate_start_date_end_date(start_date, end_date)
+        if date_validation is not None:
+            return date_validation
+        # if start date and end date are not provided, use the current date as start date. End date is None
+
+        if start_date is None:
+            start_date = datetime.now()
+
+        # send survey url to the email
+        cls.send_survey_url(email, survey_url, start_date, end_date)
+        # update end date and start date of the survey
+        return Survey.publish_survey(survey_id, start_date, end_date, survey_url)
+
+    @classmethod
+    def send_survey_url(cls, email, survey_url, start_date=None, end_date=None):
+        try:
+            return Email.send_survey_url(email, survey_url, start_date, end_date)
+        except Exception as e:
+            return {"message": str(e)}
