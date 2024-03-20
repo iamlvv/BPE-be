@@ -21,6 +21,8 @@ class Response_service:
         survey = Survey.check_if_survey_exists(process_version_version)
         if not survey:
             return {"message": "Survey not found"}
+        if survey.is_published is False:
+            return {"message": "Survey is not published"}
         survey_id = survey.id
         new_respondent = Respondent_service.create_respondent(email, full_name)
         respondent_id = new_respondent.id

@@ -54,3 +54,14 @@ def get_survey_response():
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/publish/close", methods=["GET"])
+def close_publish_survey():
+    process_version_version = request.args.get("processVersionVersion", None)
+    data = Survey_service.close_publish_survey(process_version_version)
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

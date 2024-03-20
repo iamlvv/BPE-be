@@ -248,6 +248,8 @@ class Survey_service:
         survey = Survey.check_if_survey_exists(process_version_version)
         if survey is None:
             return {"message": "Survey does not exist."}
+        if survey.is_published is False:
+            return {"message": "Survey is not published."}
         survey_id = survey.id
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
         return {
@@ -299,3 +301,11 @@ class Survey_service:
             return Email.send_survey_url(email, survey_url, start_date, end_date)
         except Exception as e:
             return {"message": str(e)}
+
+    @classmethod
+    def close_publish_survey(cls, process_version_version):
+        survey = Survey.check_if_survey_exists(process_version_version)
+        if survey is None:
+            return {"message": "Survey does not exist."}
+        end_date = datetime.now()
+        return Survey.close_publish_survey(survey.id, end_date)
