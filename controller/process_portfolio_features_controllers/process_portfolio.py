@@ -16,12 +16,12 @@ def get_all_projects_in_workspace():
     )
 
 
-@bpsky.route("/api/v1/workspace/portfolio/projects/<int:project_id>", methods=["GET"])
-def get_all_active_process_versions_in_workspace(project_id):
+@bpsky.route("/api/v1/workspace/portfolio/processversion", methods=["GET"])
+def get_all_active_process_versions_in_workspace():
     try:
         user_id = get_id_from_token(get_token(request))
         workspace_id = request.args.get("workspaceId")
-        print("project_id", project_id)
+        project_id = request.args.get("projectId")
         data = ProcessService.get_all_active_process_versions_in_workspace(
             workspace_id, project_id, user_id
         )
@@ -34,7 +34,7 @@ def get_all_active_process_versions_in_workspace(project_id):
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
-@bpsky.route("/api/v1/workspace/portfolio/process/active", methods=["POST"])
+@bpsky.route("/api/v1/workspace/portfolio/processversion/active", methods=["POST"])
 def active_process_version():
     try:
         user_id = get_id_from_token(get_token(request))
