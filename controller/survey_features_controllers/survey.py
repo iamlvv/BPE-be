@@ -178,7 +178,7 @@ def config_survey_response():
 def publish_survey():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
-    survey_id = body["surveyId"]
+    process_version_version = body["processVersionVersion"]
     project_id = body["projectId"]
     start_date = body["startDate"] if "startDate" in body else None
     end_date = body["endDate"] if "endDate" in body else None
@@ -190,7 +190,7 @@ def publish_survey():
         end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S")
 
     data = Survey_service.publish_survey(
-        survey_id,
+        process_version_version,
         project_id,
         user_id,
         survey_url,

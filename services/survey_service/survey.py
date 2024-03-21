@@ -268,7 +268,7 @@ class Survey_service:
     @classmethod
     def publish_survey(
         cls,
-        survey_id,
+        process_version_version,
         project_id,
         user_id,
         survey_url,
@@ -282,6 +282,10 @@ class Survey_service:
         if not is_user_has_access:
             return {"message": "User has no access to the survey"}
 
+        survey = cls.check_if_survey_exists(process_version_version)
+        if survey is None:
+            return {"message": "Survey does not exist."}
+        survey_id = survey.id
         date_validation = cls.validate_start_date_end_date(start_date, end_date)
         if date_validation is not None:
             return date_validation
