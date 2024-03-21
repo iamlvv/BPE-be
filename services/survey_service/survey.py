@@ -247,7 +247,7 @@ class Survey_service:
         survey = Survey.check_if_survey_exists(process_version_version)
         if survey is None:
             raise Exception("Survey does not exist.")
-        if survey.is_published is False and is_preview is False:
+        if survey.is_published is False and is_preview is None:
             raise Exception("Survey is not published.")
         survey_id = survey.id
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
@@ -304,7 +304,7 @@ class Survey_service:
         try:
             return Email.send_survey_url(email, survey_url, start_date, end_date)
         except Exception as e:
-            return {"message": str(e)}
+            raise Exception(e)
 
     @classmethod
     def close_publish_survey(cls, user_id, project_id, process_version_version):
