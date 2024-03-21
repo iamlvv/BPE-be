@@ -56,7 +56,7 @@ def get_survey_response():
     )
 
 
-@bpsky.route("/api/v1/survey/publish/close", methods=["GET"])
+@bpsky.route("/api/v1/survey/publish/close", methods=["POST"])
 def close_publish_survey():
     process_version_version = request.args.get("processVersionVersion", None)
     data = Survey_service.close_publish_survey(process_version_version)
