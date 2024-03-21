@@ -1,3 +1,5 @@
+from data.models.process_model import Process_version_model, Process_model
+from data.models.project_model import Project_model
 from data.repositories.utils import *
 
 
@@ -168,4 +170,28 @@ class ProcessVersion:
                 connection.commit()
         except Exception as e:
             connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_all_active_process_versions_in_workspace(cls, project_id):
+        session = DatabaseConnector.get_session()
+        try:
+            active_process_versions = (
+                session.query(Process_version_model)
+                .join(
+                    Process_model, Process_model.id == Process_version_model.process_id
+                )
+                .join(
+                    Project_model, Project_model.id == Process_version_model.project_id
+                )
+                .filter(
+                    Process_version_model.project_id == project_id,
+                    # Process_version_model.is_active == True
+                )
+                .all()
+            )
+            session.commit()
+            return active_process_versions
+        except Exception as e:
+            session.rollback()
             raise Exception(e)

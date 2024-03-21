@@ -79,6 +79,10 @@ class ProcessVersionService_Get:
     def get_comment_by_user(cls, user_id):
         return CommentOn.get_by_user(user_id)
 
+    @classmethod
+    def get_all_active_process_versions_in_workspace(cls, project_id):
+        return ProcessVersion.get_all_active_process_versions_in_workspace(project_id)
+
 
 class ProcessVersionService_Update:
     @classmethod

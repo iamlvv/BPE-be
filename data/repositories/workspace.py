@@ -1,3 +1,4 @@
+from data.models.workspace_model import Workspace_model
 from data.repositories.utils import *
 import json
 from bpsky import socketio
@@ -494,3 +495,24 @@ class Workspace(Workspace_Get, Workspace_Insert, Workspace_Update, Workspace_Del
         for k in kwargs:
             getattr(self, k)
         vars(self).update(kwargs)
+
+    @classmethod
+    def check_if_user_is_workspace_owner(cls, workspace_id, user_id):
+        session = DatabaseConnector.get_session()
+        try:
+            workspace = (
+                session.query(Workspace_model)
+                .filter(
+                    Workspace.id == int(workspace_id),
+                    Workspace_model.isdeleted == False,
+                )
+                .first()
+            )
+            session.commit()
+            if workspace:
+                return workspace.ownerid == user_id
+            else:
+                return "Workspace not found"
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

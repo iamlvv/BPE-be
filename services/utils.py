@@ -1,6 +1,7 @@
 import hashlib
 
 from data.repositories.constant import Role
+from data.repositories.workspace import Workspace
 from services.project_service.work_on import WorkOnService
 
 mySalt = "$2b$12$6rMnsklapuHBKL."
@@ -56,3 +57,7 @@ class Permission_check:
     @classmethod
     def check_user_has_access_survey(cls, project_id, user_id):
         return WorkOnService.is_project_owner(user_id, project_id)
+
+    @classmethod
+    def check_if_user_is_workspace_owner(cls, workspace_id, user_id):
+        return Workspace.check_if_user_is_workspace_owner(workspace_id, user_id)

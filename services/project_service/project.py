@@ -5,7 +5,7 @@ from services.file_service.document_file import DocumentFileService
 from fileIO.file import FileIO
 from services.project_service.work_on import WorkOnService
 from data.repositories.constant import Role
-from services.utils import PermissionConverter
+from services.utils import PermissionConverter, Permission_check
 from services.workspace_service.join_workspace import JoinWorkspaceService
 
 
@@ -83,8 +83,11 @@ class ProjectService_Get:
         return users
 
     @classmethod
-    def getAllProjectsInWorkspace(cls, workspaceId):
-        return Project.getAllProjectsInWorkspace(workspaceId)
+    def getAllProjectsInWorkspace(cls, workspace_id, user_id):
+        print("user_id", user_id)
+        if not Permission_check.check_if_user_is_workspace_owner(workspace_id, user_id):
+            raise Exception("permission denied")
+        return Project.getAllProjectsInWorkspace(workspace_id)
 
     @classmethod
     def get_workspace_id(cls, project_id):

@@ -16,13 +16,12 @@ from smtp.email import Email
 class Survey_service:
     @classmethod
     def validate_start_date_end_date(cls, start_date, end_date):
-        if start_date is not None and end_date is not None:
-            if start_date > end_date:
-                return {"message": "Start date must be before end date"}
-            if start_date < datetime.now():
-                return {"message": "Start date must be in the future"}
-            if end_date < datetime.now():
-                return {"message": "End date must be in the future"}
+        if start_date is not None and start_date < datetime.now():
+            return {"message": "Start date must be in the future"}
+        if end_date is not None and end_date < datetime.now():
+            return {"message": "End date must be in the future"}
+        if start_date is not None and end_date is not None and start_date > end_date:
+            return {"message": "Start date must be before end date"}
         return None
 
     @classmethod

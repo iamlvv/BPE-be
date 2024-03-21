@@ -3,6 +3,7 @@ import shutil
 from data.repositories.process import Process
 from services.process_service.process_version import ProcessVersionService
 from services.project_service.work_on import WorkOnService
+from services.utils import Permission_check
 
 
 class ProcessService:
@@ -43,3 +44,20 @@ class ProcessService:
         if not WorkOnService.can_view(user_id, project_id):
             raise Exception("permission denied")
         return Process.get_by_project(project_id)
+
+    @classmethod
+    def get_all_active_process_versions_in_workspace(
+        cls, workspace_id, project_id, user_id
+    ):
+        # get all projects in workspace
+        # in each project, get all processes that has active process_version
+        # check if user is workspace_owner
+        workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+            workspace_id, user_id
+        )
+        active_process_versions_list = (
+            ProcessVersionService.get_all_active_process_versions_in_workspace(
+                project_id
+            )
+        )
+        return active_process_versions_list
