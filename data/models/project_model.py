@@ -15,9 +15,9 @@ class Project_model(Base):
     create_at: Mapped[datetime] = mapped_column(nullable=False)
     deletedat: Mapped[datetime] = mapped_column(nullable=True, default=None)
     is_delete: Mapped[bool] = mapped_column(nullable=False, default=False)
-    ownerId: Mapped[int] = mapped_column(nullable=False)
-    workspaceId: Mapped[int] = mapped_column(nullable=False)
-    isWorkspaceDeleted: Mapped[bool] = mapped_column(nullable=False, default=False)
+    ownerid: Mapped[int] = mapped_column(nullable=False)
+    workspaceid: Mapped[int] = mapped_column(nullable=False)
+    isworkspacedeleted: Mapped[bool] = mapped_column(nullable=False, default=False)
 
 
 Base.metadata.create_all(DatabaseConnector.get_engine())

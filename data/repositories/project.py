@@ -1,3 +1,5 @@
+from data.models.project_model import Project_model
+from data.models.user_model import User_model
 from data.repositories.utils import *
 
 
@@ -216,4 +218,26 @@ class Project:
                 return result[0]
         except Exception as e:
             connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_all_projects_in_workspace(cls, workspace_id):
+        session = DatabaseConnector.get_session()
+        try:
+            result = (
+                session.query(
+                    Project_model.id,
+                    Project_model.name,
+                    User_model.name.label("owner_name"),
+                )
+                .join(User_model, Project_model.ownerid == User_model.id)
+                .filter(
+                    Project_model.workspaceid == workspace_id,
+                    Project_model.is_delete == False,
+                )
+                .all()
+            )
+            session.commit()
+            return result
+        except Exception as e:
             raise Exception(e)

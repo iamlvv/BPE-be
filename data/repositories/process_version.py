@@ -175,6 +175,7 @@ class ProcessVersion:
     @classmethod
     def get_all_active_process_versions_in_workspace(cls, project_id):
         session = DatabaseConnector.get_session()
+        print("project id in get_all_active_process_versions_in_workspace", project_id)
         try:
             active_process_versions = (
                 session.query(Process_version_model)
@@ -192,6 +193,22 @@ class ProcessVersion:
             )
             session.commit()
             return active_process_versions
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def active_process_version(cls, process_version_version):
+        session = DatabaseConnector.get_session()
+        try:
+            process_version = (
+                session.query(Process_version_model)
+                .filter(Process_version_model.version == process_version_version)
+                .first()
+            )
+            process_version.is_active = True
+            session.commit()
+            return process_version
         except Exception as e:
             session.rollback()
             raise Exception(e)

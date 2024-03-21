@@ -92,6 +92,20 @@ class ProjectService_Get:
     def get_workspace_id(cls, project_id):
         return Project.get_workspace_id(project_id)
 
+    @classmethod
+    def get_all_projects_in_workspace(cls, workspace_id, user_id):
+        if not Permission_check.check_if_user_is_workspace_owner(workspace_id, user_id):
+            raise Exception("permission denied")
+        projects = Project.get_all_projects_in_workspace(workspace_id)
+        return [
+            {
+                "id": project.id,
+                "name": project.name,
+                "ownerName": project.owner_name,
+            }
+            for project in projects
+        ]
+
 
 class ProjectService_Update(Validate):
     @classmethod

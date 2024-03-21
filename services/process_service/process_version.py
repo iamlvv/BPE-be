@@ -6,6 +6,7 @@ from data.repositories.process import Process
 from data.repositories.comment_on import CommentOn
 from fileIO.file import FileIO
 from services.project_service.work_on import WorkOnService
+from services.utils import Permission_check
 
 
 class OldestVersionOperation:
@@ -114,6 +115,24 @@ class ProcessVersionService_Update:
         if not CommentOn.owner(user_id, project_id, process_id, xml_file_link, id):
             raise Exception("permission denied")
         CommentOn.update(id, content)
+
+    @classmethod
+    def active_process_version(cls, user_id, workspace_id, process_version_version):
+        workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+            workspace_id, user_id
+        )
+        if not workspace_owner:
+            raise Exception("permission denied")
+
+        active_process_version = ProcessVersion.active_process_version(
+            process_version_version
+        )
+        return {
+            "project_id": active_process_version.project_id,
+            "process_id": active_process_version.process_id,
+            "version": active_process_version.version,
+            "is_active": active_process_version.is_active,
+        }
 
 
 class ProcessVersionService_Insert(OldestVersionOperation):

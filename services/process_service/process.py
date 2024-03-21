@@ -60,4 +60,12 @@ class ProcessService:
                 project_id
             )
         )
-        return active_process_versions_list
+        return [
+            {
+                "project_id": process.project_id,
+                "process_id": process.id,
+                "version": process.version,
+                "is_active": process.is_active,
+            }
+            for process in active_process_versions_list
+        ]
