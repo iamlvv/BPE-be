@@ -308,7 +308,13 @@ class Survey_service:
             return {"message": str(e)}
 
     @classmethod
-    def close_publish_survey(cls, process_version_version):
+    def close_publish_survey(cls, user_id, project_id, process_version_version):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            return {"message": "User has no access to the survey"}
+
         survey = Survey.check_if_survey_exists(process_version_version)
         if survey is None:
             return {"message": "Survey does not exist."}
