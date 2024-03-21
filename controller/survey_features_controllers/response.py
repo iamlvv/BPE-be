@@ -58,7 +58,8 @@ def get_survey_response():
 
 @bpsky.route("/api/v1/survey/publish/close", methods=["POST"])
 def close_publish_survey():
-    process_version_version = request.args.get("processVersionVersion", None)
+    body = load_request_body(request)
+    process_version_version = body["processVersionVersion"]
     data = Survey_service.close_publish_survey(process_version_version)
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
