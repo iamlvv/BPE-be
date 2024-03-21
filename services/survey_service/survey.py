@@ -243,7 +243,7 @@ class Survey_service:
         }
 
     @classmethod
-    def get_sections_in_survey(cls, process_version_version, mode):
+    def get_sections_in_survey(cls, process_version_version, mode=None):
         survey = Survey.check_if_survey_exists(process_version_version)
         if survey is None:
             raise Exception("Survey does not exist.")

@@ -19,14 +19,19 @@ def get_survey_questions_by_section_id():
 
 @bpsky.route("/api/v1/survey/section/all", methods=["GET"])
 def get_survey_sections():
-    process_version_version = request.args.get("processVersionVersion")
-    mode = request.args.get("mode")
-    data = Survey_service.get_sections_in_survey(process_version_version, mode)
-    return bpsky.response_class(
-        response=jsonpickle.encode(data, unpicklable=False),
-        status=200,
-        mimetype="application/json",
-    )
+    try:
+        process_version_version = request.args.get("processVersionVersion")
+        mode = request.args.get("mode")
+        if process_version_version is None or mode is None:
+            raise Exception("params required")
+        data = Survey_service.get_sections_in_survey(process_version_version, mode)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        raise Exception(e)
 
 
 @bpsky.route("/api/v1/survey/submission", methods=["POST"])
