@@ -252,6 +252,7 @@ class Survey:
                 "sendResultToRespondent": survey.send_result_to_respondent,
                 "startDate": survey.start_date,
                 "endDate": survey.end_date,
+                "isPublished": survey.is_published,
             }
         except Exception as e:
             session.rollback()
