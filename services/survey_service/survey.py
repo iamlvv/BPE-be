@@ -243,11 +243,11 @@ class Survey_service:
         }
 
     @classmethod
-    def get_sections_in_survey(cls, process_version_version, is_preview):
+    def get_sections_in_survey(cls, process_version_version, mode):
         survey = Survey.check_if_survey_exists(process_version_version)
         if survey is None:
             raise Exception("Survey does not exist.")
-        if survey.is_published is False and is_preview is None:
+        if survey.is_published is False and mode == "published":
             raise Exception("Survey is not published.")
         survey_id = survey.id
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
