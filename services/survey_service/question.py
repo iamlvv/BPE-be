@@ -26,7 +26,7 @@ class Question_service:
             project_id, user_id
         )
         if not is_user_has_access:
-            return {"message": "User has no access to the survey"}
+            raise Exception("User has no access to the survey")
 
         questions_by_system = Question.get_sample_questions()
         questions_by_user = Question.get_user_questions()

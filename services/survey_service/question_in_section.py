@@ -82,7 +82,7 @@ class Question_in_section_service:
             project_id, user_id
         )
         if not is_user_has_access:
-            return {"message": "User has no access to the survey"}
+            raise Exception("User has no access to the survey")
 
         question_in_section = Question_in_section.get_question_detail_in_survey(
             question_in_section_id
@@ -132,7 +132,7 @@ class Question_in_section_service:
             project_id, user_id
         )
         if not is_user_has_access:
-            return {"message": "User has no access to the survey"}
+            raise Exception("User has no access to the survey")
 
         if content == "":
             return {"message": "Question content cannot be empty"}
@@ -262,7 +262,7 @@ class Question_in_section_service:
             project_id, user_id
         )
         if not is_user_has_access:
-            return {"message": "User has no access to the survey"}
+            raise Exception("User has no access to the survey")
 
         # delete the question in the section
         Question_in_section.delete_question_in_section(question_in_section_id)
@@ -327,7 +327,7 @@ class Question_in_section_service:
             project_id, user_id
         )
         if not is_user_has_access:
-            return {"message": "User has no access to the survey"}
+            raise Exception("User has no access to the survey")
 
         # add question to the section
         new_question_in_section = Question_in_section.add_new_question_to_section(
@@ -391,7 +391,7 @@ class Question_in_section_service:
             project_id, user_id
         )
         if not is_user_has_access:
-            return {"message": "User has no access to the survey"}
+            raise Exception("User has no access to the survey")
 
         updated_question = cls.update_question_detail_in_survey(
             user_id,
@@ -461,7 +461,7 @@ class Question_in_section_service:
             project_id, user_id
         )
         if not is_user_has_access:
-            return {"message": "User has no access to the survey"}
+            raise Exception("User has no access to the survey")
 
         question = Question.get_question_by_id(question_id)
 

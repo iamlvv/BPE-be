@@ -84,7 +84,6 @@ class ProjectService_Get:
 
     @classmethod
     def getAllProjectsInWorkspace(cls, workspace_id, user_id):
-        print("user_id", user_id)
         if not Permission_check.check_if_user_is_workspace_owner(workspace_id, user_id):
             raise Exception("permission denied")
         return Project.getAllProjectsInWorkspace(workspace_id)

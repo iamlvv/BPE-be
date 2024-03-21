@@ -19,8 +19,8 @@ def get_survey_questions_by_section_id():
 
 @bpsky.route("/api/v1/survey/section/all", methods=["GET"])
 def get_survey_sections():
-    process_version_version = request.args.get("processVersionVersion", None)
-    is_preview = request.args.get("isPreview", None)
+    process_version_version = request.args.get("processVersionVersion")
+    is_preview = request.args.get("isPreview")
     data = Survey_service.get_sections_in_survey(process_version_version, is_preview)
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
