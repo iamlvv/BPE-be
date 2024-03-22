@@ -175,19 +175,12 @@ class ProcessVersion:
     @classmethod
     def get_all_active_process_versions_in_workspace(cls, project_id):
         session = DatabaseConnector.get_session()
-        print("project id in get_all_active_process_versions_in_workspace", project_id)
         try:
             active_process_versions = (
                 session.query(Process_version_model)
-                .join(
-                    Process_model, Process_model.id == Process_version_model.process_id
-                )
-                .join(
-                    Project_model, Project_model.id == Process_version_model.project_id
-                )
                 .filter(
                     Process_version_model.project_id == project_id,
-                    # Process_version_model.is_active == True
+                    Process_version_model.is_active == True,
                 )
                 .all()
             )
@@ -198,7 +191,7 @@ class ProcessVersion:
             raise Exception(e)
 
     @classmethod
-    def active_process_version(cls, process_version_version):
+    def activate_process_version(cls, process_version_version):
         session = DatabaseConnector.get_session()
         try:
             process_version = (
@@ -207,6 +200,37 @@ class ProcessVersion:
                 .first()
             )
             process_version.is_active = True
+            session.commit()
+            return process_version
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_all_process_versions_in_workspace(cls, project_id):
+        session = DatabaseConnector.get_session()
+        try:
+            process_versions = (
+                session.query(Process_version_model)
+                .filter(Process_version_model.project_id == project_id)
+                .all()
+            )
+            session.commit()
+            return process_versions
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def deactivate_process_version(cls, version):
+        session = DatabaseConnector.get_session()
+        try:
+            process_version = (
+                session.query(Process_version_model)
+                .filter(Process_version_model.version == version)
+                .first()
+            )
+            process_version.is_active = False
             session.commit()
             return process_version
         except Exception as e:

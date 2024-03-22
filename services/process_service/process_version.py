@@ -84,6 +84,24 @@ class ProcessVersionService_Get:
     def get_all_active_process_versions_in_workspace(cls, project_id):
         return ProcessVersion.get_all_active_process_versions_in_workspace(project_id)
 
+    @classmethod
+    def get_all_process_versions_in_workspace(cls, workspace_id, project_id, user_id):
+        workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+            workspace_id, user_id
+        )
+        process_versions_list = ProcessVersion.get_all_process_versions_in_workspace(
+            project_id
+        )
+        return [
+            {
+                "project_id": process.project_id,
+                "process_id": process.id,
+                "version": process.version,
+                "is_active": process.is_active,
+            }
+            for process in process_versions_list
+        ]
+
 
 class ProcessVersionService_Update:
     @classmethod
@@ -117,14 +135,24 @@ class ProcessVersionService_Update:
         CommentOn.update(id, content)
 
     @classmethod
-    def active_process_version(cls, user_id, workspace_id, process_version_version):
+    def activate_process_version(cls, user_id, workspace_id, process_version_version):
         workspace_owner = Permission_check.check_if_user_is_workspace_owner(
             workspace_id, user_id
         )
         if not workspace_owner:
             raise Exception("permission denied")
 
-        active_process_version = ProcessVersion.active_process_version(
+        # check if there are any active process versions in the workspace
+        # if there are and the version is not the same as the one that is being activated, deactivate it
+        active_process_versions = (
+            ProcessVersion.get_all_active_process_versions_in_workspace(workspace_id)
+        )
+        for active_process_version in active_process_versions:
+            if active_process_version.version != process_version_version:
+                ProcessVersion.deactivate_process_version(
+                    active_process_version.version,
+                )
+        active_process_version = ProcessVersion.activate_process_version(
             process_version_version
         )
         return {
