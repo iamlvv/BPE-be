@@ -305,7 +305,7 @@ class Survey:
             raise Exception(e)
 
     @classmethod
-    def close_publish_survey(cls, survey_id, end_date):
+    def close_publish_survey(cls, survey_id):
         session = DatabaseConnector.get_session()
         try:
             survey = (
@@ -314,7 +314,6 @@ class Survey:
                 .first()
             )
             survey.is_published = False
-            survey.end_date = end_date
             session.commit()
             return {
                 "id": survey.id,

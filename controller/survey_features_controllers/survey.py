@@ -153,9 +153,9 @@ def config_survey_response():
 
     # convert to datetime object, including hours, minutes, and seconds
     if start_date is not None:
-        start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%f")
+        start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
     if end_date is not None:
-        end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%f")
+        end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S")
 
     data = Survey_service.config_survey_response(
         survey_id,
