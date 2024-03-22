@@ -221,7 +221,7 @@ class Project:
             raise Exception(e)
 
     @classmethod
-    def get_all_projects_in_workspace(cls, workspace_id):
+    def get_all_projects_in_workspace(cls, workspace_id, page, limit):
         session = DatabaseConnector.get_session()
         try:
             result = (
@@ -231,11 +231,26 @@ class Project:
                     User_model.name.label("owner_name"),
                 )
                 .join(User_model, Project_model.ownerid == User_model.id)
-                .filter(
-                    Project_model.workspaceid == workspace_id,
-                    Project_model.is_delete == False,
-                )
+                .filter(Project_model.workspaceid == workspace_id)
+                .filter(Project_model.is_delete == False)
+                .offset(page)
+                .limit(limit)
                 .all()
+            )
+            session.commit()
+            return result
+        except Exception as e:
+            raise Exception(e)
+
+    @classmethod
+    def get_number_of_projects_in_workspace(cls, workspace_id):
+        session = DatabaseConnector.get_session()
+        try:
+            result = (
+                session.query(Project_model)
+                .filter(Project_model.workspaceid == workspace_id)
+                .filter(Project_model.is_delete == False)
+                .count()
             )
             session.commit()
             return result

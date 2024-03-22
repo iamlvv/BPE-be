@@ -16,13 +16,24 @@ from database.db import DatabaseConnector
 class Health_model(Base):
     __tablename__ = "health"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[int] = mapped_column(primary_key=True)
     total_score: Mapped[float] = mapped_column(nullable=True)
-    expected_cycle_time: Mapped[float] = mapped_column(nullable=True)
-    expected_cost: Mapped[float] = mapped_column(nullable=True)
-    expected_internal_quality: Mapped[float] = mapped_column(nullable=True)
-    expected_external_quality: Mapped[float] = mapped_column(nullable=True)
-    expected_flexibility: Mapped[float] = mapped_column(nullable=True)
+
+    targeted_cycle_time: Mapped[float] = mapped_column(nullable=True)
+    current_cycle_time: Mapped[float] = mapped_column(nullable=True)
+    worst_cycle_time: Mapped[float] = mapped_column(nullable=True)
+
+    targeted_cost: Mapped[float] = mapped_column(nullable=True)
+    current_cost: Mapped[float] = mapped_column(nullable=True)
+    worst_cost: Mapped[float] = mapped_column(nullable=True)
+
+    targeted_quality: Mapped[float] = mapped_column(nullable=True)
+    current_quality: Mapped[float] = mapped_column(nullable=True)
+    worst_quality: Mapped[float] = mapped_column(nullable=True)
+
+    targeted_flexibility: Mapped[float] = mapped_column(nullable=True)
+    current_flexibility: Mapped[float] = mapped_column(nullable=True)
+    worst_flexibility: Mapped[float] = mapped_column(nullable=True)
 
     # foreign key
     process_portfolio_id: Mapped[int] = mapped_column(
@@ -40,7 +51,7 @@ class Health_model(Base):
 class Feasibility_model(Base):
     __tablename__ = "feasibility"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[int] = mapped_column(primary_key=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False)
     is_deleted: Mapped[bool] = mapped_column(nullable=False, default=False)
     total_score: Mapped[float] = mapped_column(nullable=True)
@@ -61,7 +72,7 @@ class Feasibility_model(Base):
 class Strategic_importance_model(Base):
     __tablename__ = "strategic_importance"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[int] = mapped_column(primary_key=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False)
     is_deleted: Mapped[bool] = mapped_column(nullable=False, default=False)
     total_score: Mapped[float] = mapped_column(nullable=True)
@@ -86,14 +97,14 @@ class Strategic_importance_model(Base):
 class Process_portfolio_model(Base):
     __tablename__ = "process_portfolio"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[int] = mapped_column(primary_key=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False)
 
     # foreign key
-    project_id: Mapped[int] = mapped_column(ForeignKey("project.id"), nullable=False)
+    workspace_id: Mapped[int] = mapped_column(ForeignKey("project.id"), nullable=False)
 
     # relationship
-    project = relationship("Project_model", backref="process_portfolio")
+    workspace = relationship("Project_model", backref="process_portfolio")
 
 
 Base.metadata.create_all(DatabaseConnector.get_engine())

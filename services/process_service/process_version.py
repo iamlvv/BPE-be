@@ -85,19 +85,19 @@ class ProcessVersionService_Get:
         return ProcessVersion.get_all_active_process_versions_in_workspace(project_id)
 
     @classmethod
-    def get_all_process_versions_in_workspace(cls, workspace_id, project_id, user_id):
+    def get_all_process_versions_in_process(cls, workspace_id, process_id, user_id):
         workspace_owner = Permission_check.check_if_user_is_workspace_owner(
             workspace_id, user_id
         )
-        process_versions_list = ProcessVersion.get_all_process_versions_in_workspace(
-            project_id
+        process_versions_list = ProcessVersion.get_all_process_versions_in_process(
+            process_id
         )
         return [
             {
-                "project_id": process.project_id,
-                "process_id": process.id,
+                "projectId": process.project_id,
+                "processId": process.id,
                 "version": process.version,
-                "is_active": process.is_active,
+                "isActive": process.is_active,
             }
             for process in process_versions_list
         ]

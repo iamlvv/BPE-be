@@ -207,12 +207,12 @@ class ProcessVersion:
             raise Exception(e)
 
     @classmethod
-    def get_all_process_versions_in_workspace(cls, project_id):
+    def get_all_process_versions_in_process(cls, process_id):
         session = DatabaseConnector.get_session()
         try:
             process_versions = (
                 session.query(Process_version_model)
-                .filter(Process_version_model.project_id == project_id)
+                .filter(Process_version_model.process_id == process_id)
                 .all()
             )
             session.commit()

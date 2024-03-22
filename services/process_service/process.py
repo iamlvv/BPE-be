@@ -46,26 +46,19 @@ class ProcessService:
         return Process.get_by_project(project_id)
 
     @classmethod
-    def get_all_active_process_versions_in_workspace(
-        cls, workspace_id, project_id, user_id
-    ):
-        # get all projects in workspace
-        # in each project, get all processes that has active process_version
-        # check if user is workspace_owner
+    def get_all_processes_in_project(cls, workspace_id, project_id, user_id):
         workspace_owner = Permission_check.check_if_user_is_workspace_owner(
             workspace_id, user_id
         )
-        active_process_versions_list = (
-            ProcessVersionService.get_all_active_process_versions_in_workspace(
-                project_id
-            )
-        )
+        if not workspace_owner:
+            raise Exception("permission denied")
+
+        processes_in_project = Process.get_by_project(project_id)
         return [
             {
-                "project_id": process.project_id,
-                "process_id": process.id,
-                "version": process.version,
-                "is_active": process.is_active,
+                "id": process["id"],
+                "name": process["name"],
+                "lastSaved": process["last_saved"],
             }
-            for process in active_process_versions_list
+            for process in processes_in_project
         ]
