@@ -91,7 +91,12 @@ class Health_service:
 
     @classmethod
     def check_if_process_version_exists_in_health(cls, process_version_version):
-        return Health.check_if_process_version_exists_in_health(process_version_version)
+        health = Health.check_if_process_version_exists_in_health(
+            process_version_version
+        )
+        if health is None:
+            raise Exception("health of process version does not exist")
+        return health
 
     @classmethod
     def update_health_of_active_process_versions(

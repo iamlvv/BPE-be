@@ -4,6 +4,9 @@ from bpsky import bpsky
 from controller.utils import *
 from services.process_portfolio_service.feasibility import Feasibility_service
 from services.process_portfolio_service.health import Health_service
+from services.process_portfolio_service.process_portfolio import (
+    Process_portfolio_service,
+)
 from services.process_portfolio_service.strategic_importance import (
     Strategic_importance_service,
 )
@@ -189,6 +192,25 @@ def edit_strategic_importance_of_active_process_version():
         total_score = body["totalScore"]
         data = Strategic_importance_service.edit_strategic_importance_of_active_process_version(
             workspace_id, process_version_version, user_id, total_score
+        )
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/portfolio", methods=["POST"])
+def create_process_portfolio():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        body = load_request_body(request)
+        workspace_id = body["workspaceId"]
+        active_process_version_list = body["activeProcessVersion"]
+        data = Process_portfolio_service.create_process_portfolio(
+            workspace_id, user_id, active_process_version_list
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),

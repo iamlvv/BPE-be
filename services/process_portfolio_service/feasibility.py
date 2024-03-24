@@ -33,9 +33,12 @@ class Feasibility_service:
 
     @classmethod
     def check_if_process_version_exists_in_feasibility(cls, process_version_version):
-        return Feasibility.check_if_process_version_exists_in_feasibility(
+        feasibility = Feasibility.check_if_process_version_exists_in_feasibility(
             process_version_version
         )
+        if feasibility is None:
+            raise Exception("feasibility of process version does not exist")
+        return feasibility
 
     @classmethod
     def update_feasibility_of_active_process_version(

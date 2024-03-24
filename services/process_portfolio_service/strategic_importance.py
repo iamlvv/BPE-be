@@ -39,9 +39,12 @@ class Strategic_importance_service:
     def check_if_process_version_exists_in_strategic_importance(
         cls, process_version_version
     ):
-        return Strategic_importance.check_if_process_version_exists_in_strategic_importance(
+        strategic_importance = Strategic_importance.check_if_process_version_exists_in_strategic_importance(
             process_version_version
         )
+        if strategic_importance is None:
+            raise Exception("strategic importance of process version does not exist")
+        return strategic_importance
 
     @classmethod
     def add_strategic_importance_of_active_process_version(
