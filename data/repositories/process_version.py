@@ -25,13 +25,13 @@ class ProcessVersion:
     @classmethod
     def create(cls, xml_file_link, project_id, process_id, version):
         query = f"""INSERT INTO public.process_version
-                    (xml_file_link, project_id, process_id, "version", num, last_saved)
+                    (xml_file_link, project_id, process_id, "version", num, last_saved, is_active)
                     VALUES('{xml_file_link}', {project_id}, {process_id}, '{version}',
                         CAST((SELECT CASE WHEN MAX(num) IS NULL THEN 0 ELSE MAX(num) END
                             FROM public.process_version
                             WHERE project_id={project_id} AND process_id={process_id})
                             AS INT)+1,
-                    NOW());
+                    NOW(), true);
                 """
         connection = DatabaseConnector.get_connection()
         try:
