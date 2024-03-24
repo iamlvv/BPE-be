@@ -74,6 +74,7 @@ class Health_service:
                 current_flexibility,
             )
         return {
+            "processVersionVersion": process_version_health.process_version_version,
             "targetedCycleTime": process_version_health.targeted_cycle_time,
             "worstCycleTime": process_version_health.worst_cycle_time,
             "currentCycleTime": process_version_health.current_cycle_time,
