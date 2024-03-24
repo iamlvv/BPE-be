@@ -15,3 +15,4 @@ from .survey_features_controllers.question import *
 from .survey_features_controllers.response import *
 from .survey_features_controllers.survey_result import *
 from .process_portfolio_features_controllers.process_portfolio import *
+from .trigger import *
