@@ -65,3 +65,51 @@ class Process_portfolio_service:
                 )
         except Exception as e:
             raise Exception(e)
+
+    @classmethod
+    def get_process_portfolio_content(cls, workspace_id, user_id):
+        try:
+            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+                workspace_id, user_id
+            )
+            if not workspace_owner:
+                raise Exception("permission denied")
+            process_portfolio = cls.check_if_process_portfolio_exists(workspace_id)
+            if not process_portfolio:
+                return None
+            # return stats of every active process version in workspace
+            return {
+                "id": process_portfolio.id,
+                "createdAt": process_portfolio.created_at,
+                "isDeleted": process_portfolio.is_deleted,
+                "workspaceId": process_portfolio.workspace_id,
+                "processVersionStats": cls.get_process_version_stats(workspace_id),
+            }
+        except Exception as e:
+            raise Exception(e)
+
+    @classmethod
+    def get_process_version_stats(cls, workspace_id):
+        try:
+            process_version_stats = []
+            active_process_versions = Process_portfolio.get_active_process_versions(
+                workspace_id
+            )
+            for active_process_version in active_process_versions:
+                process_version_stats.append(
+                    {
+                        "processVersionVersion": active_process_version.version,
+                        "health": Health_service.get_health_of_active_process_version(
+                            active_process_version.version
+                        ),
+                        "strategicImportance": Strategic_importance_service.get_strategic_importance_of_active_process_version(
+                            active_process_version.version
+                        ),
+                        "feasibility": Feasibility_service.get_feasibility_of_active_process_version(
+                            active_process_version.version
+                        ),
+                    }
+                )
+            return process_version_stats
+        except Exception as e:
+            raise Exception(e)

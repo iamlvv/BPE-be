@@ -115,3 +115,18 @@ class Health:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_health_of_active_process_version(cls, process_version_version):
+        session = DatabaseConnector.get_session()
+        try:
+            health = (
+                session.query(Health_model)
+                .filter(Health_model.process_version_version == process_version_version)
+                .first()
+            )
+            session.commit()
+            return health
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

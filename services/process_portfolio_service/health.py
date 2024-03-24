@@ -163,3 +163,9 @@ class Health_service:
             worst_flexibility,
             current_flexibility,
         )
+
+    @classmethod
+    def get_health_of_active_process_version(cls, process_version_version):
+        health_stats = Health.get_health_of_active_process_version(
+            process_version_version
+        )

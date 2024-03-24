@@ -219,3 +219,20 @@ def create_process_portfolio():
         )
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/portfolio", methods=["GET"])
+def get_process_portfolio_content():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        workspace_id = request.args.get("workspaceId")
+        data = Process_portfolio_service.get_process_portfolio_content(
+            workspace_id, user_id
+        )
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
