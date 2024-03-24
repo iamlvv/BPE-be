@@ -20,4 +20,4 @@ class Project_model(Base):
     isworkspacedeleted: Mapped[bool] = mapped_column(nullable=False, default=False)
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())

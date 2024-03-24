@@ -8,4 +8,4 @@ class Base(DeclarativeBase):
     pass
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())

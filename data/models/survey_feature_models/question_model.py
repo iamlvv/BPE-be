@@ -99,4 +99,4 @@ class Question_model(Base):
     contributor = relationship("User_model", backref="question")
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())

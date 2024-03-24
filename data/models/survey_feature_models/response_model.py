@@ -38,4 +38,4 @@ class Response_model(Base):
     respondent = relationship("Respondent_model", backref="response")
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())

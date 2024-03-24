@@ -22,4 +22,4 @@ class Workspace_model(Base):
     # relationship
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())

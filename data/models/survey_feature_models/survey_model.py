@@ -82,4 +82,4 @@ class Survey_recipient_association_model(Base):
     survey = relationship("Survey_model", backref="survey_recipient_association")
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())

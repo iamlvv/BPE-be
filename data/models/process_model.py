@@ -42,4 +42,4 @@ class Process_version_model(Base):
     process = relationship("Process_model", backref="process_version")
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())

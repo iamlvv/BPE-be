@@ -27,4 +27,4 @@ class Answer_model(Base):
     question = relationship("Question_in_section_model", backref="answer")
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())

@@ -16,4 +16,4 @@ class User_model(Base):
     phone: Mapped[str] = mapped_column(nullable=True)
 
 
-Base.metadata.create_all(DatabaseConnector.get_engine())
+# Base.metadata.create_all(DatabaseConnector.get_engine())
