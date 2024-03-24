@@ -1,4 +1,9 @@
 from data.models.process_model import Process_version_model, Process_model
+from data.models.process_portfolio_feature_models.process_portfolio_model import (
+    Feasibility_model,
+    Strategic_importance_model,
+    Health_model,
+)
 from data.models.project_model import Project_model
 from data.repositories.utils import *
 
@@ -211,7 +216,32 @@ class ProcessVersion:
         session = DatabaseConnector.get_session()
         try:
             process_versions = (
-                session.query(Process_version_model)
+                session.query(
+                    Process_version_model.project_id,
+                    Process_version_model.version,
+                    Process_version_model.process_id,
+                    Process_version_model.is_active,
+                    Health_model.total_score.label("health"),
+                    Strategic_importance_model.total_score.label(
+                        "strategic_importance"
+                    ),
+                    Feasibility_model.total_score.label("feasibility"),
+                )
+                .outerjoin(
+                    Health_model,
+                    Process_version_model.version
+                    == Health_model.process_version_version,
+                )
+                .outerjoin(
+                    Strategic_importance_model,
+                    Process_version_model.version
+                    == Strategic_importance_model.process_version_version,
+                )
+                .outerjoin(
+                    Feasibility_model,
+                    Process_version_model.version
+                    == Feasibility_model.process_version_version,
+                )
                 .filter(Process_version_model.process_id == process_id)
                 .all()
             )

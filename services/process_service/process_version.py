@@ -95,9 +95,12 @@ class ProcessVersionService_Get:
         return [
             {
                 "projectId": process.project_id,
-                "processId": process.id,
+                "processId": process.process_id,
                 "version": process.version,
                 "isActive": process.is_active,
+                "health": process.health,
+                "strategicImportance": process.strategic_importance,
+                "feasibility": process.feasibility,
             }
             for process in process_versions_list
         ]

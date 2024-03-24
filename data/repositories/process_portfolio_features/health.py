@@ -108,7 +108,6 @@ class Health:
                 targeted_flexibility=targeted_flexibility,
                 worst_flexibility=worst_flexibility,
                 current_flexibility=current_flexibility,
-                total_score=0,
             )
             session.add(health)
             session.commit()
