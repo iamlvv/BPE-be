@@ -51,7 +51,14 @@ def evaluated_result_save():
     description = body["description"] if "description" in body else ""
     xml_file_link = get_xml_link(project_id, process_id, version)
     EvaluatedResultService.save(
-        user_id, xml_file_link, project_id, process_id, name, result, description
+        user_id,
+        xml_file_link,
+        project_id,
+        process_id,
+        name,
+        result,
+        description,
+        version,
     )
     return "Create successfully"
 

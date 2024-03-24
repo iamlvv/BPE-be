@@ -5,12 +5,20 @@ from services.project_service.work_on import WorkOnService
 class EvaluatedResultService:
     @classmethod
     def save(
-        cls, user_id, xml_file_link, project_id, process_id, name, result, description
+        cls,
+        user_id,
+        xml_file_link,
+        project_id,
+        process_id,
+        name,
+        result,
+        description,
+        version,
     ):
         if not WorkOnService.can_edit(user_id, project_id):
             raise Exception("permission denied")
         EvaluatedResult.insert(
-            xml_file_link, project_id, process_id, name, result, description
+            xml_file_link, project_id, process_id, name, result, description, version
         )
 
     @classmethod

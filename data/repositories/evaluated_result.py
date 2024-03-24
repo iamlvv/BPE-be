@@ -12,10 +12,19 @@ class EvaluatedResult:
     create_at = datetime.now()
 
     @classmethod
-    def insert(cls, xml_file_link, project_id, process_id, name, result, description):
+    def insert(
+        cls,
+        xml_file_link,
+        project_id,
+        process_id,
+        name,
+        result,
+        description,
+        process_version_version,
+    ):
         query = """INSERT INTO public.evaluated_result
-                    (xml_file_link, project_id, process_id, "name", "result", description, create_at)
-                    VALUES(%s, %s, %s, %s, %s::jsonb, %s, NOW());
+                    (xml_file_link, project_id, process_id, "name", "result", description, create_at, process_version_version)
+                    VALUES(%s, %s, %s, %s, %s::jsonb, %s, NOW(), %s);
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -29,6 +38,7 @@ class EvaluatedResult:
                         name,
                         json.dumps(result),
                         description,
+                        process_version_version,
                     ),
                 )
                 connection.commit()
