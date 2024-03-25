@@ -12,16 +12,7 @@ class Survey:
         session = DatabaseConnector.get_session()
         try:
             survey = (
-                session.query(
-                    Survey_model.id,
-                    Survey_model.name,
-                    Survey_model.description,
-                    Survey_model.created_at,
-                    Survey_model.is_deleted,
-                    Survey_model.start_date,
-                    Survey_model.end_date,
-                    Survey_model.is_published,
-                )
+                session.query(Survey_model)
                 .filter(
                     Survey_model.process_version_version == process_version_version,
                     Survey_model.is_deleted == False,
@@ -32,14 +23,14 @@ class Survey:
             if survey is None:
                 return None
             return {
-                "id": survey[0],
-                "name": survey[1],
-                "description": survey[2],
-                "createdAt": survey[3],
-                "isDeleted": survey[4],
-                "startDate": survey[5],
-                "endDate": survey[6],
-                "isPublished": survey[7],
+                "id": survey.id,
+                "name": survey.name,
+                "description": survey.description,
+                "createdAt": survey.created_at,
+                "isDeleted": survey.is_deleted,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+                "isPublished": survey.is_published,
             }
         except Exception as e:
             session.rollback()

@@ -74,7 +74,9 @@ class Survey_service:
         )
         if not is_user_has_access:
             raise Exception("User has no access to the survey")
-        survey_info = Survey.get_survey_detail(process_version_version)
+        survey_info = cls.get_survey_detail(
+            process_version_version, project_id, user_id
+        )
         if survey_info is None:
             return {"message": "Survey does not exist."}
         survey_id = survey_info["id"]

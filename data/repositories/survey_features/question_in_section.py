@@ -57,7 +57,6 @@ class Question_in_section:
 
     @classmethod
     def get_questions_in_survey(cls, sections_list_in_survey):
-        session = DatabaseConnector.get_session()
         try:
             questions_in_survey = []
             # get questions in each section, but with multiple choice and branching questions,
@@ -77,11 +76,12 @@ class Question_in_section:
                         )
                         question_options_list.append(question_options)
                 print("question_options_list: ", question_options_list)
+                print("section: ", section)
                 questions_in_survey.append(
                     {
                         "sectionId": section["id"],
                         "sectionName": section["name"],
-                        "orderInSurvey": section["orderInSurvey"],
+                        "orderInSurvey": section["order_in_survey"],
                         "questions": [
                             {
                                 "questionOptions": (
@@ -111,10 +111,8 @@ class Question_in_section:
                         ],
                     }
                 )
-            session.close()
             return questions_in_survey
         except Exception as e:
-            session.rollback()
             raise Exception(e)
 
     @classmethod

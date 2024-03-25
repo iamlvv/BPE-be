@@ -35,7 +35,9 @@ def create_new_survey():
     # only have 1 existing survey
     survey_id_exists = Survey_service.check_if_survey_exists(process_version_version)
     if survey_id_exists:
-        data = Survey_service.get_survey_content(user_id, project_id, survey_id_exists)
+        data = Survey_service.get_survey_content(
+            user_id, project_id, process_version_version
+        )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
             status=200,

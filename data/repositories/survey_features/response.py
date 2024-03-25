@@ -81,7 +81,7 @@ class Response:
             for response in responses:
                 response.is_deleted = True
             session.commit()
-            return {"message": "Responses are deleted"}
+            return responses
         except Exception as e:
             session.rollback()
             raise Exception(e)
