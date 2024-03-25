@@ -66,7 +66,7 @@ class Section:
                     {
                         "id": section.id,
                         "name": section.name,
-                        "orderInSurvey": section.order_in_survey,
+                        "order_in_survey": section.order_in_survey,
                     }
                 )
             session.close()
