@@ -9,6 +9,10 @@ from services.survey_service.question_in_section import (
 from services.survey_service.question_option import Question_option_service
 from services.survey_service.response import Response_service
 from services.survey_service.section import Section_service
+from services.survey_service.survey_recipient import (
+    Survey_recipient_service,
+    Survey_send_service,
+)
 from services.utils import Permission_check
 from smtp.email import Email
 
@@ -273,7 +277,7 @@ class Survey_service:
         project_id,
         user_id,
         survey_url,
-        email=None,
+        email_list=None,
         start_date=None,
         end_date=None,
     ):
@@ -295,9 +299,12 @@ class Survey_service:
         if start_date is None:
             start_date = datetime.now()
 
+        # save email in the database
+        if email_list is not None:
+            cls.save_recipient_email(survey_id, email_list)
         # send survey url to the email
-        if email is not None:
-            cls.send_survey_url(email, survey_url, start_date, end_date)
+        if email_list is not None:
+            cls.send_survey_url(email_list, survey_url, start_date, end_date)
         # update end date and start date of the survey
         return Survey.publish_survey(survey_id, start_date, end_date, survey_url)
 
@@ -320,3 +327,21 @@ class Survey_service:
         if survey is None:
             return {"message": "Survey does not exist."}
         return Survey.close_publish_survey(survey.id)
+
+    @classmethod
+    def save_recipient_email(cls, survey_id, email_list):
+        # insert into table survey_recipient unique email
+        # then insert into table send_survey with survey_id and recipient_id
+        recipient_list = Survey_recipient_service.save_recipient_email(email_list)
+        # update survey_recipient_association table with latest recipient list
+        current_recipient_list = Survey_send_service.get_survey_recipient_email(
+            survey_id
+        )
+        for recipient in current_recipient_list:
+            Survey_send_service.delete_survey_recipient_email(survey_id, recipient.id)
+
+        for recipient_list_item in recipient_list:
+            Survey_send_service.save_survey_recipient_email(
+                survey_id, recipient_list_item.id
+            )
+        return

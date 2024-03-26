@@ -184,7 +184,7 @@ def publish_survey():
     project_id = body["projectId"]
     start_date = body["startDate"] if "startDate" in body else None
     end_date = body["endDate"] if "endDate" in body else None
-    email = body["email"] if "email" in body else None
+    email_list = body["email"] if "email" in body else None
     survey_url = body["surveyUrl"]
     if start_date is not None:
         start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
@@ -196,7 +196,7 @@ def publish_survey():
         project_id,
         user_id,
         survey_url,
-        email,
+        email_list,
         start_date,
         end_date,
     )

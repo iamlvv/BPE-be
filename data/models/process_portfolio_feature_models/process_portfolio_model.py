@@ -13,7 +13,7 @@ from database.db import DatabaseConnector
 class Health_model(Base):
     __tablename__ = "health"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     total_score: Mapped[float] = mapped_column(nullable=True)
 
     targeted_cycle_time: Mapped[float] = mapped_column(nullable=True)
@@ -48,7 +48,7 @@ class Health_model(Base):
 class Feasibility_model(Base):
     __tablename__ = "feasibility"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     total_score: Mapped[float] = mapped_column(nullable=True)
 
     # foreign key
@@ -67,7 +67,7 @@ class Feasibility_model(Base):
 class Strategic_importance_model(Base):
     __tablename__ = "strategic_importance"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     total_score: Mapped[float] = mapped_column(nullable=True)
 
     # foreign key
@@ -90,7 +90,7 @@ class Strategic_importance_model(Base):
 class Process_portfolio_model(Base):
     __tablename__ = "process_portfolio"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     created_at: Mapped[datetime] = mapped_column(nullable=False)
     is_deleted: Mapped[bool] = mapped_column(nullable=False, default=False)
 
