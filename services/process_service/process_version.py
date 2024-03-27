@@ -138,7 +138,9 @@ class ProcessVersionService_Update:
         CommentOn.update(id, content)
 
     @classmethod
-    def activate_process_version(cls, user_id, workspace_id, process_version_version):
+    def activate_process_version(
+        cls, user_id, workspace_id, process_version_version, process_id
+    ):
         workspace_owner = Permission_check.check_if_user_is_workspace_owner(
             workspace_id, user_id
         )
@@ -147,22 +149,23 @@ class ProcessVersionService_Update:
 
         # check if there are any active process versions in the workspace
         # if there are and the version is not the same as the one that is being activated, deactivate it
-        active_process_versions = (
-            ProcessVersion.get_all_active_process_versions_in_workspace(workspace_id)
+        active_process_version = (
+            ProcessVersion.get_current_active_process_version_in_process(process_id)
         )
-        for active_process_version in active_process_versions:
-            if active_process_version.version != process_version_version:
-                ProcessVersion.deactivate_process_version(
-                    active_process_version.version,
-                )
-        active_process_version = ProcessVersion.activate_process_version(
+        if active_process_version.version != process_version_version:
+            ProcessVersion.deactivate_process_version(
+                active_process_version.version,
+            )
+        elif active_process_version.version == process_version_version:
+            raise Exception("process version is already active")
+        new_active_process_version = ProcessVersion.activate_process_version(
             process_version_version
         )
         return {
-            "project_id": active_process_version.project_id,
-            "process_id": active_process_version.process_id,
-            "version": active_process_version.version,
-            "is_active": active_process_version.is_active,
+            "project_id": new_active_process_version.project_id,
+            "process_id": new_active_process_version.process_id,
+            "version": new_active_process_version.version,
+            "is_active": new_active_process_version.is_active,
         }
 
 
@@ -174,7 +177,7 @@ class ProcessVersionService_Insert(OldestVersionOperation):
             "static/diagram.bpmn", f"{project_id}/{process_id}/{version}.bpmn"
         )
 
-        ProcessVersion.create(xml_file_link, project_id, process_id, version)
+        ProcessVersion.create_default(xml_file_link, project_id, process_id, version)
 
     @classmethod
     def create_new_version(cls, user_id, file, project_id, process_id):

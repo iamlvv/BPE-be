@@ -23,6 +23,26 @@ class ProcessVersion:
         vars(self).update(kwargs)
 
     @classmethod
+    def create_default(cls, xml_file_link, project_id, process_id, version):
+        query = f"""INSERT INTO public.process_version
+                            (xml_file_link, project_id, process_id, "version", num, last_saved, is_active)
+                            VALUES('{xml_file_link}', {project_id}, {process_id}, '{version}',
+                                CAST((SELECT CASE WHEN MAX(num) IS NULL THEN 0 ELSE MAX(num) END
+                                    FROM public.process_version
+                                    WHERE project_id={project_id} AND process_id={process_id})
+                                    AS INT)+1,
+                            NOW(), true);
+                        """
+        connection = DatabaseConnector.get_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                connection.commit()
+        except Exception as e:
+            connection.rollback()
+            raise Exception(e)
+
+    @classmethod
     def create(cls, xml_file_link, project_id, process_id, version):
         query = f"""INSERT INTO public.process_version
                     (xml_file_link, project_id, process_id, "version", num, last_saved, is_active)
@@ -31,7 +51,7 @@ class ProcessVersion:
                             FROM public.process_version
                             WHERE project_id={project_id} AND process_id={process_id})
                             AS INT)+1,
-                    NOW(), true);
+                    NOW(), false);
                 """
         connection = DatabaseConnector.get_connection()
         try:
@@ -261,6 +281,24 @@ class ProcessVersion:
                 .first()
             )
             process_version.is_active = False
+            session.commit()
+            return process_version
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_current_active_process_version_in_process(cls, process_id):
+        session = DatabaseConnector.get_session()
+        try:
+            process_version = (
+                session.query(Process_version_model)
+                .filter(
+                    Process_version_model.process_id == process_id,
+                    Process_version_model.is_active == True,
+                )
+                .first()
+            )
             session.commit()
             return process_version
         except Exception as e:

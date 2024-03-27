@@ -71,8 +71,9 @@ def activate_process_version():
         body = load_request_body(request)
         workspace_id = body["workspaceId"]
         process_version_version = body["processVersionVersion"]
+        process_id = body["processId"]
         data = ProcessVersionService.activate_process_version(
-            user_id, workspace_id, process_version_version
+            user_id, workspace_id, process_version_version, process_id
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
