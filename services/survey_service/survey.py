@@ -253,7 +253,9 @@ class Survey_service:
         survey = Survey.check_if_survey_exists(process_version_version)
         if survey is None:
             raise Exception("Survey does not exist.")
-        if survey.is_published is False and mode == "published":
+        if (
+            survey.is_published == "closed" or survey.is_published == "pending"
+        ) and mode == "published":
             raise Exception("Survey is not published.")
         survey_id = survey.id
         sections_list_in_survey = Section_service.get_sections_in_survey(survey_id)
@@ -345,3 +347,25 @@ class Survey_service:
                 survey_id, recipient_list_item.id
             )
         return
+
+    @classmethod
+    def get_publish_info(cls, process_version_version, project_id, user_id):
+        is_user_has_access = Permission_check.check_user_has_access_survey(
+            project_id, user_id
+        )
+        if not is_user_has_access:
+            raise Exception("User has no access to the survey")
+        survey = cls.check_if_survey_exists(process_version_version)
+        if survey is None:
+            return {"message": "Survey does not exist."}
+
+        # get email list
+        email_list = Survey_send_service.get_survey_recipient_email(survey.id)
+        return {
+            "id": survey.id,
+            "email": [email.email for email in email_list],
+            "surveyUrl": survey.survey_url,
+            "startDate": survey.start_date,
+            "endDate": survey.end_date,
+            "isPublished": survey.is_published,
+        }

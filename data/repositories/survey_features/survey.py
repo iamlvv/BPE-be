@@ -47,7 +47,7 @@ class Survey:
                 process_version_version=process_version_version,
                 created_at=datetime.now(),
                 is_deleted=False,
-                is_published=False,
+                is_published="closed",
                 survey_url="",
                 start_date=None,
                 end_date=None,
@@ -279,7 +279,7 @@ class Survey:
                 .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
                 .first()
             )
-            survey.is_published = True
+            survey.is_published = "published" if start_date is None else "pending"
             survey.start_date = start_date
             survey.end_date = end_date
             survey.survey_url = survey_url
@@ -304,7 +304,7 @@ class Survey:
                 .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
                 .first()
             )
-            survey.is_published = False
+            survey.is_published = "closed"
             session.commit()
             return {
                 "id": survey.id,

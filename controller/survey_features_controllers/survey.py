@@ -205,3 +205,16 @@ def publish_survey():
         status=200,
         mimetype="application/json",
     )
+
+
+@bpsky.route("/api/v1/survey/publish", methods=["GET"])
+def get_publish_info():
+    user_id = get_id_from_token(get_token(request))
+    process_version_version = request.args.get("processVersionVersion")
+    project_id = request.args.get("projectId")
+    data = Survey_service.get_publish_info(process_version_version, project_id, user_id)
+    return bpsky.response_class(
+        response=jsonpickle.encode(data, unpicklable=False),
+        status=200,
+        mimetype="application/json",
+    )

@@ -16,7 +16,7 @@ class Survey_model(Base):
     created_at: Mapped[datetime] = mapped_column(nullable=False)
     start_date: Mapped[datetime] = mapped_column(nullable=True, default=None)
     end_date: Mapped[datetime] = mapped_column(nullable=True, default=None)
-    is_published: Mapped[bool] = mapped_column(nullable=False, default=False)
+    is_published: Mapped[str] = mapped_column(nullable=False, default="closed")
     is_deleted: Mapped[bool] = mapped_column(nullable=False, default=False)
     deleted_at: Mapped[datetime] = mapped_column(nullable=True, default=None)
     allow_duplicate_respondent: Mapped[bool] = mapped_column(
