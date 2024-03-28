@@ -42,7 +42,10 @@ class DatabaseConnector:
         if cls.engine is None:
             from sqlalchemy import create_engine
 
-            cls.engine = create_engine(DATABASE_URL_TEST, echo=True)
+            cls.engine = create_engine(
+                DATABASE_URL_TEST,
+                echo=True,
+            )
         return cls.engine
 
     @classmethod

@@ -241,6 +241,7 @@ class ProcessVersion:
                     Process_version_model.version,
                     Process_version_model.process_id,
                     Process_version_model.is_active,
+                    Process_version_model.num,
                     Health_model.total_score.label("health"),
                     Strategic_importance_model.total_score.label(
                         "strategic_importance"

@@ -101,6 +101,7 @@ class ProcessVersionService_Get:
                 "health": process.health,
                 "strategicImportance": process.strategic_importance,
                 "feasibility": process.feasibility,
+                "num": process.num,
             }
             for process in process_versions_list
         ]

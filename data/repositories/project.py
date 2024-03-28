@@ -235,6 +235,7 @@ class Project:
                     Project_model.workspaceid == workspace_id,
                     Project_model.is_delete == False,
                 )
+                .order_by(Project_model.create_at.desc())
                 .offset((int(page) - 1 if int(page) - 1 >= 0 else 0) * int(limit))
                 .limit(int(limit))
                 .all()

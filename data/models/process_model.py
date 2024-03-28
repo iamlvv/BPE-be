@@ -29,6 +29,7 @@ class Process_version_model(Base):
     xml_file_link: Mapped[str] = mapped_column(nullable=False, primary_key=True)
     version: Mapped[str] = mapped_column(nullable=False, unique=True)
     is_active: Mapped[bool] = mapped_column(nullable=True, default=False)
+    num: Mapped[int] = mapped_column(nullable=False)
     # foreign key
     project_id: Mapped[int] = mapped_column(
         ForeignKey("project.id"), nullable=False, primary_key=True
