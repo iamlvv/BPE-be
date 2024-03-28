@@ -231,10 +231,12 @@ class Project:
                     User_model.name.label("owner_name"),
                 )
                 .join(User_model, Project_model.ownerid == User_model.id)
-                .filter(Project_model.workspaceid == workspace_id)
-                .filter(Project_model.is_delete == False)
-                .offset(page)
-                .limit(limit)
+                .filter(
+                    Project_model.workspaceid == workspace_id,
+                    Project_model.is_delete == False,
+                )
+                .offset((int(page) - 1 if int(page) - 1 >= 0 else 0) * int(limit))
+                .limit(int(limit))
                 .all()
             )
             session.commit()

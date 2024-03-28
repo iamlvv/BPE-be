@@ -516,3 +516,48 @@ class Workspace(Workspace_Get, Workspace_Insert, Workspace_Update, Workspace_Del
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def edit_workspace_measurements(
+        cls,
+        workspace_id,
+        targeted_cycle_time,
+        worst_cycle_time,
+        targeted_cost,
+        worst_cost,
+        targeted_quality,
+        worst_quality,
+        targeted_flexibility,
+        worst_flexibility,
+    ):
+        session = DatabaseConnector.get_session()
+        try:
+            workspace = (
+                session.query(Workspace_model)
+                .filter(
+                    Workspace.id == int(workspace_id),
+                    Workspace_model.isdeleted == False,
+                )
+                .first()
+            )
+            if targeted_cycle_time is not None:
+                workspace.targeted_cycle_time = targeted_cycle_time
+            if worst_cycle_time is not None:
+                workspace.worst_cycle_time = worst_cycle_time
+            if targeted_cost is not None:
+                workspace.targeted_cost = targeted_cost
+            if worst_cost is not None:
+                workspace.worst_cost = worst_cost
+            if targeted_quality is not None:
+                workspace.targeted_quality = targeted_quality
+            if worst_quality is not None:
+                workspace.worst_quality = worst_quality
+            if targeted_flexibility is not None:
+                workspace.targeted_flexibility = targeted_flexibility
+            if worst_flexibility is not None:
+                workspace.worst_flexibility = worst_flexibility
+            session.commit()
+            return workspace
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

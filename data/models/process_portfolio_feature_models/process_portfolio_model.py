@@ -16,21 +16,13 @@ class Health_model(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     total_score: Mapped[float] = mapped_column(nullable=True)
 
-    targeted_cycle_time: Mapped[float] = mapped_column(nullable=True)
     current_cycle_time: Mapped[float] = mapped_column(nullable=True)
-    worst_cycle_time: Mapped[float] = mapped_column(nullable=True)
 
-    targeted_cost: Mapped[float] = mapped_column(nullable=True)
     current_cost: Mapped[float] = mapped_column(nullable=True)
-    worst_cost: Mapped[float] = mapped_column(nullable=True)
 
-    targeted_quality: Mapped[float] = mapped_column(nullable=True)
     current_quality: Mapped[float] = mapped_column(nullable=True)
-    worst_quality: Mapped[float] = mapped_column(nullable=True)
 
-    targeted_flexibility: Mapped[float] = mapped_column(nullable=True)
     current_flexibility: Mapped[float] = mapped_column(nullable=True)
-    worst_flexibility: Mapped[float] = mapped_column(nullable=True)
 
     # foreign key
     # process_portfolio_id: Mapped[int] = mapped_column(

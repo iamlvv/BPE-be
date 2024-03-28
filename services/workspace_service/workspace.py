@@ -127,6 +127,36 @@ class WorkspaceService_Update:
         )
         return recent_opened_workspace
 
+    @classmethod
+    def edit_workspace_measurements(
+        cls,
+        workspace_id,
+        user_id,
+        targeted_cycle_time,
+        worst_cycle_time,
+        targeted_cost,
+        worst_cost,
+        targeted_quality,
+        worst_quality,
+        targeted_flexibility,
+        worst_flexibility,
+    ):
+        workspace = Workspace.getWorkspace(workspace_id)
+        if workspace is None:
+            return None
+        workspace = Workspace.edit_workspace_measurements(
+            workspace_id,
+            targeted_cycle_time,
+            worst_cycle_time,
+            targeted_cost,
+            worst_cost,
+            targeted_quality,
+            worst_quality,
+            targeted_flexibility,
+            worst_flexibility,
+        )
+        return workspace
+
 
 class WorkspaceService_Delete:
     @classmethod

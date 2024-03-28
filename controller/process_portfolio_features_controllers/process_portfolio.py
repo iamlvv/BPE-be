@@ -84,6 +84,49 @@ def activate_process_version():
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
+@bpsky.route("/api/v1/workspace/measurements/edit", methods=["POST"])
+def edit_workspace_measurements():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        body = load_request_body(request)
+        workspace_id = body["workspaceId"]
+        targeted_cycle_time = (
+            body["targetedCycleTime"] if "targetedCycleTime" in body else None
+        )
+        worst_cycle_time = body["worstCycleTime"] if "worstCycleTime" in body else None
+        targeted_cost = body["targetedCost"] if "targetedCost" in body else None
+        worst_cost = body["worstCost"] if "worstCost" in body else None
+        targeted_quality = (
+            body["targetedQuality"] if "targetedQuality" in body else None
+        )
+        worst_quality = body["worstQuality"] if "worstQuality" in body else None
+        targeted_flexibility = (
+            body["targetedFlexibility"] if "targetedFlexibility" in body else None
+        )
+        worst_flexibility = (
+            body["worstFlexibility"] if "worstFlexibility" in body else None
+        )
+        data = WorkspaceService.edit_workspace_measurements(
+            workspace_id,
+            user_id,
+            targeted_cycle_time,
+            worst_cycle_time,
+            targeted_cost,
+            worst_cost,
+            targeted_quality,
+            worst_quality,
+            targeted_flexibility,
+            worst_flexibility,
+        )
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
 @bpsky.route("/api/v1/workspace/portfolio/health", methods=["GET"])
 def get_health_of_active_process_versions_in_workspace():
     try:
@@ -109,30 +152,15 @@ def edit_health_of_active_process_version():
         body = load_request_body(request)
         workspace_id = body["workspaceId"]
         process_version_version = body["processVersionVersion"]
-        targeted_cycle_time = (
-            body["targetedCycleTime"] if "targetedCycleTime" in body else None
-        )
-        worst_cycle_time = body["worstCycleTime"] if "worstCycleTime" in body else None
+
         current_cycle_time = (
             body["currentCycleTime"] if "currentCycleTime" in body else None
         )
 
-        targeted_cost = body["targetedCost"] if "targetedCost" in body else None
-        worst_cost = body["worstCost"] if "worstCost" in body else None
         current_cost = body["currentCost"] if "currentCost" in body else None
 
-        targeted_quality = (
-            body["targetedQuality"] if "targetedQuality" in body else None
-        )
-        worst_quality = body["worstQuality"] if "worstQuality" in body else None
         current_quality = body["currentQuality"] if "currentQuality" in body else None
 
-        targeted_flexibility = (
-            body["targetedFlexibility"] if "targetedFlexibility" in body else None
-        )
-        worst_flexibility = (
-            body["worstFlexibility"] if "worstFlexibility" in body else None
-        )
         current_flexibility = (
             body["currentFlexibility"] if "currentFlexibility" in body else None
         )
@@ -141,17 +169,9 @@ def edit_health_of_active_process_version():
             workspace_id,
             process_version_version,
             user_id,
-            targeted_cycle_time,
-            worst_cycle_time,
             current_cycle_time,
-            targeted_cost,
-            worst_cost,
             current_cost,
-            targeted_quality,
-            worst_quality,
             current_quality,
-            targeted_flexibility,
-            worst_flexibility,
             current_flexibility,
         )
         return bpsky.response_class(
