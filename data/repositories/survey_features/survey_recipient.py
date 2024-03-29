@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from data.models.survey_feature_models.survey_model import (
     Survey_recipient_model,
     Survey_recipient_association_model,
+    Survey_model,
 )
 from database.db import DatabaseConnector
 
@@ -54,6 +57,40 @@ class Survey_send:
                     == recipient_id,
                 )
                 .delete()
+            )
+            session.commit()
+            return survey_recipient
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_all_emails_dates_url_of_not_published_survey(cls):
+        session = DatabaseConnector.get_session()
+        # get survey that has not been published, means start date is greater than current date
+        # get all emails of the survey
+        try:
+            survey_recipient = (
+                session.query(
+                    Survey_recipient_model.email,
+                    Survey_model.start_date,
+                    Survey_model.survey_url,
+                    Survey_model.end_date,
+                )
+                .join(
+                    Survey_recipient_association_model,
+                    Survey_recipient_model.id
+                    == Survey_recipient_association_model.survey_recipient_id,
+                )
+                .join(
+                    Survey_model,
+                    Survey_recipient_association_model.survey_id == Survey_model.id,
+                )
+                .filter(
+                    Survey_model.start_date > datetime.now(),
+                    Survey_model.is_published == "pending",
+                )
+                .all()
             )
             session.commit()
             return survey_recipient

@@ -13,7 +13,7 @@ from services.survey_service.survey_recipient import (
     Survey_recipient_service,
     Survey_send_service,
 )
-from services.utils import Permission_check
+from services.utils import Permission_check, Date_time_convert
 from smtp.email import Email
 
 
@@ -299,14 +299,16 @@ class Survey_service:
         # if start date and end date are not provided, use the current date as start date. End date is None
 
         if start_date is None:
-            start_date = datetime.now()
+            # get date and hour and minute only.
+            start_date = Date_time_convert.get_date_time_now()
 
         # save email in the database
         if email_list is not None:
             cls.save_recipient_email(survey_id, email_list)
         # send survey url to the email
-        if email_list is not None:
-            cls.send_survey_url(email_list, survey_url, start_date, end_date)
+        if email_list is not None and start_date is None:  # send email immediately
+            for email in email_list:
+                cls.send_survey_url(email, survey_url, start_date, end_date)
         # update end date and start date of the survey
         return Survey.publish_survey(survey_id, start_date, end_date, survey_url)
 

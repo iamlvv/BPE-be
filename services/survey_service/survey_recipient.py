@@ -20,6 +20,13 @@ class Survey_send_service:
         # delete email sent to the survey
         return Survey_send.delete_survey_recipient_email(survey_id, recipient_id)
 
+    @classmethod
+    def get_all_emails_dates_url_of_not_published_survey(cls):
+        email_and_start_date_and_url = (
+            Survey_send.get_all_emails_dates_url_of_not_published_survey()
+        )
+        return email_and_start_date_and_url
+
 
 class Survey_recipient_service:
     @classmethod

@@ -1,4 +1,5 @@
 import hashlib
+from datetime import datetime
 
 from data.repositories.constant import Role
 from data.repositories.workspace import Workspace
@@ -61,3 +62,15 @@ class Permission_check:
     @classmethod
     def check_if_user_is_workspace_owner(cls, workspace_id, user_id):
         return Workspace.check_if_user_is_workspace_owner(workspace_id, user_id)
+
+
+class Date_time_convert:
+    @classmethod
+    def convert_string_to_date(cls, date_str):
+        return datetime.strptime(date_str, "%Y-%m-%dT%H:%M")
+
+    @classmethod
+    def get_date_time_now(cls):
+        date_now = datetime.now().strftime("%Y-%m-%dT%H:%M")
+        date = datetime.strptime(date_now, "%Y-%m-%dT%H:%M")
+        return date

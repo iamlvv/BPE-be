@@ -5,6 +5,7 @@ import jsonpickle
 from bpsky import bpsky
 from controller.utils import *
 from services.survey_service.survey import Survey_service
+from services.utils import Date_time_convert
 
 
 @bpsky.route("/api/v1/survey", methods=["GET"])
@@ -187,9 +188,9 @@ def publish_survey():
     email_list = body["email"] if "email" in body else None
     survey_url = body["surveyUrl"]
     if start_date is not None:
-        start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S")
+        start_date = Date_time_convert.convert_string_to_date(start_date)
     if end_date is not None:
-        end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S")
+        end_date = Date_time_convert.convert_string_to_date(end_date)
 
     data = Survey_service.publish_survey(
         process_version_version,

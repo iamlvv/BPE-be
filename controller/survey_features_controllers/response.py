@@ -1,9 +1,14 @@
 import jsonpickle
-
 from bpsky import bpsky
 from controller.utils import *
 from services.survey_service.response import Response_service
 from services.survey_service.survey import Survey_service
+from services.survey_service.cron.scheduling import Scheduling_send_email
+
+
+@bpsky.route("/", methods=["GET"])
+def run_scheduling_send_email():
+    Scheduling_send_email.main()
 
 
 @bpsky.route("/api/v1/survey/section", methods=["GET"])

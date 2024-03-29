@@ -67,7 +67,7 @@ class Email:
 
     @classmethod
     def send_survey_url(
-        cls, receiver_email_list, survey_url, start_date=None, end_date=None
+        cls, receiver_email, survey_url, start_date=None, end_date=None
     ):
         sender_email = os.environ.get("EMAIL")
         password = os.environ.get("PASSWORD")
@@ -88,8 +88,7 @@ class Email:
         </body>
         </html>
         """
-        for receiver_email in receiver_email_list:
-            cls.send(sender_email, password, receiver_email, subject, html)
+        cls.send(sender_email, password, receiver_email, subject, html)
 
     @classmethod
     def send_survey_result(cls):
