@@ -44,7 +44,7 @@ class DatabaseConnector:
             from sqlalchemy import create_engine
 
             cls.engine = create_engine(
-                DATABASE_URL_TEST,
+                DATABASE_URL,
                 echo=True,
             )
         return cls.engine

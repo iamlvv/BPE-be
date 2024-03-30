@@ -20,12 +20,25 @@ from smtp.email import Email
 class Survey_service:
     @classmethod
     def validate_start_date_end_date(cls, start_date, end_date):
-        if start_date is not None and start_date < datetime.now():
-            return {"message": "Start date must be in the future"}
-        if end_date is not None and end_date < datetime.now():
-            return {"message": "End date must be in the future"}
-        if start_date is not None and end_date is not None and start_date > end_date:
-            return {"message": "Start date must be before end date"}
+        if (
+            start_date is not None
+            and start_date < datetime.now()
+            and start_date.time() < datetime.now().time()
+        ):
+            raise Exception("Start date must be in the future")
+        if (
+            end_date is not None
+            and end_date < datetime.now()
+            and end_date.time() < datetime.now().time()
+        ):
+            raise Exception("End date must be in the future")
+        if (
+            start_date is not None
+            and end_date is not None
+            and start_date > end_date
+            and start_date.time() > end_date.time()
+        ):
+            raise Exception("Start date must be before end date")
         return None
 
     @classmethod
@@ -294,9 +307,9 @@ class Survey_service:
             raise Exception("Survey does not exist.")
         survey_id = survey.id
         is_published = survey.is_published
-        date_validation = cls.validate_start_date_end_date(start_date, end_date)
-        if date_validation is not None:
-            return date_validation
+        cls.validate_start_date_end_date(start_date, end_date)
+        # if date_validation is not None:
+        #     return date_validation
         # if start date and end date are not provided, use the current date as start date. End date is None
         # save email in the database
         if email_list is not None:
@@ -316,7 +329,13 @@ class Survey_service:
             is_published == "pending"
         ):  # when survey is pending, publish means update publish status
             # only update publish status, which is email_list
-            return survey
+            return {
+                "id": survey.id,
+                "isPublished": survey.is_published,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+                "surveyUrl": survey.survey_url,
+            }
 
     @classmethod
     def send_survey_url(cls, email, survey_url, start_date=None, end_date=None):
