@@ -116,7 +116,10 @@ class ProcessVersion:
                 if result is None:
                     raise Exception("version doesn't exist")
                 return dict(
-                    zip(["xml_file_link", "version", "num", "last_saved"], result)
+                    zip(
+                        ["xml_file_link", "version", "num", "last_saved", "is_active"],
+                        result,
+                    )
                 )
         except Exception as e:
             connection.rollback()

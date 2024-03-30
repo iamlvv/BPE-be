@@ -20,24 +20,30 @@ class OldestVersionOperation:
 class ProcessVersionService_Delete:
     @classmethod
     def delete_version(cls, user_id, project_id, process_id, version):
-        if not WorkOnService.can_edit(user_id, project_id):
-            raise Exception("permission denied")
-        if len(ProcessVersion.get_by_process(project_id, process_id)) == 1:
-            Process.delete(project_id, process_id)
-            shutil.rmtree(f"static/{project_id}/{process_id}")
-            return
-        # check if the version is active
-        # if it is active, delete it and active the version has smallest num
-        process_version = ProcessVersion.get_by_version(project_id, process_id, version)
-        xml_link = ProcessVersion.delete(project_id, process_id, version)
-        FileIO.delete(xml_link)
-        if process_version["is_active"]:
-            process_with_smallest_num = (
-                ProcessVersion.get_process_version_with_smallest_num(process_id)
+        try:
+            if not WorkOnService.can_edit(user_id, project_id):
+                raise Exception("permission denied")
+            if len(ProcessVersion.get_by_process(project_id, process_id)) == 1:
+                Process.delete(project_id, process_id)
+                shutil.rmtree(f"static/{project_id}/{process_id}")
+                return
+            # check if the version is active
+            # if it is active, delete it and active the version has smallest num
+            process_version = ProcessVersion.get_by_version(
+                project_id, process_id, version
             )
-            ProcessVersion.activate_process_version(
-                process_with_smallest_num.version,
-            )
+            print(process_version)
+            xml_link = ProcessVersion.delete(project_id, process_id, version)
+            if process_version["is_active"]:
+                process_with_smallest_num = (
+                    ProcessVersion.get_process_version_with_smallest_num(process_id)
+                )
+                ProcessVersion.activate_process_version(
+                    process_with_smallest_num.version,
+                )
+            FileIO.delete(xml_link)
+        except Exception as e:
+            return e
 
     @classmethod
     def delete_comment(cls, user_id, project_id, process_id, xml_file_link, id):
@@ -160,6 +166,7 @@ class ProcessVersionService_Update:
 
         # check if there are any active process versions in the workspace
         # if there are and the version is not the same as the one that is being activated, deactivate it
+
         active_process_version = (
             ProcessVersion.get_current_active_process_version_in_process(process_id)
         )
