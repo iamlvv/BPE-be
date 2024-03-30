@@ -84,7 +84,22 @@ def activate_process_version():
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
-@bpsky.route("/api/v1/workspace/measurements/edit", methods=["POST"])
+@bpsky.route("/api/v1/workspace/measurements", methods=["GET"])
+def get_workspace_measurements():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        workspace_id = request.args.get("workspaceId")
+        data = WorkspaceService.get_workspace_measurements(workspace_id, user_id)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/measurements", methods=["PUT"])
 def edit_workspace_measurements():
     try:
         user_id = get_id_from_token(get_token(request))

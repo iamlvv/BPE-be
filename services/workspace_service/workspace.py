@@ -61,6 +61,38 @@ class WorkspaceService_Get:
             return None
         return workspace
 
+    @classmethod
+    def get_workspace_measurements(cls, workspace_id, user_id):
+        workspace = Workspace.getWorkspace(workspace_id)
+        if workspace is None:
+            return None
+        workspace = Workspace.get_workspace_measurements(workspace_id)
+        if workspace is None:
+            return None
+        return {
+            "targetedCycleTime": workspace.targeted_cycle_time
+            if workspace.targeted_cycle_time is not None
+            else 0,
+            "worstCycleTime": workspace.worst_cycle_time,
+            "targetedCost": workspace.targeted_cost
+            if workspace.targeted_cost is not None
+            else 0,
+            "worstCost": workspace.worst_cost,
+            "targetedQuality": workspace.targeted_quality
+            if workspace.targeted_quality is not None
+            else 100,
+            "worstQuality": workspace.worst_quality
+            if workspace.worst_quality is not None
+            else 0,
+            "targetedFlexibility": workspace.targeted_flexibility
+            if workspace.targeted_flexibility is not None
+            else 100,
+            "worstFlexibility": workspace.worst_flexibility
+            if workspace.worst_flexibility is not None
+            else 0,
+            "workspaceId": int(workspace_id),
+        }
+
 
 class WorkspaceService_Update:
     @classmethod
@@ -155,7 +187,27 @@ class WorkspaceService_Update:
             targeted_flexibility,
             worst_flexibility,
         )
-        return workspace
+        return {
+            "targetedCycleTime": workspace.targeted_cycle_time
+            if workspace.targeted_cycle_time
+            else 0,
+            "worstCycleTime": workspace.worst_cycle_time,
+            "targetedCost": workspace.targeted_cost
+            if workspace.targeted_cost is not None
+            else 0,
+            "worstCost": workspace.worst_cost,
+            "targetedQuality": workspace.targeted_quality
+            if workspace.targeted_quality is not None
+            else 100,
+            "worstQuality": workspace.worst_quality if workspace.worst_quality else 0,
+            "targetedFlexibility": workspace.targeted_flexibility
+            if workspace.targeted_flexibility is not None
+            else 100,
+            "worstFlexibility": workspace.worst_flexibility
+            if workspace.worst_flexibility
+            else 0,
+            "workspaceId": workspace_id,
+        }
 
 
 class WorkspaceService_Delete:
