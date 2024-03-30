@@ -26,8 +26,18 @@ class ProcessVersionService_Delete:
             Process.delete(project_id, process_id)
             shutil.rmtree(f"static/{project_id}/{process_id}")
             return
+        # check if the version is active
+        # if it is active, delete it and active the version has smallest num
+        process_version = ProcessVersion.get_by_version(project_id, process_id, version)
         xml_link = ProcessVersion.delete(project_id, process_id, version)
         FileIO.delete(xml_link)
+        if process_version["is_active"]:
+            process_with_smallest_num = (
+                ProcessVersion.get_process_version_with_smallest_num(process_id)
+            )
+            ProcessVersion.activate_process_version(
+                process_with_smallest_num.version,
+            )
 
     @classmethod
     def delete_comment(cls, user_id, project_id, process_id, xml_file_link, id):

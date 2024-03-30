@@ -293,24 +293,30 @@ class Survey_service:
         if survey is None:
             raise Exception("Survey does not exist.")
         survey_id = survey.id
+        is_published = survey.is_published
         date_validation = cls.validate_start_date_end_date(start_date, end_date)
         if date_validation is not None:
             return date_validation
         # if start date and end date are not provided, use the current date as start date. End date is None
-
-        if start_date is None:
-            # get date and hour and minute only.
-            start_date = Date_time_convert.get_date_time_now()
-
         # save email in the database
         if email_list is not None:
             cls.save_recipient_email(survey_id, email_list)
-        # send survey url to the email
-        if email_list is not None and start_date is None:  # send email immediately
-            for email in email_list:
-                cls.send_survey_url(email, survey_url, start_date, end_date)
-        # update end date and start date of the survey
-        return Survey.publish_survey(survey_id, start_date, end_date, survey_url)
+        if is_published == "closed":  # when survey is closed, publish means publish
+            if start_date is None:
+                # get date and hour and minute only.
+                start_date = Date_time_convert.get_date_time_now()
+
+            # send survey url to the email
+            if email_list is not None and start_date is None:  # send email immediately
+                for email in email_list:
+                    cls.send_survey_url(email, survey_url, start_date, end_date)
+            # update end date and start date of the survey
+            return Survey.publish_survey(survey_id, start_date, end_date, survey_url)
+        elif (
+            is_published == "pending"
+        ):  # when survey is pending, publish means update publish status
+            # only update publish status, which is email_list
+            return survey
 
     @classmethod
     def send_survey_url(cls, email, survey_url, start_date=None, end_date=None):

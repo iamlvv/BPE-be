@@ -7,6 +7,7 @@ POSTGRES_USER = os.environ.get("POSTGRES_USER")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 POSTGRES_DB = os.environ.get("POSTGRES_DB")
 DATABASE_URL_TEST = os.environ.get("DATABASE_URL_TEST")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 
 class DatabaseConnector:

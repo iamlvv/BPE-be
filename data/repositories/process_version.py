@@ -104,7 +104,7 @@ class ProcessVersion:
 
     @classmethod
     def get_by_version(cls, project_id, process_id, version):
-        query = f"""SELECT xml_file_link, "version", num, last_saved
+        query = f"""SELECT xml_file_link, "version", num, last_saved, is_active
                     FROM public.process_version
                     WHERE project_id={project_id} AND process_id={process_id} AND version='{version}';
                 """
@@ -298,6 +298,22 @@ class ProcessVersion:
                     Process_version_model.process_id == process_id,
                     Process_version_model.is_active == True,
                 )
+                .first()
+            )
+            session.commit()
+            return process_version
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_process_version_with_smallest_num(cls, process_id):
+        session = DatabaseConnector.get_session()
+        try:
+            process_version = (
+                session.query(Process_version_model)
+                .filter(Process_version_model.process_id == process_id)
+                .order_by(Process_version_model.num)
                 .first()
             )
             session.commit()
