@@ -76,6 +76,8 @@ class Survey_send:
                     Survey_model.start_date,
                     Survey_model.survey_url,
                     Survey_model.end_date,
+                    Survey_model.id,
+                    Survey_recipient_model.id.label("recipient_id"),
                 )
                 .join(
                     Survey_recipient_association_model,
@@ -86,8 +88,8 @@ class Survey_send:
                     Survey_model,
                     Survey_recipient_association_model.survey_id == Survey_model.id,
                 )
+                .order_by(Survey_model.start_date.asc())
                 .filter(
-                    Survey_model.start_date > datetime.now(),
                     Survey_model.is_published == "pending",
                 )
                 .all()

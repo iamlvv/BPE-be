@@ -318,3 +318,25 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def set_survey_published(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
+                .first()
+            )
+            survey.is_published = "published"
+            session.commit()
+            return {
+                "id": survey.id,
+                "isPublished": survey.is_published,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+                "surveyUrl": survey.survey_url,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

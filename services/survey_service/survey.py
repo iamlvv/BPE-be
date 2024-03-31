@@ -396,3 +396,7 @@ class Survey_service:
             "endDate": survey.end_date,
             "isPublished": survey.is_published,
         }
+
+    @classmethod
+    def set_survey_published(cls, survey_id):
+        return Survey.set_survey_published(survey_id)
