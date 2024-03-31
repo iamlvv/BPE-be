@@ -45,7 +45,7 @@ class DatabaseConnector:
 
             cls.engine = create_engine(
                 DATABASE_URL_TEST,
-                echo=True,
+                echo=False,
             )
         return cls.engine
 

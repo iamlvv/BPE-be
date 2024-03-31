@@ -91,3 +91,20 @@ class Health:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def save_total_score(cls, process_version_version, total_score):
+        session = DatabaseConnector.get_session()
+        try:
+            health = (
+                session.query(Health_model)
+                .filter(Health_model.process_version_version == process_version_version)
+                .first()
+            )
+            if health:
+                health.total_score = total_score
+            session.commit()
+            return health
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

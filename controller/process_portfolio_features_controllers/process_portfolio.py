@@ -187,7 +187,7 @@ def edit_measurements_of_active_process_version():
         )
         feasibility = body["feasibility"] if "feasibility" in body else None
 
-        data = Process_portfolio_service.edit_measurements_of_active_process_versions(
+        data = Process_portfolio_service.edit_measurements_of_process_version(
             workspace_id,
             process_version_version,
             user_id,

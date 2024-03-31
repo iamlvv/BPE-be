@@ -1,7 +1,6 @@
 from data.repositories.process_portfolio_features.process_portfolio import (
     Process_portfolio,
 )
-from services.file_service.evaluate_result import EvaluatedResultService
 from services.process_portfolio_service.feasibility import Feasibility_service
 from services.process_portfolio_service.health import Health_service
 from services.process_portfolio_service.strategic_importance import (
@@ -159,15 +158,12 @@ class Process_portfolio_service:
 
     @classmethod
     def get_evaluation_result_of_process_version(cls, process_version_version):
-        evaluation_result = (
-            EvaluatedResultService.get_evaluation_result_of_process_version(
-                process_version_version
-            )
+        return Health_service.get_evaluation_result_of_process_version(
+            process_version_version
         )
-        return evaluation_result
 
     @classmethod
-    def edit_measurements_of_active_process_versions(
+    def edit_measurements_of_process_version(
         cls,
         workspace_id,
         process_version_version,

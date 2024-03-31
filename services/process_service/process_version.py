@@ -5,6 +5,7 @@ from data.repositories.process_version import ProcessVersion
 from data.repositories.process import Process
 from data.repositories.comment_on import CommentOn
 from fileIO.file import FileIO
+from services.process_portfolio_service.health import Health_service
 from services.project_service.work_on import WorkOnService
 from services.utils import Permission_check
 
@@ -105,6 +106,14 @@ class ProcessVersionService_Get:
         workspace_owner = Permission_check.check_if_user_is_workspace_owner(
             workspace_id, user_id
         )
+        # calculate score before getting
+
+        process_versions_list = ProcessVersion.get_all_process_versions_in_process(
+            process_id
+        )
+        for process in process_versions_list:
+            Health_service.calculate_total_score(workspace_id, user_id, process.version)
+        # get list again
         process_versions_list = ProcessVersion.get_all_process_versions_in_process(
             process_id
         )
