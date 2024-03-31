@@ -1,6 +1,7 @@
 from data.repositories.process_portfolio_features.process_portfolio import (
     Process_portfolio,
 )
+from services.file_service.evaluate_result import EvaluatedResultService
 from services.process_portfolio_service.feasibility import Feasibility_service
 from services.process_portfolio_service.health import Health_service
 from services.process_portfolio_service.strategic_importance import (
@@ -99,7 +100,7 @@ class Process_portfolio_service:
                 process_version_stats.append(
                     {
                         "processVersionVersion": active_process_version.version,
-                        "health": Health_service.get_health_of_active_process_version(
+                        "health": Health_service.get_health_of_process_version(
                             active_process_version.version
                         ),
                         "strategicImportance": Strategic_importance_service.get_strategic_importance_of_active_process_version(
@@ -111,5 +112,106 @@ class Process_portfolio_service:
                     }
                 )
             return process_version_stats
+        except Exception as e:
+            raise Exception(e)
+
+    @classmethod
+    def get_measurements_of_process_version(
+        cls, workspace_id, user_id, process_version_version
+    ):
+        # get current health, strategic importance, feasibility of
+        try:
+            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+                workspace_id, user_id
+            )
+            if not workspace_owner:
+                raise Exception("permission denied")
+
+            evaluation_result = cls.get_evaluation_result_of_process_version(
+                process_version_version
+            )
+            health = Health_service.get_health_of_process_version(
+                process_version_version
+            )
+            strategic_importance = Strategic_importance_service.get_strategic_importance_of_process_version(
+                process_version_version
+            )
+            feasibility = Feasibility_service.get_feasibility_of_process_version(
+                process_version_version
+            )
+            return {
+                "health": {
+                    "currentCycleTime": health.current_cycle_time,
+                    "currentCost": health.current_cost,
+                    "currentQuality": health.current_quality,
+                    "currentFlexibility": health.current_flexibility,
+                }
+                if health
+                else None,
+                "strategicImportance": strategic_importance.total_score
+                if strategic_importance
+                else None,
+                "feasibility": feasibility.total_score if feasibility else None,
+                "evaluationResult": evaluation_result,
+            }
+        except Exception as e:
+            raise Exception(e)
+
+    @classmethod
+    def get_evaluation_result_of_process_version(cls, process_version_version):
+        evaluation_result = (
+            EvaluatedResultService.get_evaluation_result_of_process_version(
+                process_version_version
+            )
+        )
+        return evaluation_result
+
+    @classmethod
+    def edit_measurements_of_active_process_versions(
+        cls,
+        workspace_id,
+        process_version_version,
+        user_id,
+        current_cycle_time,
+        current_cost,
+        current_quality,
+        current_flexibility,
+        strategic_importance,
+        feasibility,
+    ):
+        try:
+            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+                workspace_id, user_id
+            )
+            if not workspace_owner:
+                raise Exception("permission denied")
+
+            health = Health_service.edit_health_of_process_version(
+                workspace_id,
+                process_version_version,
+                user_id,
+                current_cycle_time,
+                current_cost,
+                current_quality,
+                current_flexibility,
+            )
+            strategic_importance_score = Strategic_importance_service.edit_strategic_importance_of_process_version(
+                workspace_id, process_version_version, user_id, strategic_importance
+            )
+            feasibility_score = (
+                Feasibility_service.edit_feasibility_of_process_versions(
+                    workspace_id, process_version_version, user_id, feasibility
+                )
+            )
+            return {
+                "health": {
+                    "currentCycleTime": health.current_cycle_time,
+                    "currentCost": health.current_cost,
+                    "currentQuality": health.current_quality,
+                    "currentFlexibility": health.current_flexibility,
+                },
+                "strategicImportance": strategic_importance_score.total_score,
+                "feasibility": feasibility_score.total_score,
+            }
         except Exception as e:
             raise Exception(e)

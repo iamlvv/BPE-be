@@ -6,7 +6,7 @@ from services.utils import Permission_check
 
 class Strategic_importance_service:
     @classmethod
-    def edit_strategic_importance_of_active_process_version(
+    def edit_strategic_importance_of_process_version(
         cls, workspace_id, process_version_version, user_id, total_score
     ):
         workspace_owner = Permission_check.check_if_user_is_workspace_owner(
@@ -20,20 +20,17 @@ class Strategic_importance_service:
         process_version_strategic_importance = None
         if process_version:
             process_version_strategic_importance = (
-                cls.update_strategic_importance_of_active_process_version(
+                cls.update_strategic_importance_of_process_version(
                     process_version_version, total_score
                 )
             )
         else:
             process_version_strategic_importance = (
-                cls.add_strategic_importance_of_active_process_version(
+                cls.add_strategic_importance_of_process_version(
                     process_version_version, total_score
                 )
             )
-        return {
-            "processVersionVersion": process_version_strategic_importance.process_version_version,
-            "strategicImportance": process_version_strategic_importance.total_score,
-        }
+        return process_version_strategic_importance
 
     @classmethod
     def check_if_process_version_exists_in_strategic_importance(
@@ -42,12 +39,10 @@ class Strategic_importance_service:
         strategic_importance = Strategic_importance.check_if_process_version_exists_in_strategic_importance(
             process_version_version
         )
-        if strategic_importance is None:
-            raise Exception("strategic importance of process version does not exist")
         return strategic_importance
 
     @classmethod
-    def add_strategic_importance_of_active_process_version(
+    def add_strategic_importance_of_process_version(
         cls, process_version_version, total_score
     ):
         return Strategic_importance.add_strategic_importance_of_active_process_version(
@@ -55,11 +50,17 @@ class Strategic_importance_service:
         )
 
     @classmethod
-    def update_strategic_importance_of_active_process_version(
+    def update_strategic_importance_of_process_version(
         cls, process_version_version, total_score
     ):
         return (
             Strategic_importance.update_strategic_importance_of_active_process_version(
                 process_version_version, total_score
             )
+        )
+
+    @classmethod
+    def get_strategic_importance_of_process_version(cls, process_version_version):
+        return Strategic_importance.get_strategic_importance_of_process_version(
+            process_version_version
         )

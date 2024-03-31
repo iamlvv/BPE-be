@@ -21,7 +21,7 @@ class Health:
             raise Exception(e)
 
     @classmethod
-    def update_health_of_active_process_version(
+    def update_health_of_process_version(
         cls,
         process_version_version,
         current_cycle_time,
@@ -37,14 +37,15 @@ class Health:
                 .first()
             )
 
-            process_version_health.current_cycle_time = current_cycle_time
-
-            process_version_health.current_cost = current_cost
-
-            process_version_health.current_quality = current_quality
-
-            process_version_health.current_flexibility = current_flexibility
-
+            if process_version_health:
+                if current_cycle_time is not None:
+                    process_version_health.current_cycle_time = current_cycle_time
+                if current_cost is not None:
+                    process_version_health.current_cost = current_cost
+                if current_quality is not None:
+                    process_version_health.current_quality = current_quality
+                if current_flexibility is not None:
+                    process_version_health.current_flexibility = current_flexibility
             session.commit()
             return process_version_health
         except Exception as e:
@@ -52,7 +53,7 @@ class Health:
             raise Exception(e)
 
     @classmethod
-    def add_health_of_active_process_version(
+    def add_health_of_process_version(
         cls,
         process_version_version,
         current_cycle_time,
@@ -77,7 +78,7 @@ class Health:
             raise Exception(e)
 
     @classmethod
-    def get_health_of_active_process_version(cls, process_version_version):
+    def get_health_of_process_version(cls, process_version_version):
         session = DatabaseConnector.get_session()
         try:
             health = (

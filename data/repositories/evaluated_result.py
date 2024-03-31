@@ -1,4 +1,6 @@
 import json
+
+from data.models.evaluation_model import Evaluation_result_model
 from data.repositories.utils import *
 
 
@@ -120,4 +122,23 @@ class EvaluatedResult:
                 connection.commit()
         except Exception as e:
             connection.rollback()
+            raise Exception(e)
+
+    @classmethod
+    def get_evaluation_result_of_process_version(cls, process_version_version):
+        # get the latest evaluated result of the process version
+        session = DatabaseConnector.get_session()
+        try:
+            result = (
+                session.query(Evaluation_result_model)
+                .filter(
+                    Evaluation_result_model.process_version_version
+                    == process_version_version
+                )
+                .order_by(Evaluation_result_model.create_at.desc())
+                .first()
+            )
+            return result
+        except Exception as e:
+            session.rollback()
             raise Exception(e)

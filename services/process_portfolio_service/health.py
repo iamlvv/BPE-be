@@ -12,7 +12,7 @@ class Health_service:
             raise Exception("permission denied")
 
     @classmethod
-    def edit_health_of_active_process_versions(
+    def edit_health_of_process_version(
         cls,
         workspace_id,
         process_version_version,
@@ -34,7 +34,7 @@ class Health_service:
         )
         process_version_health = None
         if process_version:
-            process_version_health = cls.update_health_of_active_process_versions(
+            process_version_health = cls.update_health_of_process_version(
                 process_version_version,
                 current_cycle_time,
                 current_cost,
@@ -42,32 +42,24 @@ class Health_service:
                 current_flexibility,
             )
         else:
-            process_version_health = cls.add_health_of_active_process_versions(
+            process_version_health = cls.add_health_of_process_version(
                 process_version_version,
                 current_cycle_time,
                 current_cost,
                 current_quality,
                 current_flexibility,
             )
-        return {
-            "processVersionVersion": process_version_health.process_version_version,
-            "currentCycleTime": process_version_health.current_cycle_time,
-            "currentCost": process_version_health.current_cost,
-            "currentQuality": process_version_health.current_quality,
-            "currentFlexibility": process_version_health.current_flexibility,
-        }
+        return process_version_health
 
     @classmethod
     def check_if_process_version_exists_in_health(cls, process_version_version):
         health = Health.check_if_process_version_exists_in_health(
             process_version_version
         )
-        if health is None:
-            raise Exception("health of process version does not exist")
         return health
 
     @classmethod
-    def update_health_of_active_process_versions(
+    def update_health_of_process_version(
         cls,
         process_version_version,
         current_cycle_time,
@@ -75,7 +67,7 @@ class Health_service:
         current_quality,
         current_flexibility,
     ):
-        return Health.update_health_of_active_process_version(
+        return Health.update_health_of_process_version(
             process_version_version,
             current_cycle_time,
             current_cost,
@@ -84,7 +76,7 @@ class Health_service:
         )
 
     @classmethod
-    def add_health_of_active_process_versions(
+    def add_health_of_process_version(
         cls,
         process_version_version,
         current_cycle_time,
@@ -92,7 +84,7 @@ class Health_service:
         current_quality,
         current_flexibility,
     ):
-        return Health.add_health_of_active_process_version(
+        return Health.add_health_of_process_version(
             process_version_version,
             current_cycle_time,
             current_cost,
@@ -101,7 +93,6 @@ class Health_service:
         )
 
     @classmethod
-    def get_health_of_active_process_version(cls, process_version_version):
-        health_stats = Health.get_health_of_active_process_version(
-            process_version_version
-        )
+    def get_health_of_process_version(cls, process_version_version):
+        health_stats = Health.get_health_of_process_version(process_version_version)
+        return health_stats

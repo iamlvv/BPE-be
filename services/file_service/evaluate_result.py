@@ -42,3 +42,18 @@ class EvaluatedResultService:
         if not WorkOnService.can_edit(user_id, project_id):
             raise Exception("permission denied")
         EvaluatedResult.delete(xml_file_link, project_id, process_id, name)
+
+    @classmethod
+    def get_evaluation_result_of_process_version(cls, process_version_version):
+        evaluation_result = EvaluatedResult.get_evaluation_result_of_process_version(
+            process_version_version
+        )
+        result = evaluation_result.result[0]
+        # result is jsonb
+        # extract total cycle time, total cost, total quality, total flexibility from result
+        return {
+            "totalCycleTime": result["totalCycleTime"],
+            "totalCost": result["totalCost"],
+            "totalQuality": result["quality"],
+            "totalFlexibility": result["flexibility"],
+        }

@@ -142,14 +142,14 @@ def edit_workspace_measurements():
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
-@bpsky.route("/api/v1/workspace/portfolio/health", methods=["GET"])
-def get_health_of_active_process_versions_in_workspace():
+@bpsky.route("/api/v1/workspace/portfolio/processversion/measurements", methods=["GET"])
+def get_measurements_of_process_versions():
     try:
         user_id = get_id_from_token(get_token(request))
-
         workspace_id = request.args.get("workspaceId")
-        data = Health_service.get_health_of_active_process_versions_in_workspace(
-            workspace_id, user_id
+        process_version_version = request.args.get("processVersionVersion")
+        data = Process_portfolio_service.get_measurements_of_process_version(
+            workspace_id, user_id, process_version_version
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
@@ -160,8 +160,10 @@ def get_health_of_active_process_versions_in_workspace():
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
-@bpsky.route("/api/v1/workspace/portfolio/health", methods=["POST"])
-def edit_health_of_active_process_version():
+@bpsky.route(
+    "/api/v1/workspace/portfolio/processversion/measurements", methods=["POST"]
+)
+def edit_measurements_of_active_process_version():
     try:
         user_id = get_id_from_token(get_token(request))
         body = load_request_body(request)
@@ -180,7 +182,12 @@ def edit_health_of_active_process_version():
             body["currentFlexibility"] if "currentFlexibility" in body else None
         )
 
-        data = Health_service.edit_health_of_active_process_versions(
+        strategic_importance = (
+            body["strategicImportance"] if "strategicImportance" in body else None
+        )
+        feasibility = body["feasibility"] if "feasibility" in body else None
+
+        data = Process_portfolio_service.edit_measurements_of_active_process_versions(
             workspace_id,
             process_version_version,
             user_id,
@@ -188,6 +195,8 @@ def edit_health_of_active_process_version():
             current_cost,
             current_quality,
             current_flexibility,
+            strategic_importance,
+            feasibility,
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),
@@ -206,7 +215,7 @@ def edit_feasibility_of_active_process_version():
         workspace_id = body["workspaceId"]
         process_version_version = body["processVersionVersion"]
         total_score = body["totalScore"]
-        data = Feasibility_service.edit_feasibility_of_active_process_versions(
+        data = Feasibility_service.edit_feasibility_of_process_versions(
             workspace_id, process_version_version, user_id, total_score
         )
         return bpsky.response_class(
@@ -226,8 +235,10 @@ def edit_strategic_importance_of_active_process_version():
         workspace_id = body["workspaceId"]
         process_version_version = body["processVersionVersion"]
         total_score = body["totalScore"]
-        data = Strategic_importance_service.edit_strategic_importance_of_active_process_version(
-            workspace_id, process_version_version, user_id, total_score
+        data = (
+            Strategic_importance_service.edit_strategic_importance_of_process_version(
+                workspace_id, process_version_version, user_id, total_score
+            )
         )
         return bpsky.response_class(
             response=jsonpickle.encode(data, unpicklable=False),

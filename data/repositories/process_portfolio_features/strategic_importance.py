@@ -62,3 +62,21 @@ class Strategic_importance:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_strategic_importance_of_process_version(cls, process_version_version):
+        session = DatabaseConnector.get_session()
+        try:
+            strategic_importance = (
+                session.query(Strategic_importance_model)
+                .filter(
+                    Strategic_importance_model.process_version_version
+                    == process_version_version
+                )
+                .first()
+            )
+            session.commit()
+            return strategic_importance
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

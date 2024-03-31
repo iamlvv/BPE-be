@@ -4,7 +4,7 @@ from services.utils import Permission_check
 
 class Feasibility_service:
     @classmethod
-    def edit_feasibility_of_active_process_versions(
+    def edit_feasibility_of_process_versions(
         cls, workspace_id, process_version_version, user_id, total_score
     ):
         workspace_owner = Permission_check.check_if_user_is_workspace_owner(
@@ -17,34 +17,27 @@ class Feasibility_service:
         )
         process_version_feasibility = None
         if process_version:
-            process_version_feasibility = (
-                cls.update_feasibility_of_active_process_version(
-                    process_version_version, total_score
-                )
+            process_version_feasibility = cls.update_feasibility_of_process_version(
+                process_version_version, total_score
             )
         else:
             process_version_feasibility = cls.add_feasibility_of_active_process_version(
                 process_version_version, total_score
             )
-        return {
-            "processVersionVersion": process_version_feasibility.process_version_version,
-            "totalScore": process_version_feasibility.total_score,
-        }
+        return process_version_feasibility
 
     @classmethod
     def check_if_process_version_exists_in_feasibility(cls, process_version_version):
         feasibility = Feasibility.check_if_process_version_exists_in_feasibility(
             process_version_version
         )
-        if feasibility is None:
-            raise Exception("feasibility of process version does not exist")
         return feasibility
 
     @classmethod
-    def update_feasibility_of_active_process_version(
+    def update_feasibility_of_process_version(
         cls, process_version_version, total_score
     ):
-        return Feasibility.update_feasibility_of_active_process_version(
+        return Feasibility.update_feasibility_of_process_version(
             process_version_version, total_score
         )
 
@@ -55,3 +48,7 @@ class Feasibility_service:
         return Feasibility.add_feasibility_of_active_process_version(
             process_version_version, total_score
         )
+
+    @classmethod
+    def get_feasibility_of_process_version(cls, process_version_version):
+        return Feasibility.get_feasibility_of_process_version(process_version_version)
