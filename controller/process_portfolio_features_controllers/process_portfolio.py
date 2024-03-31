@@ -283,3 +283,22 @@ def get_process_portfolio_content():
         )
     except Exception as e:
         return bpsky.response_class(response=e.__str__(), status=500)
+
+
+@bpsky.route("/api/v1/workspace/portfolio/processversion/notavailable", methods=["GET"])
+def get_not_available_process_versions():
+    try:
+        user_id = get_id_from_token(get_token(request))
+        workspace_id = request.args.get("workspaceId")
+        page = request.args.get("page", 0)
+        limit = request.args.get("limit", 10)
+        data = Process_portfolio_service.get_not_available_process_versions(
+            workspace_id, user_id, page, limit
+        )
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)

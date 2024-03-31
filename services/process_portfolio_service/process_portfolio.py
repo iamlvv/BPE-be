@@ -211,3 +211,32 @@ class Process_portfolio_service:
             }
         except Exception as e:
             raise Exception(e)
+
+    @classmethod
+    def get_not_available_process_versions(cls, workspace_id, user_id, page, limit):
+        try:
+            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+                workspace_id, user_id
+            )
+            if not workspace_owner:
+                raise Exception("permission denied")
+            process_versions = Process_portfolio.get_not_available_process_versions(
+                workspace_id, page, limit
+            )
+            total = Process_portfolio.get_number_of_not_available_process_versions(
+                workspace_id
+            )
+            return {
+                "total": total,
+                "limit": int(limit),
+                "data": [
+                    {
+                        "processVersionVersion": process_version.version,
+                        "projectId": process_version.project_id,
+                        "num": process_version.num,
+                    }
+                    for process_version in process_versions
+                ],
+            }
+        except Exception as e:
+            raise Exception(e)
