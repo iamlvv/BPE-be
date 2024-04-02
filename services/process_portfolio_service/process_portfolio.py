@@ -234,6 +234,11 @@ class Process_portfolio_service:
                         "processVersionVersion": process_version.version,
                         "projectId": process_version.project_id,
                         "num": process_version.num,
+                        "processId": process_version.process_id,
+                        "processName": process_version.process_name,
+                        "health": process_version.health,
+                        "strategicImportance": process_version.strategic_importance,
+                        "feasibility": process_version.feasibility,
                     }
                     for process_version in process_versions
                 ],

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import or_
 
-from data.models.process_model import Process_version_model
+from data.models.process_model import Process_version_model, Process_model
 from data.models.process_portfolio_feature_models.process_portfolio_model import (
     Process_portfolio_model,
     Health_model,
@@ -76,7 +76,18 @@ class Process_portfolio:
         session = DatabaseConnector.get_session()
         try:
             process_portfolio = (
-                session.query(Process_version_model)
+                session.query(
+                    Process_version_model.version,
+                    Process_version_model.num,
+                    Process_version_model.project_id,
+                    Process_version_model.process_id,
+                    Process_model.name.label("process_name"),
+                    Health_model.total_score.label("health"),
+                    Strategic_importance_model.total_score.label(
+                        "strategic_importance"
+                    ),
+                    Feasibility_model.total_score.label("feasibility"),
+                )
                 .join(
                     Health_model,
                     Process_version_model.version
@@ -96,8 +107,13 @@ class Process_portfolio:
                     Project_model,
                     Process_version_model.project_id == Project_model.id,
                 )
+                .join(
+                    Process_model,
+                    Process_version_model.process_id == Process_model.id,
+                )
                 .filter(
                     Project_model.workspaceid == workspace_id,
+                    Process_version_model.is_active == True,
                     or_(
                         Health_model.total_score == None,
                         Strategic_importance_model.total_score == None,
