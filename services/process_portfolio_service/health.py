@@ -232,3 +232,7 @@ class Health_service:
     @classmethod
     def get_external_quality_of_process_version(cls, process_version_version):
         return Survey_result_service.get_survey_result(process_version_version)
+
+    @classmethod
+    def delete_health_values(cls, version):
+        return Health.delete_health_values(version)

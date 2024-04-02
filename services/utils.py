@@ -74,3 +74,16 @@ class Date_time_convert:
         date_now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         date = datetime.strptime(date_now, "%Y-%m-%dT%H:%M")
         return date
+
+
+class Process_version_default_values:
+    current_cycle_time = 0
+    current_cycle_cost = 0
+    current_cycle_quality = 0
+    current_cycle_flexibility = 0
+    health = None
+    strategic_importance = None
+    feasibility = None
+
+    def __init__(self):
+        pass

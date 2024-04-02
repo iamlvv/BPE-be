@@ -108,3 +108,19 @@ class Health:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def delete_health_values(cls, version):
+        session = DatabaseConnector.get_session()
+        try:
+            health = (
+                session.query(Health_model)
+                .filter(Health_model.process_version_version == version)
+                .first()
+            )
+            if health:
+                session.delete(health)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

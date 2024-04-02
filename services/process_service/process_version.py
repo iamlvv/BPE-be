@@ -5,9 +5,13 @@ from data.repositories.process_version import ProcessVersion
 from data.repositories.process import Process
 from data.repositories.comment_on import CommentOn
 from fileIO.file import FileIO
+from services.process_portfolio_service.feasibility import Feasibility_service
 from services.process_portfolio_service.health import Health_service
+from services.process_portfolio_service.strategic_importance import (
+    Strategic_importance_service,
+)
 from services.project_service.work_on import WorkOnService
-from services.utils import Permission_check
+from services.utils import Permission_check, Process_version_default_values
 
 
 class OldestVersionOperation:
@@ -205,6 +209,24 @@ class ProcessVersionService_Insert(OldestVersionOperation):
         )
 
         ProcessVersion.create_default(xml_file_link, project_id, process_id, version)
+        cls.create_default_values_measurements(version)
+
+    @classmethod
+    def create_default_values_measurements(cls, version):
+        default_values = Process_version_default_values()
+        Health_service.add_health_of_process_version(
+            version,
+            default_values.current_cycle_time,
+            default_values.current_cycle_cost,
+            default_values.current_cycle_quality,
+            default_values.current_cycle_flexibility,
+        )
+        Strategic_importance_service.add_strategic_importance_of_process_version(
+            version, default_values.strategic_importance
+        )
+        Feasibility_service.add_feasibility_of_process_version(
+            version, default_values.feasibility
+        )
 
     @classmethod
     def create_new_version(cls, user_id, file, project_id, process_id):
@@ -218,8 +240,8 @@ class ProcessVersionService_Insert(OldestVersionOperation):
         xml_file_link = FileIO.create_bpmn_file(
             file, f"{project_id}/{process_id}/{version}{extension_name}"
         )
-
         ProcessVersion.create(xml_file_link, project_id, process_id, version)
+        cls.create_default_values_measurements(version)
 
     @classmethod
     def create_new_version_permanently(
@@ -232,6 +254,7 @@ class ProcessVersionService_Insert(OldestVersionOperation):
         version = str(uuid.uuid1())[:8]
 
         ProcessVersion.create(xml_file_link, project_id, process_id, version)
+        cls.create_default_values_measurements(version)
 
     @classmethod
     def comment(cls, user_id, project_id, process_id, xml_file_link, content):

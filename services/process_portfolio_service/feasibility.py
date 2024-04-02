@@ -21,7 +21,7 @@ class Feasibility_service:
                 process_version_version, total_score
             )
         else:
-            process_version_feasibility = cls.add_feasibility_of_active_process_version(
+            process_version_feasibility = cls.add_feasibility_of_process_version(
                 process_version_version, total_score
             )
         return process_version_feasibility
@@ -42,9 +42,7 @@ class Feasibility_service:
         )
 
     @classmethod
-    def add_feasibility_of_active_process_version(
-        cls, process_version_version, total_score
-    ):
+    def add_feasibility_of_process_version(cls, process_version_version, total_score):
         return Feasibility.add_feasibility_of_active_process_version(
             process_version_version, total_score
         )
