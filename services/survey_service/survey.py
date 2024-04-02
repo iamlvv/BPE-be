@@ -28,7 +28,9 @@ class Survey_service:
                     and start_date.time() < datetime.now().time()
                 )
             ):
-                raise Exception("Start date must be in the future")
+                return {
+                    "message": "Start date must be in the future",
+                }
             if (
                 end_date is not None
                 and end_date < datetime.now()
@@ -37,7 +39,9 @@ class Survey_service:
                     and end_date.time() < datetime.now().time()
                 )
             ):
-                raise Exception("End date must be in the future")
+                return {
+                    "message": "End date must be in the future",
+                }
             if (
                 start_date is not None
                 and end_date is not None
@@ -46,7 +50,9 @@ class Survey_service:
                     or (start_date == end_date and start_date.time() > end_date.time())
                 )
             ):
-                raise Exception("Start date must be before end date")
+                return {
+                    "message": "Start date must be before end date",
+                }
             return None
         except Exception as e:
             raise Exception(e)
@@ -318,7 +324,9 @@ class Survey_service:
                 raise Exception("Survey does not exist.")
             survey_id = survey.id
             is_published = survey.is_published
-            cls.validate_start_date_end_date(start_date, end_date)
+            validation_result = cls.validate_start_date_end_date(start_date, end_date)
+            if validation_result is not None:
+                return validation_result
             # if date_validation is not None:
             #     return date_validation
             # if start date and end date are not provided, use the current date as start date. End date is None
