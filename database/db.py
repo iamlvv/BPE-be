@@ -23,7 +23,7 @@ class DatabaseConnector:
 
         print("Connecting to the PostgreSQL database...")
         # database_url = os.environ.get("DATABASE_URL")
-        database_url = DATABASE_URL
+        database_url = DATABASE_URL_TEST
         result = urlparse(database_url)
         username = result.username
         password = result.password
@@ -44,7 +44,7 @@ class DatabaseConnector:
             from sqlalchemy import create_engine
 
             cls.engine = create_engine(
-                DATABASE_URL,
+                DATABASE_URL_TEST,
                 echo=False,
             )
         return cls.engine
