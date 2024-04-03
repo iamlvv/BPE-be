@@ -1,6 +1,8 @@
 import hashlib
 from datetime import datetime
 
+import pytz
+
 from data.repositories.constant import Role
 from data.repositories.workspace import Workspace
 from services.project_service.work_on import WorkOnService
@@ -71,9 +73,15 @@ class Date_time_convert:
 
     @classmethod
     def get_date_time_now(cls):
-        date_now = datetime.now().strftime("%Y-%m-%dT%H:%M")
-        date = datetime.strptime(date_now, "%Y-%m-%dT%H:%M")
-        return date
+        current_datetime = datetime.now()
+
+        # Convert the datetime to another timezone (e.g., GMT+7)
+        gmt7_timezone = pytz.timezone("Etc/GMT-7")
+        datetime_in_gmt7 = current_datetime.astimezone(gmt7_timezone)
+
+        # Format the datetime in the desired format
+        formatted_datetime = datetime_in_gmt7.strftime("%Y-%m-%dT%H:%M")
+        return formatted_datetime
 
 
 class Process_version_default_values:
