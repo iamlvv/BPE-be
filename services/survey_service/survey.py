@@ -331,16 +331,19 @@ class Survey_service:
             if is_published == "closed":  # when survey is closed, publish means publish
                 if start_date is None:
                     # get date and hour and minute only.
-                    start_date = Date_time_convert.get_date_time_now()
+                    current_date = Date_time_convert.get_date_time_now()
 
-                # send survey url to the email
-                if (
-                    email_list is not None and start_date is None
-                ):  # send email immediately
-                    for email in email_list:
-                        cls.send_survey_url(email, survey_url, start_date, end_date)
+                    # send survey url to the email
+                    if email_list is not None:
+                        for email in email_list:
+                            cls.send_survey_url(
+                                email, survey_url, current_date, end_date
+                            )
+
+                    start_date = Date_time_convert.convert_string_to_date(current_date)
+
                 # update end date and start date of the survey
-                start_date = Date_time_convert.convert_string_to_date(start_date)
+
                 return Survey.publish_survey(
                     survey_id, start_date, end_date, survey_url, "published"
                 )
