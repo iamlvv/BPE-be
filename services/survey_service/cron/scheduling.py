@@ -28,11 +28,15 @@ class Scheduling_send_email:
         print("email sent")
 
     @classmethod
+    def get_unpublished_surveys(cls):
+        return Survey_service.get_unpublished_surveys()
+
+    @classmethod
     def schedule_emails(cls):
         with bpsky.app_context():
             cls.get_email_recipients_and_survey_url()
-            now = Date_time_convert.get_date_time_now()
-            print("now", now)
+            # if no email but start date comes, then set publish survey
+
             for item in cls.emails_dates_url[:]:
                 email = item.email
                 survey_url = item.survey_url
@@ -40,7 +44,9 @@ class Scheduling_send_email:
                 end_date = item.end_date
                 survey_id = item.id
                 recipient_id = item.recipient_id
-                current = Date_time_convert.get_date_time_now()
+                current = Date_time_convert.convert_string_to_date(
+                    Date_time_convert.get_date_time_now()
+                )
 
                 if current == start_date and current.time() == start_date.time():
                     cls.send_email(email, survey_url, start_date, end_date)
@@ -57,9 +63,32 @@ class Scheduling_send_email:
                         print("survey published", published_survey)
 
     @classmethod
+    def schedule_publish_survey(cls):
+        # if survey has no emails to send, but start date comes, then set survey to published
+        with bpsky.app_context():
+            unpublished_surveys = cls.get_unpublished_surveys()
+            for survey in unpublished_surveys:
+                survey_id = survey.id
+                start_date = survey.start_date
+                current = Date_time_convert.convert_string_to_date(
+                    Date_time_convert.get_date_time_now()
+                )
+                # print("current scheduling", current, start_date)
+                # print(len(cls.get_remaining_emails_of_survey(survey_id)))
+                # check if survey has no emails to send
+                if len(cls.get_remaining_emails_of_survey(survey_id)) == 0:
+                    # print(current == start_date, current.time() == start_date.time())
+                    if current == start_date and current.time() == start_date.time():
+                        published_survey = Survey_service.set_survey_published(
+                            survey_id
+                        )
+                        print("survey published", published_survey)
+
+    @classmethod
     def schedule_loop(cls):
         while True:
             print("schedule running")
+            cls.schedule_publish_survey()
             cls.schedule_emails()
             schedule.run_pending()
             time.sleep(60)

@@ -340,3 +340,21 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_unpublished_surveys(cls):
+        session = DatabaseConnector.get_session()
+        try:
+            surveys = (
+                session.query(Survey_model)
+                .filter(
+                    Survey_model.is_published == "pending",
+                    Survey_model.is_deleted == False,
+                )
+                .all()
+            )
+            session.commit()
+            return surveys
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

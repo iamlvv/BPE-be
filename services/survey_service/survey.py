@@ -427,3 +427,7 @@ class Survey_service:
     @classmethod
     def set_survey_published(cls, survey_id):
         return Survey.set_survey_published(survey_id)
+
+    @classmethod
+    def get_unpublished_surveys(cls):
+        return Survey.get_unpublished_surveys()
