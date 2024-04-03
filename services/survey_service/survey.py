@@ -21,23 +21,19 @@ class Survey_service:
     @classmethod
     def validate_start_date_end_date(cls, start_date, end_date):
         try:
+            current = Date_time_convert.get_date_time_now()
+            print("validate_current", current)
             if start_date is not None and (
-                start_date < datetime.now()
-                or (
-                    start_date == datetime.now()
-                    and start_date.time() < datetime.now().time()
-                )
+                start_date < current
+                or (start_date == current and start_date.time() < current.time())
             ):
                 return {
                     "message": "Start date must be in the future",
                 }
             if (
                 end_date is not None
-                and end_date < datetime.now()
-                or (
-                    end_date == datetime.now()
-                    and end_date.time() < datetime.now().time()
-                )
+                and end_date < current
+                or (end_date == current and end_date.time() < current.time())
             ):
                 return {
                     "message": "End date must be in the future",
