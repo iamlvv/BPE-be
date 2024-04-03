@@ -104,12 +104,12 @@ class Process_portfolio:
                     == Feasibility_model.process_version_version,
                 )
                 .join(
-                    Project_model,
-                    Process_version_model.project_id == Project_model.id,
-                )
-                .join(
                     Process_model,
                     Process_version_model.process_id == Process_model.id,
+                )
+                .join(
+                    Project_model,
+                    Process_version_model.project_id == Project_model.id,
                 )
                 .filter(
                     Project_model.workspaceid == workspace_id,
