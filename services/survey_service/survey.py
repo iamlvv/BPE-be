@@ -21,7 +21,9 @@ class Survey_service:
     @classmethod
     def validate_start_date_end_date(cls, start_date, end_date):
         try:
-            current = Date_time_convert.get_date_time_now()
+            current = Date_time_convert.convert_string_to_date(
+                Date_time_convert.get_date_time_now()
+            )
             print("validate_current", current)
             if start_date is not None and (
                 start_date < current
