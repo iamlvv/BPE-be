@@ -28,10 +28,13 @@ class ProcessService:
 
     @classmethod
     def delete(cls, user_id, project_id, process_id):
-        if not WorkOnService.can_edit(user_id, project_id):
-            raise Exception("permission denied")
-        Process.delete(project_id, process_id)
-        shutil.rmtree(f"static/{project_id}/{process_id}")
+        try:
+            if not WorkOnService.can_edit(user_id, project_id):
+                raise Exception("permission denied")
+            Process.delete(project_id, process_id)
+            shutil.rmtree(f"static/{project_id}/{process_id}")
+        except Exception as e:
+            return e
 
     @classmethod
     def update_name(cls, user_id, project_id, process_id, name):

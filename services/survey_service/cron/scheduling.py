@@ -39,6 +39,7 @@ class Scheduling_send_email:
                 survey_id = item.id
                 recipient_id = item.recipient_id
                 current = Date_time_convert.get_date_time_now()
+                print("current time", current)
                 if current == start_date and current.time() == start_date.time():
                     cls.send_email(email, survey_url, start_date, end_date)
                     # which email has been sent, remove it in database
