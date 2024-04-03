@@ -52,7 +52,7 @@ class Process:
             raise Exception(e)
 
     @classmethod
-    def delete(self, project_id, id):
+    def delete(cls, project_id, id):
         query = f"""DELETE FROM public.process
                     WHERE id={id} AND project_id={project_id};
                     """

@@ -81,6 +81,7 @@ class Date_time_convert:
 
         # Format the datetime in the desired format
         formatted_datetime = datetime_in_gmt7.strftime("%Y-%m-%dT%H:%M")
+        print("formatted_datetime", formatted_datetime)
         return formatted_datetime
 
 
