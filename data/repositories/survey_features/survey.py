@@ -271,7 +271,7 @@ class Survey:
             raise Exception(e)
 
     @classmethod
-    def publish_survey(cls, survey_id, start_date, end_date, survey_url):
+    def publish_survey(cls, survey_id, start_date, end_date, survey_url, is_published):
         session = DatabaseConnector.get_session()
         try:
             survey = (
@@ -279,7 +279,7 @@ class Survey:
                 .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
                 .first()
             )
-            survey.is_published = "published" if start_date is None else "pending"
+            survey.is_published = is_published
             survey.start_date = start_date
             survey.end_date = end_date
             survey.survey_url = survey_url

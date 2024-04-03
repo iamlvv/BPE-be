@@ -193,10 +193,9 @@ class Survey_service:
         if not is_user_has_access:
             raise Exception("User has no access to the survey")
 
-        if start_date is not None and end_date is not None:
-            validation_result = cls.validate_start_date_end_date(start_date, end_date)
-            if validation_result is not None:
-                return validation_result
+        validation_result = cls.validate_start_date_end_date(start_date, end_date)
+        if validation_result is not None:
+            return validation_result
 
         return Survey.config_survey_response(
             survey_id,
@@ -341,8 +340,9 @@ class Survey_service:
                     for email in email_list:
                         cls.send_survey_url(email, survey_url, start_date, end_date)
                 # update end date and start date of the survey
+                start_date = Date_time_convert.convert_string_to_date(start_date)
                 return Survey.publish_survey(
-                    survey_id, start_date, end_date, survey_url
+                    survey_id, start_date, end_date, survey_url, "published"
                 )
             elif (
                 is_published == "pending"
