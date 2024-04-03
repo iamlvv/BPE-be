@@ -192,12 +192,10 @@ class Survey_service:
             raise Exception("User has no access to the survey")
 
         if start_date is not None and end_date is not None:
-            if start_date > end_date:
-                return {"message": "Start date must be before end date"}
-            if start_date < datetime.now():
-                return {"message": "Start date must be in the future"}
-            if end_date < datetime.now():
-                return {"message": "End date must be in the future"}
+            validation_result = cls.validate_start_date_end_date(start_date, end_date)
+            if validation_result is not None:
+                return validation_result
+
         return Survey.config_survey_response(
             survey_id,
             incomplete_survey_action,
