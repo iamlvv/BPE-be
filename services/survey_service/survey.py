@@ -341,11 +341,14 @@ class Survey_service:
                             )
 
                     start_date = Date_time_convert.convert_string_to_date(current_date)
+                    return Survey.publish_survey(
+                        survey_id, start_date, end_date, survey_url, "published"
+                    )
 
                 # update end date and start date of the survey
 
                 return Survey.publish_survey(
-                    survey_id, start_date, end_date, survey_url, "published"
+                    survey_id, start_date, end_date, survey_url, "pending"
                 )
             elif (
                 is_published == "pending"
