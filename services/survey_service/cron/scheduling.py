@@ -106,6 +106,8 @@ class Scheduling_send_email:
                 )
                 if current == end_date and current.time() == end_date.time():
                     closed_survey = Survey_service.set_survey_closed(survey_id)
+                    # reset dates
+                    Survey_service.reset_dates(survey_id)
                     print("survey closed", closed_survey)
 
     @classmethod

@@ -23,11 +23,14 @@ class Survey_result_service:
         ces_weight = weights_of_scores.ces_weight
         nps_weight = weights_of_scores.nps_weight
         csat_weight = weights_of_scores.csat_weight
-        total_score = (
-            ces_score["ces_score"] * ces_weight
-            + nps_score["nps_score"] * nps_weight
-            + csat_score["csat_score"] * csat_weight
-        ) / (ces_weight + nps_weight + csat_weight)
+        if ces_weight + nps_weight + csat_weight == 0:
+            total_score = 0
+        else:
+            total_score = (
+                ces_score["ces_score"] * ces_weight
+                + nps_score["nps_score"] * nps_weight
+                + csat_score["csat_score"] * csat_weight
+            ) / (ces_weight + nps_weight + csat_weight)
 
         # update survey with final score
         survey_result = cls.check_if_survey_result_exists(survey_id)
@@ -84,11 +87,15 @@ class Survey_result_service:
         for index in dict_weight:
             sum_of_weight += dict_weight[index]
         for index in dict_positive_answers_for_each_question:
-            result += (
-                dict_positive_answers_for_each_question[index]
-                * dict_weight[index]
-                / (total_number_of_responses * sum_of_weight)
-            )
+            denominator = total_number_of_responses * sum_of_weight
+            if denominator == 0:
+                result += 0
+            else:
+                result += (
+                    dict_positive_answers_for_each_question[index]
+                    * dict_weight[index]
+                    / denominator
+                )
         num_of_positive_answers = sum(
             dict_positive_answers_for_each_question.values()
         )  # sum of positive answers
@@ -146,17 +153,25 @@ class Survey_result_service:
         for index in dict_weight:
             sum_of_weight += dict_weight[index]
         for index in dict_promoters_for_each_question:
-            result += (
-                dict_promoters_for_each_question[index]
-                * dict_weight[index]
-                / (total_number_of_responses * sum_of_weight)
-            )
+            denominator = total_number_of_responses * sum_of_weight
+            if denominator == 0:
+                result += 0
+            else:
+                result += (
+                    dict_promoters_for_each_question[index]
+                    * dict_weight[index]
+                    / denominator
+                )
         for index in dict_detractors_for_each_question:
-            result -= (
-                dict_detractors_for_each_question[index]
-                * dict_weight[index]
-                / (total_number_of_responses * sum_of_weight)
-            )
+            denominator = total_number_of_responses * sum_of_weight
+            if denominator == 0:
+                result -= 0
+            else:
+                result -= (
+                    dict_detractors_for_each_question[index]
+                    * dict_weight[index]
+                    / denominator
+                )
 
         num_of_promoters = sum(dict_promoters_for_each_question.values())
         num_of_detractors = sum(dict_detractors_for_each_question.values())

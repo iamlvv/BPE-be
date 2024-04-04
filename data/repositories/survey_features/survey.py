@@ -397,3 +397,24 @@ class Survey:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def reset_dates(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey = (
+                session.query(Survey_model)
+                .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
+                .first()
+            )
+            survey.start_date = None
+            survey.end_date = None
+            session.commit()
+            return {
+                "id": survey.id,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+            }
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

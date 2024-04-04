@@ -379,6 +379,8 @@ class Survey_service:
         survey = Survey.check_if_survey_exists(process_version_version)
         if survey is None:
             return {"message": "Survey does not exist."}
+        # reset start date and end date to None
+        cls.reset_dates(survey.id)
         return Survey.close_publish_survey(survey.id)
 
     @classmethod
@@ -436,3 +438,7 @@ class Survey_service:
     @classmethod
     def get_published_surveys(cls):
         return Survey.get_published_surveys()
+
+    @classmethod
+    def reset_dates(cls, survey_id):
+        return Survey.reset_dates(survey_id)
