@@ -431,3 +431,11 @@ class Survey_service:
     @classmethod
     def get_unpublished_surveys(cls):
         return Survey.get_unpublished_surveys()
+
+    @classmethod
+    def set_survey_closed(cls, survey_id):
+        return Survey.set_survey_closed(survey_id)
+
+    @classmethod
+    def get_published_surveys(cls):
+        return Survey.get_published_surveys()

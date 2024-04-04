@@ -85,11 +85,34 @@ class Scheduling_send_email:
                         print("survey published", published_survey)
 
     @classmethod
-    def schedule_loop(cls):
+    def schedule_close_survey(cls):
+        with bpsky.app_context():
+            # get all surveys that are published
+            published_surveys = Survey_service.get_published_surveys()
+            for survey in published_surveys:
+                survey_id = survey.id
+                end_date = survey.end_date
+                current = Date_time_convert.convert_string_to_date(
+                    Date_time_convert.get_date_time_now()
+                )
+                if current == end_date and current.time() == end_date.time():
+                    closed_survey = Survey_service.set_survey_closed(survey_id)
+                    print("survey closed", closed_survey)
+
+    @classmethod
+    def schedule_loop_send_emails_and_publish_survey(cls):
         while True:
             print("schedule running")
             cls.schedule_publish_survey()
             cls.schedule_emails()
+            schedule.run_pending()
+            time.sleep(60)
+
+    @classmethod
+    def schedule_loop_close_survey(cls):
+        while True:
+            print("schedule close survey running")
+            cls.schedule_close_survey()
             schedule.run_pending()
             time.sleep(60)
 
@@ -99,7 +122,3 @@ class Scheduling_send_email:
             Survey_send_service.get_all_emails_dates_url_of_not_published_survey()
         )
         return [item for item in emails_and_start_date_and_url if item.id == survey_id]
-
-    @classmethod
-    def main(cls):
-        cls.schedule_loop()
