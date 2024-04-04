@@ -100,6 +100,21 @@ class Survey_send:
             session.rollback()
             raise Exception(e)
 
+    @classmethod
+    def delete_survey_recipient_mails(cls, survey_id):
+        session = DatabaseConnector.get_session()
+        try:
+            survey_recipient = (
+                session.query(Survey_recipient_association_model)
+                .filter(Survey_recipient_association_model.survey_id == survey_id)
+                .delete()
+            )
+            session.commit()
+            return survey_recipient
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+
 
 class Survey_recipient:
     @classmethod

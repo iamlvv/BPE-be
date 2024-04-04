@@ -27,6 +27,10 @@ class Survey_send_service:
         )
         return email_and_start_date_and_url
 
+    @classmethod
+    def delete_survey_recipient_emails(cls, survey_id):
+        return Survey_send.delete_survey_recipient_mails(survey_id)
+
 
 class Survey_recipient_service:
     @classmethod

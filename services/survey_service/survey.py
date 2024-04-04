@@ -322,10 +322,6 @@ class Survey_service:
             validation_result = cls.validate_start_date_end_date(start_date, end_date)
             if validation_result is not None:
                 return validation_result
-            # if date_validation is not None:
-            #     return date_validation
-            # if start date and end date are not provided, use the current date as start date. End date is None
-            # save email in the database
             if email_list is not None:
                 cls.save_recipient_email(survey_id, email_list)
             if is_published == "closed":  # when survey is closed, publish means publish
@@ -339,7 +335,8 @@ class Survey_service:
                             cls.send_survey_url(
                                 email, survey_url, current_date, end_date
                             )
-
+                        # delete all emails in the database
+                        Survey_send_service.delete_survey_recipient_emails(survey_id)
                     start_date = Date_time_convert.convert_string_to_date(current_date)
                     return Survey.publish_survey(
                         survey_id, start_date, end_date, survey_url, "published"
@@ -400,7 +397,7 @@ class Survey_service:
             Survey_send_service.save_survey_recipient_email(
                 survey_id, recipient_list_item.id
             )
-        return
+        return recipient_list
 
     @classmethod
     def get_publish_info(cls, process_version_version, project_id, user_id):
