@@ -22,17 +22,17 @@ class Process_portfolio_service:
                 raise Exception("permission denied")
 
             # check if item in active_process_version_list exists in table Health, Strategic Importance, Feasibility
-            cls.check_if_active_process_versions_have_health_strategic_importance_feasibility(
-                active_process_version_list
-            )
             # check if process portfolio exists in table Process_portfolio
             process_portfolio = cls.check_if_process_portfolio_exists(workspace_id)
             if process_portfolio:
                 return {
-                    "id": process_portfolio.id,
-                    "createdAt": process_portfolio.created_at,
-                    "isDeleted": process_portfolio.is_deleted,
-                    "workspaceId": process_portfolio.workspace_id,
+                    "processPortfolio": {
+                        "id": process_portfolio.id,
+                        "createdAt": process_portfolio.created_at,
+                        "isDeleted": process_portfolio.is_deleted,
+                        "workspaceId": process_portfolio.workspace_id,
+                    },
+                    "processVersion": {},
                 }
             process_portfolio = Process_portfolio.add_process_portfolio(workspace_id)
             return {
@@ -74,16 +74,33 @@ class Process_portfolio_service:
             )
             if not workspace_owner:
                 raise Exception("permission denied")
-            process_portfolio = cls.check_if_process_portfolio_exists(workspace_id)
-            if not process_portfolio:
-                return None
+            # process_portfolio = cls.check_if_process_portfolio_exists(workspace_id)
+            # if not process_portfolio:
+            #     return None
             # return stats of every active process version in workspace
+            eligible_process_versions_list = cls.get_eligible_process_versions(
+                workspace_id
+            )
+            print(eligible_process_versions_list[0].version)
+            print(eligible_process_versions_list[0].num)
+            print(eligible_process_versions_list[0].health)
+            print(eligible_process_versions_list[0].strategic_importance)
+            print(eligible_process_versions_list[0].feasibility)
+            print(eligible_process_versions_list[0].project_name)
+            print(eligible_process_versions_list[0].process_name)
             return {
-                "id": process_portfolio.id,
-                "createdAt": process_portfolio.created_at,
-                "isDeleted": process_portfolio.is_deleted,
-                "workspaceId": process_portfolio.workspace_id,
-                "processVersionStats": cls.get_process_version_stats(workspace_id),
+                "processPortfolio": [
+                    {
+                        "processVersionVersion": process_version.version,
+                        "health": process_version.health,
+                        "strategicImportance": process_version.strategic_importance,
+                        "feasibility": process_version.feasibility,
+                        "projectName": process_version.project_name,
+                        "processName": process_version.process_name,
+                        "num": process_version.num,
+                    }
+                    for process_version in eligible_process_versions_list
+                ]
             }
         except Exception as e:
             raise Exception(e)
@@ -245,3 +262,8 @@ class Process_portfolio_service:
             }
         except Exception as e:
             raise Exception(e)
+
+    @classmethod
+    def get_eligible_process_versions(cls, workspace_id):
+        # get health, feasibility and strategic_importance of process_versions that total_score is not None
+        return Process_portfolio.get_eligible_process_versions(workspace_id)

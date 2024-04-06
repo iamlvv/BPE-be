@@ -175,3 +175,59 @@ class Process_portfolio:
             raise Exception(e)
         finally:
             session.close()
+
+    @classmethod
+    def get_eligible_process_versions(cls, workspace_id):
+        session = DatabaseConnector.get_session()
+        try:
+            process_portfolio = (
+                session.query(
+                    Process_version_model.version,
+                    Process_version_model.num,
+                    Project_model.name.label("project_name"),
+                    Process_model.name.label("process_name"),
+                    Health_model.total_score.label("health"),
+                    Strategic_importance_model.total_score.label(
+                        "strategic_importance"
+                    ),
+                    Feasibility_model.total_score.label("feasibility"),
+                )
+                .join(
+                    Health_model,
+                    Process_version_model.version
+                    == Health_model.process_version_version,
+                )
+                .join(
+                    Strategic_importance_model,
+                    Process_version_model.version
+                    == Strategic_importance_model.process_version_version,
+                )
+                .join(
+                    Feasibility_model,
+                    Process_version_model.version
+                    == Feasibility_model.process_version_version,
+                )
+                .join(
+                    Process_model,
+                    Process_version_model.process_id == Process_model.id,
+                )
+                .join(
+                    Project_model,
+                    Process_version_model.project_id == Project_model.id,
+                )
+                .filter(
+                    Project_model.workspaceid == workspace_id,
+                    Health_model.total_score != None,
+                    Strategic_importance_model.total_score != None,
+                    Feasibility_model.total_score != None,
+                    Process_version_model.is_active == True,
+                )
+                .all()
+            )
+            session.commit()
+            return process_portfolio
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)
+        finally:
+            session.close()

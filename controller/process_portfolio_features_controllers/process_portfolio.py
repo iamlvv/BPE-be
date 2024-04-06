@@ -249,23 +249,20 @@ def edit_strategic_importance_of_active_process_version():
         return bpsky.response_class(response=e.__str__(), status=500)
 
 
-@bpsky.route("/api/v1/workspace/portfolio", methods=["POST"])
-def create_process_portfolio():
-    try:
-        user_id = get_id_from_token(get_token(request))
-        body = load_request_body(request)
-        workspace_id = body["workspaceId"]
-        active_process_version_list = body["activeProcessVersion"]
-        data = Process_portfolio_service.create_process_portfolio(
-            workspace_id, user_id, active_process_version_list
-        )
-        return bpsky.response_class(
-            response=jsonpickle.encode(data, unpicklable=False),
-            status=200,
-            mimetype="application/json",
-        )
-    except Exception as e:
-        return bpsky.response_class(response=e.__str__(), status=500)
+# @bpsky.route("/api/v1/workspace/portfolio", methods=["POST"])
+# def create_process_portfolio():
+#     try:
+#         user_id = get_id_from_token(get_token(request))
+#         body = load_request_body(request)
+#         workspace_id = body["workspaceId"]
+#         data = Process_portfolio_service.create_process_portfolio(workspace_id, user_id)
+#         return bpsky.response_class(
+#             response=jsonpickle.encode(data, unpicklable=False),
+#             status=200,
+#             mimetype="application/json",
+#         )
+#     except Exception as e:
+#         return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/workspace/portfolio", methods=["GET"])
