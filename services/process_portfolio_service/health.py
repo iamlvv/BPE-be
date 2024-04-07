@@ -5,6 +5,14 @@ from services.utils import Permission_check
 from services.workspace_service.workspace import WorkspaceService
 
 
+class Measurements:
+    def __init__(self, targeted, worst, current, threshold):
+        self.targeted = targeted
+        self.worst = worst
+        self.current = current
+        self.threshold = threshold
+
+
 class Health_service:
     @classmethod
     def get_health_of_active_process_versions_in_workspace(cls, workspace_id, user_id):
@@ -121,42 +129,50 @@ class Health_service:
         ):
             cls.save_total_score(process_version_version, None)
             return
-        print(
-            "None ",
-            evaluation_result,
-            workspace_measurements,
-            process_version_measurements,
-        )
+
         check = cls.check_values(
             evaluation_result, workspace_measurements, process_version_measurements
         )
         if check is None:
             cls.save_total_score(process_version_version, None)
             return
-        cycle_time_score = cls.pl_method(
+
+        # check if current is in range target and worst
+        cycle_time_values = Measurements(
             workspace_measurements["targetedCycleTime"],
             workspace_measurements["worstCycleTime"],
             process_version_measurements.current_cycle_time,
             evaluation_result["totalCycleTime"],
         )
-        cost_score = cls.pl_method(
+        cost_values = Measurements(
             workspace_measurements["targetedCost"],
             workspace_measurements["worstCost"],
             process_version_measurements.current_cost,
             evaluation_result["totalCost"],
         )
-        quality_score = cls.pl_method(
+        quality_values = Measurements(
             workspace_measurements["targetedQuality"],
             workspace_measurements["worstQuality"],
             process_version_measurements.current_quality,
             evaluation_result["totalQuality"],
         )
-        flexibility_score = cls.pl_method(
+        flexibility_values = Measurements(
             workspace_measurements["targetedFlexibility"],
             workspace_measurements["worstFlexibility"],
             process_version_measurements.current_flexibility,
             evaluation_result["totalFlexibility"],
         )
+
+        current_values_check = cls.check_current_values(
+            cycle_time_values, cost_values, quality_values, flexibility_values
+        )
+        if current_values_check is not None:
+            return current_values_check
+
+        cycle_time_score = cls.pl_method(cycle_time_values, "cycle_time")
+        cost_score = cls.pl_method(cost_values, "cost")
+        quality_score = cls.pl_method(quality_values, "quality")
+        flexibility_score = cls.pl_method(flexibility_values, "flexibility")
         total_score = (
             cycle_time_score + cost_score + quality_score + flexibility_score
         ) / 4
@@ -164,10 +180,23 @@ class Health_service:
         cls.save_total_score(process_version_version, total_score)
 
     @classmethod
-    def pl_method(cls, target, worst, current, threshold):
-        if current >= threshold:
-            return abs(current - threshold) / abs(target - threshold)
-        return -abs(current - threshold) / abs(threshold - worst)
+    def pl_method(cls, measurement_values, measurement_type):
+        if measurement_type == "cycle_time" or measurement_type == "cost":
+            if measurement_values.current >= measurement_values.threshold:
+                return -abs(
+                    measurement_values.current - measurement_values.threshold
+                ) / abs(measurement_values.threshold - measurement_values.worst)
+            return abs(measurement_values.current - measurement_values.threshold) / abs(
+                measurement_values.targeted - measurement_values.threshold
+            )
+        else:
+            if measurement_values.current >= measurement_values.threshold:
+                return abs(
+                    measurement_values.current - measurement_values.threshold
+                ) / abs(measurement_values.targeted - measurement_values.threshold)
+            return -abs(
+                measurement_values.current - measurement_values.threshold
+            ) / abs(measurement_values.threshold - measurement_values.worst)
 
     @classmethod
     def get_evaluation_result_of_process_version(cls, process_version_version):
@@ -236,3 +265,35 @@ class Health_service:
     @classmethod
     def delete_health_values(cls, version):
         return Health.delete_health_values(version)
+
+    @classmethod
+    def check_current_values(
+        cls, cycle_time_values, cost_values, quality_values, flexibility_values
+    ):
+        if (
+            cycle_time_values.current < cycle_time_values.targeted
+            or cycle_time_values.current > cycle_time_values.worst
+        ):
+            return {
+                "message": "Cycle time is not in the range of targeted and worst values"
+            }
+        if (
+            cost_values.current < cost_values.targeted
+            or cost_values.current > cost_values.worst
+        ):
+            return {"message": "Cost is not in the range of targeted and worst values"}
+        if (
+            quality_values.current > quality_values.targeted
+            or quality_values.current < quality_values.worst
+        ):
+            return {
+                "message": "Quality is not in the range of targeted and worst values"
+            }
+        if (
+            flexibility_values.current > flexibility_values.targeted
+            or flexibility_values.current < flexibility_values.worst
+        ):
+            return {
+                "message": "Flexibility is not in the range of targeted and worst values"
+            }
+        return True

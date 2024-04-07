@@ -96,3 +96,17 @@ class Process_version_default_values:
 
     def __init__(self):
         pass
+
+
+class Workspace_default_values:
+    targeted_cycle_time = 0
+    worst_cycle_time = None
+    targeted_cost = 0
+    worst_cost = None
+    targeted_quality = 1
+    worst_quality = 0
+    targeted_flexibility = 1
+    worst_flexibility = 0
+
+    def __init__(self):
+        pass
