@@ -122,6 +122,14 @@ class Health_service:
         process_version_measurements = cls.get_health_of_process_version(
             process_version_version
         )
+        print(
+            "evaluation_result",
+            evaluation_result,
+            "workspace_measurements",
+            workspace_measurements,
+            "process_version_measurements",
+            process_version_measurements is None,
+        )
         if (
             evaluation_result is None
             or workspace_measurements is None
@@ -296,4 +304,4 @@ class Health_service:
             return {
                 "message": "Flexibility is not in the range of targeted and worst values"
             }
-        return True
+        return None
