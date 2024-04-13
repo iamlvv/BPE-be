@@ -77,7 +77,7 @@ class Result:
     exceptionHandling: float
     steps: list
     total_quality: float
-    external_quality: float | None
+    external_quality: float
 
     def __init__(self):
         self.name = ""
@@ -96,4 +96,4 @@ class Result:
         self.exceptionHandling = 0.0
         self.steps = []
         self.total_quality = 0.0
-        self.external_quality = None
+        self.external_quality = 0.0

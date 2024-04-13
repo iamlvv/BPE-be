@@ -94,22 +94,27 @@ class ProjectService_Get:
 
     @classmethod
     def get_all_projects_in_workspace(cls, workspace_id, user_id, page, limit):
-        if not Permission_check.check_if_user_is_workspace_owner(workspace_id, user_id):
-            raise Exception("permission denied")
-        total_projects = Project.get_number_of_projects_in_workspace(workspace_id)
-        projects = Project.get_all_projects_in_workspace(workspace_id, page, limit)
-        return {
-            "total": total_projects,
-            "limit": limit,
-            "data": [
-                {
-                    "id": project.id,
-                    "name": project.name,
-                    "ownerName": project.owner_name,
-                }
-                for project in projects
-            ],
-        }
+        try:
+            if not Permission_check.check_if_user_is_workspace_owner(
+                workspace_id, user_id
+            ):
+                raise Exception("permission denied")
+            total_projects = Project.get_number_of_projects_in_workspace(workspace_id)
+            projects = Project.get_all_projects_in_workspace(workspace_id, page, limit)
+            return {
+                "total": total_projects,
+                "limit": limit,
+                "data": [
+                    {
+                        "id": project.id,
+                        "name": project.name,
+                        "ownerName": project.owner_name,
+                    }
+                    for project in projects
+                ],
+            }
+        except Exception as e:
+            raise Exception(e)
 
 
 class ProjectService_Update(Validate):
