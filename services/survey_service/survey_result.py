@@ -323,6 +323,7 @@ class Survey_result_service:
                 question_answers.append(
                     cls.get_answer_details_for_multiple_questions(question_id)
                 )
+        print(len(question_answers), len(list_of_questions))
         return {
             "survey_id": survey_id,
             "questions": [
@@ -330,10 +331,11 @@ class Survey_result_service:
                     "id": question["id"],
                     "content": question["content"],
                     "questionType": question["questionType"],
-                    "answers": question_answers[question["id"]]["answers"],
+                    "answers": question_answers[index]["answers"],
                 }
-                for question in list_of_questions
+                for index, question in enumerate(list_of_questions)
             ],
+            "answers": question_answers,
         }
 
     @classmethod

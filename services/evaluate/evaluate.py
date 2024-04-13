@@ -136,7 +136,7 @@ class Evaluate:
         model = map_element["model"]
         process_version_version = map_element["processVersionVersion"]
         survey_result = Survey_result_service.get_survey_result(process_version_version)
-        survey_score = survey_result["totalScore"]
+        survey_score = survey_result["totalScore"] if survey_result is not None else None
         collaboration = ProcessDirector(model).build_graph()
         t = Traverse()
         for p in collaboration.participants:
