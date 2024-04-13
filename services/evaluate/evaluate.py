@@ -1,5 +1,6 @@
 from .traverse import *
 from .utils import *
+from ..survey_service.survey_result import Survey_result_service
 
 
 class ProcessDirector:
@@ -20,17 +21,14 @@ class ProcessDirector:
                 self.linkEventNode[element.linkCode][1].append(element.id)
         else:
             if element.eventType == EventType.INTERMIDIATE_THROW_EVENT.value:
-                self.linkEventNode.update(
-                    {element.linkCode: [[element.id], []]})
+                self.linkEventNode.update({element.linkCode: [[element.id], []]})
             else:
-                self.linkEventNode.update(
-                    {element.linkCode: [[], [element.id]]})
+                self.linkEventNode.update({element.linkCode: [[], [element.id]]})
 
     def handleLinkEvent(self):
         for linkCode in self.linkEventNode:
             throw_nodes = self.get_node_of_ids(self.linkEventNode[linkCode][0])
-            catch_node = self.get_node_of_ids(
-                self.linkEventNode[linkCode][1])[0]
+            catch_node = self.get_node_of_ids(self.linkEventNode[linkCode][1])[0]
 
             for throw_node in throw_nodes:
                 next_nodes_of_prev_node = throw_node.previous[0].next
@@ -39,9 +37,10 @@ class ProcessDirector:
 
                 prev_nodes_of_next_node = catch_node.next[0].previous
                 try:
-                    index_of_link_event = prev_nodes_of_next_node.index(
-                        catch_node)
-                    prev_nodes_of_next_node[index_of_link_event] = throw_node.previous[0]
+                    index_of_link_event = prev_nodes_of_next_node.index(catch_node)
+                    prev_nodes_of_next_node[index_of_link_event] = throw_node.previous[
+                        0
+                    ]
                 except:
                     pass
 
@@ -50,8 +49,7 @@ class ProcessDirector:
         instance = target_class(element)
 
         if isinstance(instance, LinkEvent):
-            instance.setAttribute(
-                element.linkCode, element.outgoing, element.incoming)
+            instance.setAttribute(element.linkCode, element.outgoing, element.incoming)
             self.createLinkEventNode(instance, element)
 
         if isinstance(instance, ConditionalEvent):
@@ -78,10 +76,8 @@ class ProcessDirector:
             if isinstance(n, Node):
                 n.previous = self.get_node_of_ids(e.incoming)
                 n.next = self.get_node_of_ids(e.outgoing)
-                n.incoming_messageflow = self.get_node_of_ids(
-                    e.incoming_messageflow)
-                n.outgoing_messageflow = self.get_node_of_ids(
-                    e.outgoing_messageflow)
+                n.incoming_messageflow = self.get_node_of_ids(e.incoming_messageflow)
+                n.outgoing_messageflow = self.get_node_of_ids(e.outgoing_messageflow)
             elif type(n) is Participant:
                 collaboration = self.map_node_created[e.parentID]
                 collaboration.participants.append(n)
@@ -102,7 +98,7 @@ class ProcessDirector:
             if isinstance(n, Event) and n.event_type == EventType.START_EVENT.value:
                 lane = self.map_node_created[e.parentID]
                 lane.node.append(n)
-            if isinstance(n, Activity) and hasattr(e, 'boundary'):
+            if isinstance(n, Activity) and hasattr(e, "boundary"):
                 for b in e.boundary:
                     n.boundary.append(self.map_node_created[b])
             if isinstance(n, EventSubProcess):
@@ -135,10 +131,13 @@ class Collaboration:
 
 
 class Evaluate:
-
     @classmethod
     def evaluate(cls, map_element: dict):
-        collaboration = ProcessDirector(map_element).build_graph()
+        model = map_element["model"]
+        process_version_version = map_element["processVersionVersion"]
+        survey_result = Survey_result_service.get_survey_result(process_version_version)
+        survey_score = survey_result["totalScore"]
+        collaboration = ProcessDirector(model).build_graph()
         t = Traverse()
         for p in collaboration.participants:
             c = Context()
@@ -147,15 +146,20 @@ class Evaluate:
             r.totalNumberExplicitTasks = collaboration.get_total_number_explicit_tasks()
             p.accept(t, c, r)
             if r.handledTasks + r.unHandledTasks > 0:
-                r.exceptionHandling = r.handledTasks / \
-                    (r.handledTasks +
-                     r.unHandledTasks)
+                r.exceptionHandling = r.handledTasks / (
+                    r.handledTasks + r.unHandledTasks
+                )
             if r.totalTasks > 0:
                 r.flexibility = r.numberOfOptionalTasks / r.totalTasks
             if r.total_loop == 0:
                 r.quality = 1
             else:
                 r.quality = 1 - (r.total_loop_probability / r.total_loop)
+            if survey_score is not None:
+                r.external_quality = survey_score
+                r.total_quality = (r.total_quality + r.external_quality) / 2
+            else:
+                r.total_quality = r.quality
             if r.totalCycleTime != 0:
                 collaboration.result.append(r)
 

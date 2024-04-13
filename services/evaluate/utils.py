@@ -76,6 +76,8 @@ class Result:
     unHandledTasks: int
     exceptionHandling: float
     steps: list
+    total_quality: float
+    external_quality: float | None
 
     def __init__(self):
         self.name = ""
@@ -93,3 +95,5 @@ class Result:
         self.unHandledTasks = 0
         self.exceptionHandling = 0.0
         self.steps = []
+        self.total_quality = 0.0
+        self.external_quality = None
