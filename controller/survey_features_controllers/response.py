@@ -6,9 +6,9 @@ from services.survey_service.survey import Survey_service
 from services.survey_service.cron.scheduling import Scheduling_send_email
 
 
-@bpsky.route("/", methods=["GET"])
-def run_scheduling_send_email():
-    Scheduling_send_email.main()
+# @bpsky.route("/", methods=["GET"])
+# def run_scheduling_send_email():
+#     Scheduling_send_email.main()
 
 
 @bpsky.route("/api/v1/survey/section", methods=["GET"])
@@ -60,22 +60,6 @@ def submit_survey_form():
 def get_survey_response():
     response_id = request.args.get("responseId", None)
     data = Response_service.get_survey_response(response_id)
-    return bpsky.response_class(
-        response=jsonpickle.encode(data, unpicklable=False),
-        status=200,
-        mimetype="application/json",
-    )
-
-
-@bpsky.route("/api/v1/survey/publish/close", methods=["POST"])
-def close_publish_survey():
-    user_id = get_id_from_token(get_token(request))
-    body = load_request_body(request)
-    project_id = body["projectId"]
-    process_version_version = body["processVersionVersion"]
-    data = Survey_service.close_publish_survey(
-        user_id, project_id, process_version_version
-    )
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
         status=200,
