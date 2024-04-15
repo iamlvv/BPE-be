@@ -21,10 +21,7 @@ class Survey_service:
     @classmethod
     def validate_start_date_end_date(cls, start_date, end_date):
         try:
-            current = Date_time_convert.convert_string_to_date(
-                Date_time_convert.get_date_time_now()
-            )
-            print("validate_current", current)
+            current = Date_time_convert.get_date_time_now_date()
             if start_date is not None and (
                 start_date < current
                 or (start_date == current and start_date.time() < current.time())
@@ -58,11 +55,11 @@ class Survey_service:
     @classmethod
     def get_survey_detail(cls, process_version_version, project_id, user_id):
         # check if user has access to the survey
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
         # get survey detail
         return Survey.get_survey_detail(process_version_version)
 
@@ -100,11 +97,11 @@ class Survey_service:
 
     @classmethod
     def get_survey_content(cls, user_id, project_id, process_version_version):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
         survey_info = cls.get_survey_detail(
             process_version_version, project_id, user_id
         )
@@ -123,11 +120,11 @@ class Survey_service:
 
     @classmethod
     def delete_survey(cls, user_id, project_id, survey_id):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         # delete all responses
         deleted_responses = Response_service.delete_responses(survey_id)
@@ -160,11 +157,11 @@ class Survey_service:
         ces_weight=None,
         csat_weight=None,
     ):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         return Survey.config_survey_general(
             survey_id,
@@ -187,11 +184,11 @@ class Survey_service:
         start_date=None,
         end_date=None,
     ):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         validation_result = cls.validate_start_date_end_date(start_date, end_date)
         if validation_result is not None:
@@ -212,20 +209,20 @@ class Survey_service:
 
     @classmethod
     def get_survey_general_config(cls, survey_id, user_id, project_id):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
         return Survey.get_survey_general_config(survey_id)
 
     @classmethod
     def get_survey_response_config(cls, survey_id, user_id, project_id):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         return Survey.get_survey_response_config(survey_id)
 
@@ -308,11 +305,11 @@ class Survey_service:
         end_date=None,
     ):
         try:
-            is_user_has_access = Permission_check.check_user_has_access_survey(
-                project_id, user_id
-            )
-            if not is_user_has_access:
-                raise Exception("User has no access to the survey")
+            # is_user_has_access = Permission_check.check_user_has_access_survey(
+            #     project_id, user_id
+            # )
+            # if not is_user_has_access:
+            #     raise Exception("User has no access to the survey")
 
             survey = cls.check_if_survey_exists(process_version_version)
             if survey is None:
@@ -370,12 +367,6 @@ class Survey_service:
 
     @classmethod
     def close_publish_survey(cls, user_id, project_id, process_version_version):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
-
         survey = Survey.check_if_survey_exists(process_version_version)
         if survey is None:
             return {"message": "Survey does not exist."}
@@ -403,11 +394,11 @@ class Survey_service:
 
     @classmethod
     def get_publish_info(cls, process_version_version, project_id, user_id):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
         survey = cls.check_if_survey_exists(process_version_version)
         if survey is None:
             return {"message": "Survey does not exist."}

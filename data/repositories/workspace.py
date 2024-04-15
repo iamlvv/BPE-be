@@ -503,13 +503,13 @@ class Workspace(Workspace_Get, Workspace_Insert, Workspace_Update, Workspace_Del
             workspace = (
                 session.query(Workspace_model)
                 .filter(
-                    Workspace.id == int(workspace_id),
+                    Workspace_model.id == int(workspace_id),
                     Workspace_model.isdeleted == False,
                 )
                 .first()
             )
             session.commit()
-            if workspace:
+            if workspace is not None:
                 return workspace.ownerid == user_id
             else:
                 return "Workspace not found"

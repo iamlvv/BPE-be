@@ -45,9 +45,7 @@ class Scheduling_send_email:
                     end_date = item.end_date
                     survey_id = item.id
                     recipient_id = item.recipient_id
-                    current = Date_time_convert.convert_string_to_date(
-                        Date_time_convert.get_date_time_now()
-                    )
+                    current = Date_time_convert.get_date_time_now_date()
 
                     if current == start_date and current.time() == start_date.time():
                         cls.send_email(email, survey_url, start_date, end_date)
@@ -74,9 +72,7 @@ class Scheduling_send_email:
                 for survey in unpublished_surveys:
                     survey_id = survey.id
                     start_date = survey.start_date
-                    current = Date_time_convert.convert_string_to_date(
-                        Date_time_convert.get_date_time_now()
-                    )
+                    current = Date_time_convert.get_date_time_now_date()
                     # print("current scheduling", current, start_date)
                     # print(len(cls.get_remaining_emails_of_survey(survey_id)))
                     # check if survey has no emails to send
@@ -101,9 +97,7 @@ class Scheduling_send_email:
             for survey in published_surveys:
                 survey_id = survey.id
                 end_date = survey.end_date
-                current = Date_time_convert.convert_string_to_date(
-                    Date_time_convert.get_date_time_now()
-                )
+                current = Date_time_convert.get_date_time_now_date()
                 if current == end_date and current.time() == end_date.time():
                     closed_survey = Survey_service.set_survey_closed(survey_id)
                     # reset dates

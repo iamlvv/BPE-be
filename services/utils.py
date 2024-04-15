@@ -68,11 +68,11 @@ class Permission_check:
 
 class Date_time_convert:
     @classmethod
-    def convert_string_to_date(cls, date_str):
+    def convert_string_to_date(cls, date_str) -> datetime:
         return datetime.strptime(date_str, "%Y-%m-%dT%H:%M")
 
     @classmethod
-    def get_date_time_now(cls):
+    def get_date_time_now(cls) -> str:
         current_datetime = datetime.now()
 
         # Convert the datetime to another timezone (e.g., GMT+7)
@@ -83,6 +83,11 @@ class Date_time_convert:
         formatted_datetime = datetime_in_gmt7.strftime("%Y-%m-%dT%H:%M")
         print("formatted_datetime", formatted_datetime)
         return formatted_datetime
+
+    @classmethod
+    def get_date_time_now_date(cls) -> datetime:
+        now = cls.get_date_time_now()
+        return cls.convert_string_to_date(now)
 
 
 class Process_version_default_values:

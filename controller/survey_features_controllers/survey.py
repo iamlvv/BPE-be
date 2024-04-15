@@ -3,12 +3,14 @@ from datetime import timezone
 import jsonpickle
 
 from bpsky import bpsky
+from controller.decorators import permission_project_check
 from controller.utils import *
 from services.survey_service.survey import Survey_service
 from services.utils import Date_time_convert
 
 
 @bpsky.route("/api/v1/survey", methods=["GET"])
+@permission_project_check
 def get_survey_detail():
     user_id = get_id_from_token(get_token(request))
     process_version_version = request.args.get("processVersionVersion", None)
@@ -24,6 +26,7 @@ def get_survey_detail():
 
 
 @bpsky.route("/api/v1/survey", methods=["POST"])
+@permission_project_check
 def create_new_survey():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
@@ -55,6 +58,7 @@ def create_new_survey():
 
 
 @bpsky.route("/api/v1/survey/edit", methods=["GET"])
+@permission_project_check
 def get_survey_content():
     user_id = get_id_from_token(get_token(request))
     process_version_version = request.args.get("processVersionVersion", None)
@@ -70,6 +74,7 @@ def get_survey_content():
 
 
 @bpsky.route("/api/v1/survey", methods=["DELETE"])
+@permission_project_check
 def delete_survey():
     user_id = get_id_from_token(get_token(request))
     survey_id = request.args.get("surveyId", None)
@@ -83,6 +88,7 @@ def delete_survey():
 
 
 @bpsky.route("/api/v1/survey/general_configuration", methods=["GET"])
+@permission_project_check
 def get_survey_general_config():
     user_id = get_id_from_token(get_token(request))
     survey_id = request.args.get("surveyId")
@@ -96,6 +102,7 @@ def get_survey_general_config():
 
 
 @bpsky.route("/api/v1/survey/general_configuration", methods=["PUT"])
+@permission_project_check
 def config_survey_general():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
@@ -124,6 +131,7 @@ def config_survey_general():
 
 
 @bpsky.route("/api/v1/survey/response_configuration", methods=["GET"])
+@permission_project_check
 def get_survey_response_config():
     user_id = get_id_from_token(get_token(request))
     survey_id = request.args.get("surveyId")
@@ -137,6 +145,7 @@ def get_survey_response_config():
 
 
 @bpsky.route("/api/v1/survey/response_configuration", methods=["PUT"])
+@permission_project_check
 def config_survey_response():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
@@ -178,6 +187,7 @@ def config_survey_response():
 
 
 @bpsky.route("/api/v1/survey/publish", methods=["POST"])
+@permission_project_check
 def publish_survey():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)
@@ -209,6 +219,7 @@ def publish_survey():
 
 
 @bpsky.route("/api/v1/survey/publish", methods=["GET"])
+@permission_project_check
 def get_publish_info():
     user_id = get_id_from_token(get_token(request))
     process_version_version = request.args.get("processVersionVersion")
@@ -222,6 +233,7 @@ def get_publish_info():
 
 
 @bpsky.route("/api/v1/survey/publish/close", methods=["POST"])
+@permission_project_check
 def close_publish_survey():
     user_id = get_id_from_token(get_token(request))
     body = load_request_body(request)

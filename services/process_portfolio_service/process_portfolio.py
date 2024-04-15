@@ -15,11 +15,11 @@ class Process_portfolio_service:
         cls, workspace_id, user_id, active_process_version_list
     ):
         try:
-            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
-                workspace_id, user_id
-            )
-            if not workspace_owner:
-                raise Exception("permission denied")
+            # workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+            #     workspace_id, user_id
+            # )
+            # if not workspace_owner:
+            #     raise Exception("permission denied")
 
             # check if item in active_process_version_list exists in table Health, Strategic Importance, Feasibility
             # check if process portfolio exists in table Process_portfolio
@@ -69,11 +69,11 @@ class Process_portfolio_service:
     @classmethod
     def get_process_portfolio_content(cls, workspace_id, user_id):
         try:
-            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
-                workspace_id, user_id
-            )
-            if not workspace_owner:
-                raise Exception("permission denied")
+            # workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+            #     workspace_id, user_id
+            # )
+            # if not workspace_owner:
+            #     raise Exception("permission denied")
             # process_portfolio = cls.check_if_process_portfolio_exists(workspace_id)
             # if not process_portfolio:
             #     return None
@@ -137,11 +137,11 @@ class Process_portfolio_service:
     ):
         # get current health, strategic importance, feasibility of
         try:
-            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
-                workspace_id, user_id
-            )
-            if not workspace_owner:
-                raise Exception("permission denied")
+            # workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+            #     workspace_id, user_id
+            # )
+            # if not workspace_owner:
+            #     raise Exception("permission denied")
 
             evaluation_result = cls.get_evaluation_result_of_process_version(
                 process_version_version
@@ -193,11 +193,11 @@ class Process_portfolio_service:
         feasibility,
     ):
         try:
-            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
-                workspace_id, user_id
-            )
-            if not workspace_owner:
-                raise Exception("permission denied")
+            # workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+            #     workspace_id, user_id
+            # )
+            # if not workspace_owner:
+            #     raise Exception("permission denied")
 
             health = Health_service.edit_health_of_process_version(
                 workspace_id,
@@ -232,11 +232,11 @@ class Process_portfolio_service:
     @classmethod
     def get_not_available_process_versions(cls, workspace_id, user_id, page, limit):
         try:
-            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
-                workspace_id, user_id
-            )
-            if not workspace_owner:
-                raise Exception("permission denied")
+            # workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+            #     workspace_id, user_id
+            # )
+            # if not workspace_owner:
+            #     raise Exception("permission denied")
             process_versions = Process_portfolio.get_not_available_process_versions(
                 workspace_id, page, limit
             )

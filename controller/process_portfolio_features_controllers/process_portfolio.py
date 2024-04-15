@@ -1,6 +1,7 @@
 import jsonpickle
 
 from bpsky import bpsky
+from controller.decorators import permission_workspace_check
 from controller.utils import *
 from services.process_portfolio_service.feasibility import Feasibility_service
 from services.process_portfolio_service.health import Health_service
@@ -13,6 +14,7 @@ from services.process_portfolio_service.strategic_importance import (
 
 
 @bpsky.route("/api/v1/workspace/portfolio/projects", methods=["GET"])
+@permission_workspace_check
 def get_all_projects_in_workspace():
     user_id = get_id_from_token(get_token(request))
     workspace_id = request.args.get("workspaceId")
@@ -29,6 +31,7 @@ def get_all_projects_in_workspace():
 
 
 @bpsky.route("/api/v1/workspace/portfolio/processes", methods=["GET"])
+@permission_workspace_check
 def get_all_processes_in_project():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -47,6 +50,7 @@ def get_all_processes_in_project():
 
 
 @bpsky.route("/api/v1/workspace/portfolio/processversion", methods=["GET"])
+@permission_workspace_check
 def get_all_process_versions_in_process():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -65,6 +69,7 @@ def get_all_process_versions_in_process():
 
 
 @bpsky.route("/api/v1/workspace/portfolio/processversion/activation", methods=["POST"])
+@permission_workspace_check
 def activate_process_version():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -85,6 +90,7 @@ def activate_process_version():
 
 
 @bpsky.route("/api/v1/workspace/measurements", methods=["GET"])
+@permission_workspace_check
 def get_workspace_measurements():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -100,6 +106,7 @@ def get_workspace_measurements():
 
 
 @bpsky.route("/api/v1/workspace/measurements", methods=["PUT"])
+@permission_workspace_check
 def edit_workspace_measurements():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -143,6 +150,7 @@ def edit_workspace_measurements():
 
 
 @bpsky.route("/api/v1/workspace/portfolio/processversion/measurements", methods=["GET"])
+@permission_workspace_check
 def get_measurements_of_process_versions():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -163,6 +171,7 @@ def get_measurements_of_process_versions():
 @bpsky.route(
     "/api/v1/workspace/portfolio/processversion/measurements", methods=["POST"]
 )
+@permission_workspace_check
 def edit_measurements_of_active_process_version():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -208,6 +217,7 @@ def edit_measurements_of_active_process_version():
 
 
 @bpsky.route("/api/v1/workspace/portfolio/feasibility", methods=["POST"])
+@permission_workspace_check
 def edit_feasibility_of_active_process_version():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -228,6 +238,7 @@ def edit_feasibility_of_active_process_version():
 
 
 @bpsky.route("/api/v1/workspace/portfolio/strategic_importance", methods=["POST"])
+@permission_workspace_check
 def edit_strategic_importance_of_active_process_version():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -266,6 +277,7 @@ def edit_strategic_importance_of_active_process_version():
 
 
 @bpsky.route("/api/v1/workspace/portfolio", methods=["GET"])
+@permission_workspace_check
 def get_process_portfolio_content():
     try:
         user_id = get_id_from_token(get_token(request))
@@ -283,6 +295,7 @@ def get_process_portfolio_content():
 
 
 @bpsky.route("/api/v1/workspace/portfolio/processversion/notavailable", methods=["GET"])
+@permission_workspace_check
 def get_not_available_process_versions():
     try:
         user_id = get_id_from_token(get_token(request))
