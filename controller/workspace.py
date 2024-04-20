@@ -1,4 +1,5 @@
 from bpsky import bpsky
+from controller.decorators import permission_workspace_check
 from controller.utils import *
 import jsonpickle
 
@@ -99,6 +100,7 @@ def deleteWorkspace():
 
 # update name and description
 @bpsky.route("/api/v1/workspace/nameupdation", methods=["POST"])
+@permission_workspace_check
 def updateWorkspaceName():
     try:
         body = load_request_body(request)
@@ -106,10 +108,6 @@ def updateWorkspaceName():
         workspaceId = body["workspaceId"]
         name = body["name"]
         print(workspaceId, name, user_id)
-        # check if user is owner of workspace
-        checkResult = WorkspaceService.checkWorkspaceOwner(workspaceId, user_id)
-        if checkResult is not True:
-            raise Exception(checkResult)
         # update name
         data = WorkspaceService.updateWorkspaceName(workspaceId, name)
         return "Update name success"

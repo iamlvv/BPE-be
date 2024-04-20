@@ -90,44 +90,50 @@ def delete_survey():
 @bpsky.route("/api/v1/survey/general_configuration", methods=["GET"])
 @permission_project_check
 def get_survey_general_config():
-    user_id = get_id_from_token(get_token(request))
-    survey_id = request.args.get("surveyId")
-    project_id = request.args.get("projectId")
-    data = Survey_service.get_survey_general_config(survey_id, user_id, project_id)
-    return bpsky.response_class(
-        response=jsonpickle.encode(data, unpicklable=False),
-        status=200,
-        mimetype="application/json",
-    )
+    try:
+        user_id = get_id_from_token(get_token(request))
+        survey_id = request.args.get("surveyId")
+        project_id = request.args.get("projectId")
+        data = Survey_service.get_survey_general_config(survey_id, user_id, project_id)
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/survey/general_configuration", methods=["PUT"])
 @permission_project_check
 def config_survey_general():
-    user_id = get_id_from_token(get_token(request))
-    body = load_request_body(request)
-    project_id = body["projectId"]
-    survey_id = body["surveyId"]
-    survey_name = body["name"] if "name" in body else None
-    survey_description = body["description"] if "description" in body else None
-    nps_weight = body["npsWeight"] if "npsWeight" in body else None
-    ces_weight = body["cesWeight"] if "cesWeight" in body else None
-    csat_weight = body["csatWeight"] if "csatWeight" in body else None
-    data = Survey_service.config_survey_general(
-        survey_id,
-        user_id,
-        project_id,
-        survey_name,
-        survey_description,
-        nps_weight,
-        ces_weight,
-        csat_weight,
-    )
-    return bpsky.response_class(
-        response=jsonpickle.encode(data, unpicklable=False),
-        status=200,
-        mimetype="application/json",
-    )
+    try:
+        user_id = get_id_from_token(get_token(request))
+        body = load_request_body(request)
+        project_id = body["projectId"]
+        survey_id = body["surveyId"]
+        survey_name = body["name"] if "name" in body else None
+        survey_description = body["description"] if "description" in body else None
+        nps_weight = body["npsWeight"] if "npsWeight" in body else None
+        ces_weight = body["cesWeight"] if "cesWeight" in body else None
+        csat_weight = body["csatWeight"] if "csatWeight" in body else None
+        data = Survey_service.config_survey_general(
+            survey_id,
+            user_id,
+            project_id,
+            survey_name,
+            survey_description,
+            nps_weight,
+            ces_weight,
+            csat_weight,
+        )
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/survey/response_configuration", methods=["GET"])

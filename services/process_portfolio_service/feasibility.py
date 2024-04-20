@@ -7,15 +7,14 @@ class Feasibility_service:
     def edit_feasibility_of_process_versions(
         cls, workspace_id, process_version_version, user_id, total_score
     ):
-        workspace_owner = Permission_check.check_if_user_is_workspace_owner(
-            workspace_id, user_id
-        )
-        if not workspace_owner:
-            raise Exception("permission denied")
+        # workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+        #     workspace_id, user_id
+        # )
+        # if not workspace_owner:
+        #     raise Exception("permission denied")
         process_version = cls.check_if_process_version_exists_in_feasibility(
             process_version_version
         )
-        process_version_feasibility = None
         if process_version:
             process_version_feasibility = cls.update_feasibility_of_process_version(
                 process_version_version, total_score

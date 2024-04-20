@@ -16,18 +16,21 @@ from services.process_portfolio_service.strategic_importance import (
 @bpsky.route("/api/v1/workspace/portfolio/projects", methods=["GET"])
 @permission_workspace_check
 def get_all_projects_in_workspace():
-    user_id = get_id_from_token(get_token(request))
-    workspace_id = request.args.get("workspaceId")
-    page = request.args.get("page", 0)
-    limit = request.args.get("limit", 10)
-    data = ProjectService.get_all_projects_in_workspace(
-        workspace_id, user_id, page, limit
-    )
-    return bpsky.response_class(
-        response=jsonpickle.encode(data, unpicklable=False),
-        status=200,
-        mimetype="application/json",
-    )
+    try:
+        user_id = get_id_from_token(get_token(request))
+        workspace_id = request.args.get("workspaceId")
+        page = request.args.get("page", 0)
+        limit = request.args.get("limit", 10)
+        data = ProjectService.get_all_projects_in_workspace(
+            workspace_id, user_id, page, limit
+        )
+        return bpsky.response_class(
+            response=jsonpickle.encode(data, unpicklable=False),
+            status=200,
+            mimetype="application/json",
+        )
+    except Exception as e:
+        return bpsky.response_class(response=e.__str__(), status=500)
 
 
 @bpsky.route("/api/v1/workspace/portfolio/processes", methods=["GET"])

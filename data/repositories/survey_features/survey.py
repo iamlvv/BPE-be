@@ -88,9 +88,7 @@ class Survey:
                 .first()
             )
             survey.is_deleted = True
-            print(survey)
             session.commit()
-            session.close()
             return {"message": "Survey is deleted"}
         except Exception as e:
             session.rollback()
@@ -113,6 +111,8 @@ class Survey:
                 .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
                 .first()
             )
+            if survey is None:
+                return None
             if survey_name is not None:
                 survey.name = survey_name
             if survey_description is not None:
@@ -124,16 +124,7 @@ class Survey:
             if csat_weight is not None:
                 survey.csat_weight = csat_weight
             session.commit()
-            return {
-                "id": survey.id,
-                "name": survey.name,
-                "description": survey.description,
-                "createdAt": survey.created_at,
-                "isDeleted": survey.is_deleted,
-                "npsWeight": survey.nps_weight,
-                "cesWeight": survey.ces_weight,
-                "csatWeight": survey.csat_weight,
-            }
+            return survey
         except Exception as e:
             session.rollback()
             raise Exception(e)
@@ -155,6 +146,8 @@ class Survey:
                 .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
                 .first()
             )
+            if survey is None:
+                return None
             if incomplete_survey_action is not None:
                 survey.incomplete_survey_action = incomplete_survey_action
             if allow_duplicate_respondent is not None:
@@ -166,14 +159,7 @@ class Survey:
             if end_date is not None:
                 survey.end_date = end_date
             session.commit()
-            return {
-                "id": survey.id,
-                "incompleteSurveyAction": survey.incomplete_survey_action,
-                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
-                "sendResultToRespondent": survey.send_result_to_respondent,
-                "startDate": survey.start_date,
-                "endDate": survey.end_date,
-            }
+            return survey
         except Exception as e:
             session.rollback()
             raise Exception(e)
@@ -210,16 +196,7 @@ class Survey:
             session.commit()
             if survey is None:
                 return None
-            return {
-                "id": survey.id,
-                "name": survey.name,
-                "description": survey.description,
-                "createdAt": survey.created_at,
-                "isDeleted": survey.is_deleted,
-                "npsWeight": survey.nps_weight,
-                "cesWeight": survey.ces_weight,
-                "csatWeight": survey.csat_weight,
-            }
+            return survey
         except Exception as e:
             session.rollback()
             raise Exception(e)
@@ -236,15 +213,7 @@ class Survey:
             session.commit()
             if survey is None:
                 return None
-            return {
-                "id": survey.id,
-                "incompleteSurveyAction": survey.incomplete_survey_action,
-                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
-                "sendResultToRespondent": survey.send_result_to_respondent,
-                "startDate": survey.start_date,
-                "endDate": survey.end_date,
-                "isPublished": survey.is_published,
-            }
+            return survey
         except Exception as e:
             session.rollback()
             raise Exception(e)
@@ -254,18 +223,18 @@ class Survey:
         session = DatabaseConnector.get_session()
         try:
             survey = (
-                session.query(Survey_model)
+                session.query(
+                    Survey_model.incomplete_survey_action,
+                    Survey_model.allow_duplicate_respondent,
+                    Survey_model.send_result_to_respondent,
+                )
                 .filter(Survey_model.id == survey_id, Survey_model.is_deleted == False)
                 .first()
             )
             session.commit()
             if survey is None:
                 return None
-            return {
-                "incompleteSurveyAction": survey.incomplete_survey_action,
-                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
-                "sendResultToRespondent": survey.send_result_to_respondent,
-            }
+            return survey
         except Exception as e:
             session.rollback()
             raise Exception(e)

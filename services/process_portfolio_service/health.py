@@ -33,17 +33,16 @@ class Health_service:
         current_quality,
         current_flexibility,
     ):
-        workspace_owner = Permission_check.check_if_user_is_workspace_owner(
-            workspace_id, user_id
-        )
-        if not workspace_owner:
-            raise Exception("permission denied")
+        # workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+        #     workspace_id, user_id
+        # )
+        # if not workspace_owner:
+        #     raise Exception("permission denied")
 
         # check if process version exists in table Health
         process_version = cls.check_if_process_version_exists_in_health(
             process_version_version
         )
-        process_version_health = None
         if process_version:
             process_version_health = cls.update_health_of_process_version(
                 process_version_version,
@@ -114,21 +113,12 @@ class Health_service:
         # get workspace measurements as target and worst values
         # get survey result as the external quality of the process
         # calculate score for each metric using pl method
-        print("process_version_version", process_version_version)
         evaluation_result = cls.get_evaluation_result_of_process_version(
             process_version_version
         )
         workspace_measurements = cls.get_workspace_measurements(workspace_id, user_id)
         process_version_measurements = cls.get_health_of_process_version(
             process_version_version
-        )
-        print(
-            "evaluation_result",
-            evaluation_result,
-            "workspace_measurements",
-            workspace_measurements,
-            "process_version_measurements",
-            process_version_measurements is None,
         )
         if (
             evaluation_result is None

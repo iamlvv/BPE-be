@@ -4,6 +4,12 @@ import json
 from bpsky import socketio
 
 
+class Workspace_Socket_IO:
+    def __init__(self, type_noti, user_id):
+        self.type_noti = type_noti
+        self.user_id = user_id
+
+
 class Workspace_Returning_Type:
     @classmethod
     def singleFieldReturn(cls, result):
@@ -400,7 +406,13 @@ class Workspace_Update:
                 # after update workspace name, notify to the client by socketio
                 socketio.emit(
                     "workspace_changes" + str(id),
-                    json.dumps({"type": "workspace", "id": id}),
+                    json.dumps(
+                        {
+                            "type": "workspace",
+                            "id": id,
+                        },
+                        default=str,
+                    ),
                 )
                 # notify when workspace name is changed
 

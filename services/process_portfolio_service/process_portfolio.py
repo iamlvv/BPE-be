@@ -81,13 +81,6 @@ class Process_portfolio_service:
             eligible_process_versions_list = cls.get_eligible_process_versions(
                 workspace_id
             )
-            print(eligible_process_versions_list[0].version)
-            print(eligible_process_versions_list[0].num)
-            print(eligible_process_versions_list[0].health)
-            print(eligible_process_versions_list[0].strategic_importance)
-            print(eligible_process_versions_list[0].feasibility)
-            print(eligible_process_versions_list[0].project_name)
-            print(eligible_process_versions_list[0].process_name)
             return {
                 "processPortfolio": [
                     {

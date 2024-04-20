@@ -163,14 +163,29 @@ class Survey_service:
         # if not is_user_has_access:
         #     raise Exception("User has no access to the survey")
 
-        return Survey.config_survey_general(
-            survey_id,
-            survey_name,
-            survey_description,
-            nps_weight,
-            ces_weight,
-            csat_weight,
-        )
+        try:
+            survey = Survey.config_survey_general(
+                survey_id,
+                survey_name,
+                survey_description,
+                nps_weight,
+                ces_weight,
+                csat_weight,
+            )
+            if survey is None:
+                return None
+            return {
+                "id": survey.id,
+                "name": survey.name,
+                "description": survey.description,
+                "createdAt": survey.created_at,
+                "isDeleted": survey.is_deleted,
+                "npsWeight": survey.nps_weight,
+                "cesWeight": survey.ces_weight,
+                "csatWeight": survey.csat_weight,
+            }
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def config_survey_response(
@@ -190,18 +205,31 @@ class Survey_service:
         # if not is_user_has_access:
         #     raise Exception("User has no access to the survey")
 
-        validation_result = cls.validate_start_date_end_date(start_date, end_date)
-        if validation_result is not None:
-            return validation_result
+        try:
+            validation_result = cls.validate_start_date_end_date(start_date, end_date)
+            if validation_result is not None:
+                return validation_result
 
-        return Survey.config_survey_response(
-            survey_id,
-            incomplete_survey_action,
-            allow_duplicate_respondent,
-            send_result_to_respondent,
-            start_date,
-            end_date,
-        )
+            survey = Survey.config_survey_response(
+                survey_id,
+                incomplete_survey_action,
+                allow_duplicate_respondent,
+                send_result_to_respondent,
+                start_date,
+                end_date,
+            )
+            if survey is None:
+                return None
+            return {
+                "id": survey.id,
+                "incompleteSurveyAction": survey.incomplete_survey_action,
+                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
+                "sendResultToRespondent": survey.send_result_to_respondent,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+            }
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def check_if_survey_exists(cls, process_version_version):
@@ -214,7 +242,22 @@ class Survey_service:
         # )
         # if not is_user_has_access:
         #     raise Exception("User has no access to the survey")
-        return Survey.get_survey_general_config(survey_id)
+        try:
+            survey = Survey.get_survey_general_config(survey_id)
+            if survey is None:
+                return None
+            return {
+                "id": survey.id,
+                "name": survey.name,
+                "description": survey.description,
+                "createdAt": survey.created_at,
+                "isDeleted": survey.is_deleted,
+                "npsWeight": survey.nps_weight,
+                "cesWeight": survey.ces_weight,
+                "csatWeight": survey.csat_weight,
+            }
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def get_survey_response_config(cls, survey_id, user_id, project_id):
@@ -224,7 +267,21 @@ class Survey_service:
         # if not is_user_has_access:
         #     raise Exception("User has no access to the survey")
 
-        return Survey.get_survey_response_config(survey_id)
+        try:
+            survey = Survey.get_survey_response_config(survey_id)
+            if survey is None:
+                return None
+            return {
+                "id": survey.id,
+                "incompleteSurveyAction": survey.incomplete_survey_action,
+                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
+                "sendResultToRespondent": survey.send_result_to_respondent,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+                "isPublished": survey.is_published,
+            }
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def get_survey_questions_by_section_id(cls, section_id):
@@ -291,7 +348,15 @@ class Survey_service:
 
     @classmethod
     def get_survey_response_config_some(cls, survey_id):
-        return Survey.get_survey_response_config_some(survey_id)
+        try:
+            survey = Survey.get_survey_response_config_some(survey_id)
+            return {
+                "incompleteSurveyAction": survey.incomplete_survey_action,
+                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
+                "sendResultToRespondent": survey.send_result_to_respondent,
+            }
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def publish_survey(
