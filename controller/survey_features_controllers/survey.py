@@ -77,8 +77,9 @@ def get_survey_content():
 @permission_project_check
 def delete_survey():
     user_id = get_id_from_token(get_token(request))
-    survey_id = request.args.get("surveyId", None)
-    project_id = request.args.get("projectId", None)
+    body = load_request_body(request)
+    survey_id = body["surveyId"]
+    project_id = body["projectId"]
     data = Survey_service.delete_survey(user_id, project_id, survey_id)
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
