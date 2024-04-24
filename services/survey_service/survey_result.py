@@ -281,11 +281,11 @@ class Survey_result_service:
         # calculate percentage of each answer
         # return list of all answers
         return {
-            "question_id": question_in_section_id,
+            "questionId": question_in_section_id,
             "answers": [
                 {
                     "value": key,
-                    "number_of_answers": dict_number_of_each_answer[key],
+                    "numberOfAnswers": dict_number_of_each_answer[key],
                     "percentage": round(
                         dict_number_of_each_answer[key] / len(list_of_answers) * 100, 2
                     )
@@ -338,7 +338,7 @@ class Survey_result_service:
                     {
                         "totalResponses": sum(
                             [
-                                answer["number_of_answers"]
+                                answer["numberOfAnswers"]
                                 for answer in question_answers[index]["answers"]
                             ]
                         ),
@@ -371,7 +371,7 @@ class Survey_result_service:
             "answers": [
                 {
                     "value": key,
-                    "number_of_answers": dict_number_of_each_answer[key],
+                    "numberOfAnswers": dict_number_of_each_answer[key],
                     "percentage": round(
                         dict_number_of_each_answer[key] / len(list_of_answers) * 100, 2
                     )
@@ -408,11 +408,11 @@ class Survey_result_service:
         # calculate percentage of each answer
         # return list of all answers
         return {
-            "question_id": question_id,
+            "questionId": question_id,
             "answers": [
                 {
                     "value": key,
-                    "number_of_answers": dict_number_of_each_answer[key],
+                    "numberOfAnswers": dict_number_of_each_answer[key],
                     "percentage": round(
                         dict_number_of_each_answer[key] / len(list_of_answers) * 100, 2
                     )
@@ -421,19 +421,19 @@ class Survey_result_service:
                 }
                 for key in dict_number_of_each_answer
             ],
-            "number_of_each_group": dict_number_of_each_group,
+            "numberOfEachGroup": dict_number_of_each_group,
         }
 
     @classmethod
     def get_answer_details_for_open_question(cls, question_id):
         list_of_answers = Answer_service.get_list_of_answers_for_question(question_id)
         return {
-            "question_id": question_id,
+            "questionId": question_id,
             "answers": [
                 {
                     "id": answer.id,
                     "email": answer.email,
-                    "full_name": answer.full_name,
+                    "fullName": answer.full_name,
                     "value": answer.value,
                 }
                 for answer in list_of_answers
