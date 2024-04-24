@@ -432,69 +432,95 @@ class Survey_service:
 
     @classmethod
     def close_publish_survey(cls, user_id, project_id, process_version_version):
-        survey = Survey.check_if_survey_exists(process_version_version)
-        if survey is None:
-            return {"message": "Survey does not exist."}
-        # reset start date and end date to None
-        cls.reset_dates(survey.id)
-        return Survey.close_publish_survey(survey.id)
+        try:
+            survey = Survey.check_if_survey_exists(process_version_version)
+            if survey is None:
+                return {"message": "Survey does not exist."}
+            # reset start date and end date to None
+            cls.reset_dates(survey.id)
+            return Survey.close_publish_survey(survey.id)
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def save_recipient_email(cls, survey_id, email_list):
-        # insert into table survey_recipient unique email
-        # then insert into table send_survey with survey_id and recipient_id
-        recipient_list = Survey_recipient_service.save_recipient_email(email_list)
-        # update survey_recipient_association table with latest recipient list
-        current_recipient_list = Survey_send_service.get_survey_recipient_email(
-            survey_id
-        )
-        for recipient in current_recipient_list:
-            Survey_send_service.delete_survey_recipient_email(survey_id, recipient.id)
-
-        for recipient_list_item in recipient_list:
-            Survey_send_service.save_survey_recipient_email(
-                survey_id, recipient_list_item.id
+        try:
+            # insert into table survey_recipient unique email
+            # then insert into table send_survey with survey_id and recipient_id
+            recipient_list = Survey_recipient_service.save_recipient_email(email_list)
+            # update survey_recipient_association table with latest recipient list
+            current_recipient_list = Survey_send_service.get_survey_recipient_email(
+                survey_id
             )
-        return recipient_list
+            for recipient in current_recipient_list:
+                Survey_send_service.delete_survey_recipient_email(
+                    survey_id, recipient.id
+                )
+
+            for recipient_list_item in recipient_list:
+                Survey_send_service.save_survey_recipient_email(
+                    survey_id, recipient_list_item.id
+                )
+            return recipient_list
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def get_publish_info(cls, process_version_version, project_id, user_id):
-        # is_user_has_access = Permission_check.check_user_has_access_survey(
-        #     project_id, user_id
-        # )
-        # if not is_user_has_access:
-        #     raise Exception("User has no access to the survey")
-        survey = cls.check_if_survey_exists(process_version_version)
-        if survey is None:
-            return {"message": "Survey does not exist."}
+        try:
+            # is_user_has_access = Permission_check.check_user_has_access_survey(
+            #     project_id, user_id
+            # )
+            # if not is_user_has_access:
+            #     raise Exception("User has no access to the survey")
+            survey = cls.check_if_survey_exists(process_version_version)
+            if survey is None:
+                return {"message": "Survey does not exist."}
 
-        # get email list
-        email_list = Survey_send_service.get_survey_recipient_email(survey.id)
-        return {
-            "id": survey.id,
-            "email": [email.email for email in email_list],
-            "surveyUrl": survey.survey_url,
-            "startDate": survey.start_date,
-            "endDate": survey.end_date,
-            "isPublished": survey.is_published,
-        }
+            # get email list
+            email_list = Survey_send_service.get_survey_recipient_email(survey.id)
+            return {
+                "id": survey.id,
+                "email": [email.email for email in email_list],
+                "surveyUrl": survey.survey_url,
+                "startDate": survey.start_date,
+                "endDate": survey.end_date,
+                "isPublished": survey.is_published,
+            }
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def set_survey_published(cls, survey_id):
-        return Survey.set_survey_published(survey_id)
+        try:
+            return Survey.set_survey_published(survey_id)
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def get_unpublished_surveys(cls):
-        return Survey.get_unpublished_surveys()
+        try:
+            return Survey.get_unpublished_surveys()
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def set_survey_closed(cls, survey_id):
-        return Survey.set_survey_closed(survey_id)
+        try:
+            return Survey.set_survey_closed(survey_id)
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def get_published_surveys(cls):
-        return Survey.get_published_surveys()
+        try:
+            return Survey.get_published_surveys()
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def reset_dates(cls, survey_id):
-        return Survey.reset_dates(survey_id)
+        try:
+            return Survey.reset_dates(survey_id)
+        except Exception as e:
+            raise Exception(e)

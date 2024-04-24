@@ -18,8 +18,8 @@ def get_survey_result():
 
 @bpsky.route("/api/v1/survey/answer", methods=["GET"])
 def get_answer_details():
-    survey_id = request.args.get("surveyId", None)
-    data = Survey_result_service.get_answer_details(survey_id)
+    process_version_version = request.args.get("processVersionVersion", None)
+    data = Survey_result_service.get_answer_details(process_version_version)
     return bpsky.response_class(
         response=jsonpickle.encode(data, unpicklable=False),
         status=200,

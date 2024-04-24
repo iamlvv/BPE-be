@@ -78,11 +78,11 @@ class Question_in_section_service:
 
     @classmethod
     def get_question_detail_in_survey(cls, question_in_section_id, project_id, user_id):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         question_in_section = Question_in_section.get_question_detail_in_survey(
             question_in_section_id
@@ -128,11 +128,11 @@ class Question_in_section_service:
         content=None,
         question_options=None,
     ):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         if content == "":
             return {"message": "Question content cannot be empty"}
@@ -258,11 +258,11 @@ class Question_in_section_service:
     def delete_question_in_survey(
         cls, user_id, project_id, section_id, question_in_section_id
     ):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         # delete the question in the section
         Question_in_section.delete_question_in_section(question_in_section_id)
@@ -323,11 +323,11 @@ class Question_in_section_service:
         question_type,
         question_options=None,
     ):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         # add question to the section
         new_question_in_section = Question_in_section.add_new_question_to_section(
@@ -387,11 +387,11 @@ class Question_in_section_service:
         content,
         question_options=None,
     ):
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         updated_question = cls.update_question_detail_in_survey(
             user_id,
@@ -457,11 +457,11 @@ class Question_in_section_service:
         # if yes, return message "Question already in the section"
         # if the question is a multiple choice or branching, get the question options from table QuestionOption
         # if question is contributed by user, update the usage count
-        is_user_has_access = Permission_check.check_user_has_access_survey(
-            project_id, user_id
-        )
-        if not is_user_has_access:
-            raise Exception("User has no access to the survey")
+        # is_user_has_access = Permission_check.check_user_has_access_survey(
+        #     project_id, user_id
+        # )
+        # if not is_user_has_access:
+        #     raise Exception("User has no access to the survey")
 
         question = Question.get_question_by_id(question_id)
 

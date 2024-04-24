@@ -64,7 +64,9 @@ class Survey_result_service:
         # number of responses
         # update survey with ces score
         list_of_weight_and_answers_of_questions_in_survey = (
-            cls.get_list_of_weight_and_answers_of_questions_in_survey(survey_id, "ces")
+            cls.get_list_of_weight_and_answers_of_questions_in_survey(
+                survey_id, question_type
+            )
         )
         total_number_of_responses = current_number_of_responses  # get from response
         sum_of_weight = 0  # sum of weight of all questions
@@ -295,14 +297,19 @@ class Survey_result_service:
         }
 
     @classmethod
-    def get_answer_details(cls, survey_id):
+    def get_answer_details(cls, process_version_version):
         # for each question, get all answers, count number of each answer, calculate percentage of each answer
         # with open questions, get all answers
         # return list of all answers`
+        survey = Survey.check_if_survey_exists(process_version_version)
+        if not survey:
+            return None
+        survey_id = survey.id
         list_of_questions = Question_in_section_service.get_list_of_questions_in_survey(
             survey_id
         )
         question_answers = []
+        survey_result = cls.get_survey_result(process_version_version)
         for question in list_of_questions:
             question_type = question["questionType"]
             question_id = question["id"]
@@ -323,19 +330,27 @@ class Survey_result_service:
                 question_answers.append(
                     cls.get_answer_details_for_multiple_questions(question_id)
                 )
-        print(len(question_answers), len(list_of_questions))
         return {
-            "survey_id": survey_id,
-            "questions": [
-                {
-                    "id": question["id"],
-                    "content": question["content"],
-                    "questionType": question["questionType"],
-                    "answers": question_answers[index]["answers"],
-                }
-                for index, question in enumerate(list_of_questions)
-            ],
-            "answers": question_answers,
+            "surveyResult": {
+                "survey_id": survey_id,
+                "totalResult": survey_result,
+                "questions": [
+                    {
+                        "totalResponses": sum(
+                            [
+                                answer["number_of_answers"]
+                                for answer in question_answers[index]["answers"]
+                            ]
+                        ),
+                        "id": question["id"],
+                        "content": question["content"],
+                        "questionType": question["questionType"],
+                        "questionResponses": question_answers[index]["answers"],
+                    }
+                    for index, question in enumerate(list_of_questions)
+                ],
+                # "answers": question_answers,
+            }
         }
 
     @classmethod

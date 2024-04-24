@@ -36,16 +36,19 @@ class Survey_recipient_service:
     @classmethod
     def save_recipient_email(cls, email_list):
         # only insert if email does not exist
-        recipient_list = []
-        for email in email_list:
-            # check if email exists
-            existed_email = cls.check_if_email_exists(email)
-            if existed_email:
-                recipient_list.append(existed_email)
-                continue
-            recipient = Survey_recipient.save_recipient_email(email)
-            recipient_list.append(recipient)
-        return recipient_list
+        try:
+            recipient_list = []
+            for email in email_list:
+                # check if email exists
+                existed_email = cls.check_if_email_exists(email)
+                if existed_email:
+                    recipient_list.append(existed_email)
+                    continue
+                recipient = Survey_recipient.save_recipient_email(email)
+                recipient_list.append(recipient)
+            return recipient_list
+        except Exception as e:
+            raise Exception(e)
 
     @classmethod
     def check_if_email_exists(cls, email):
