@@ -332,8 +332,37 @@ class Survey_result_service:
                 )
         return {
             "surveyResult": {
-                "survey_id": survey_id,
-                "totalResult": survey_result,
+                "surveyId": survey_id,
+                "numberOfResponses": survey_result["numberOfResponses"]
+                if survey_result
+                else 0,
+                "ces": {
+                    "score": survey_result["ces"]["score"] if survey_result else 0,
+                    "weight": survey_result["ces"]["weight"] if survey_result else 0,
+                    "numOfPositiveAnswers": survey_result["ces"]["numOfPositiveAnswers"]
+                    if survey_result
+                    else 0,
+                },
+                "nps": {
+                    "score": survey_result["nps"]["score"] if survey_result else 0,
+                    "weight": survey_result["nps"]["weight"] if survey_result else 0,
+                    "numOfPromoters": survey_result["nps"]["numOfPromoters"]
+                    if survey_result
+                    else 0,
+                    "numOfDetractors": survey_result["nps"]["numOfDetractors"]
+                    if survey_result
+                    else 0,
+                },
+                "csat": {
+                    "score": survey_result["csat"]["score"] if survey_result else 0,
+                    "weight": survey_result["csat"]["weight"] if survey_result else 0,
+                    "numOfPositiveAnswers": survey_result["csat"][
+                        "numOfPositiveAnswers"
+                    ]
+                    if survey_result
+                    else 0,
+                },
+                "totalScore": survey_result["totalScore"] if survey_result else 0,
                 "questions": [
                     {
                         "totalResponses": sum(

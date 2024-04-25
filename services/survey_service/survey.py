@@ -342,6 +342,7 @@ class Survey_service:
                 "id": survey_id,
                 "name": survey.name,
                 "description": survey.description,
+                "allowDuplicateRespondent": survey.allow_duplicate_respondent,
             },
             "sections": sections_list_in_survey,
         }
