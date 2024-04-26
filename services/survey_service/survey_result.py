@@ -331,57 +331,53 @@ class Survey_result_service:
                     cls.get_answer_details_for_multiple_questions(question_id)
                 )
         return {
-            "surveyResult": {
-                "surveyId": survey_id,
-                "numberOfResponses": survey_result["numberOfResponses"]
+            "surveyId": survey_id,
+            "numberOfResponses": survey_result["numberOfResponses"]
+            if survey_result
+            else 0,
+            "ces": {
+                "score": survey_result["ces"]["score"] if survey_result else 0,
+                "weight": survey_result["ces"]["weight"] if survey_result else 0,
+                "numOfPositiveAnswers": survey_result["ces"]["numOfPositiveAnswers"]
                 if survey_result
                 else 0,
-                "ces": {
-                    "score": survey_result["ces"]["score"] if survey_result else 0,
-                    "weight": survey_result["ces"]["weight"] if survey_result else 0,
-                    "numOfPositiveAnswers": survey_result["ces"]["numOfPositiveAnswers"]
-                    if survey_result
-                    else 0,
-                },
-                "nps": {
-                    "score": survey_result["nps"]["score"] if survey_result else 0,
-                    "weight": survey_result["nps"]["weight"] if survey_result else 0,
-                    "numOfPromoters": survey_result["nps"]["numOfPromoters"]
-                    if survey_result
-                    else 0,
-                    "numOfDetractors": survey_result["nps"]["numOfDetractors"]
-                    if survey_result
-                    else 0,
-                },
-                "csat": {
-                    "score": survey_result["csat"]["score"] if survey_result else 0,
-                    "weight": survey_result["csat"]["weight"] if survey_result else 0,
-                    "numOfPositiveAnswers": survey_result["csat"][
-                        "numOfPositiveAnswers"
-                    ]
-                    if survey_result
-                    else 0,
-                },
-                "totalScore": survey_result["totalScore"] if survey_result else 0,
-                "questions": [
-                    {
-                        "totalResponses": sum(
-                            [
-                                answer["numberOfAnswers"]
-                                if "numberOfAnswers" in answer
-                                else 1
-                                for answer in question_answers[index]["answers"]
-                            ]
-                        ),
-                        "id": question["id"],
-                        "content": question["content"],
-                        "questionType": question["questionType"],
-                        "questionResponses": question_answers[index]["answers"],
-                    }
-                    for index, question in enumerate(list_of_questions)
-                ],
-                # "answers": question_answers,
-            }
+            },
+            "nps": {
+                "score": survey_result["nps"]["score"] if survey_result else 0,
+                "weight": survey_result["nps"]["weight"] if survey_result else 0,
+                "numOfPromoters": survey_result["nps"]["numOfPromoters"]
+                if survey_result
+                else 0,
+                "numOfDetractors": survey_result["nps"]["numOfDetractors"]
+                if survey_result
+                else 0,
+            },
+            "csat": {
+                "score": survey_result["csat"]["score"] if survey_result else 0,
+                "weight": survey_result["csat"]["weight"] if survey_result else 0,
+                "numOfPositiveAnswers": survey_result["csat"]["numOfPositiveAnswers"]
+                if survey_result
+                else 0,
+            },
+            "totalScore": survey_result["totalScore"] if survey_result else 0,
+            "questions": [
+                {
+                    "totalResponses": sum(
+                        [
+                            answer["numberOfAnswers"]
+                            if "numberOfAnswers" in answer
+                            else 1
+                            for answer in question_answers[index]["answers"]
+                        ]
+                    ),
+                    "id": question["id"],
+                    "content": question["content"],
+                    "questionType": question["questionType"],
+                    "questionResponses": question_answers[index]["answers"],
+                }
+                for index, question in enumerate(list_of_questions)
+            ],
+            # "answers": question_answers,
         }
 
     @classmethod
