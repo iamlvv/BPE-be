@@ -368,6 +368,8 @@ class Survey_result_service:
                         "totalResponses": sum(
                             [
                                 answer["numberOfAnswers"]
+                                if "numberOfAnswers" in answer
+                                else 1
                                 for answer in question_answers[index]["answers"]
                             ]
                         ),
