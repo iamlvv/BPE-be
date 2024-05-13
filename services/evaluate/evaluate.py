@@ -159,7 +159,7 @@ class Evaluate:
                 r.quality = 1 - (r.total_loop_probability / r.total_loop)
             if survey_score is not None:
                 r.external_quality = survey_score
-                r.total_quality = (r.total_quality + r.external_quality) / 2
+                r.total_quality = (r.quality + r.external_quality) / 2
             else:
                 r.total_quality = r.quality
             if r.totalCycleTime != 0:
