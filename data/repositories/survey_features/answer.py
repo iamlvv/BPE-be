@@ -91,3 +91,25 @@ class Answer:
         except Exception as e:
             session.rollback()
             raise Exception(e)
+
+    @classmethod
+    def get_number_of_responses_for_each_question(cls, question_id):
+        session = DatabaseConnector.get_session()
+        try:
+            number_of_responses = (
+                session.query(
+                    Answer_model.id,
+                    Answer_model.question_id,
+                    Answer_model.value
+                )
+                .filter(
+                    Answer_model.question_id == question_id,
+                    Answer_model.is_deleted == False,
+                )
+                .count()
+            )
+            session.commit()
+            return number_of_responses
+        except Exception as e:
+            session.rollback()
+            raise Exception(e)

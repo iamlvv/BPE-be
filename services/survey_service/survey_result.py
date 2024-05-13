@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from data.repositories.survey_features.response import Response
 from data.repositories.survey_features.survey import Survey
 from data.repositories.survey_features.survey_result import Survey_result
@@ -55,6 +57,11 @@ class Survey_result_service:
         }
 
     @classmethod
+    def get_number_of_responses_for_each_question(cls, question_id):
+        number_of_responses = Answer_service.get_number_of_responses_for_each_question(question_id)
+        return number_of_responses
+
+    @classmethod
     def calculate_ces_or_csat_score(
         cls, survey_id, current_number_of_responses, question_type
     ):
@@ -68,6 +75,10 @@ class Survey_result_service:
                 survey_id, question_type
             )
         )
+        dict_number_of_answers_each_question = defaultdict(int)
+        for item in list_of_weight_and_answers_of_questions_in_survey:
+            dict_number_of_answers_each_question[item["question_id"]] += 1
+
         total_number_of_responses = current_number_of_responses  # get from response
         sum_of_weight = 0  # sum of weight of all questions
         result = 0
@@ -89,7 +100,8 @@ class Survey_result_service:
         for index in dict_weight:
             sum_of_weight += dict_weight[index]
         for index in dict_positive_answers_for_each_question:
-            denominator = total_number_of_responses * sum_of_weight
+            # denominator = total_number_of_responses * sum_of_weight
+            denominator = dict_number_of_answers_each_question[index] * sum_of_weight
             if denominator == 0:
                 result += 0
             else:
