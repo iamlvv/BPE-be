@@ -121,9 +121,9 @@ class Health_service:
             process_version_version
         )
         if (
-            evaluation_result is None
-            or workspace_measurements is None
-            or process_version_measurements is None
+                evaluation_result is None
+                or workspace_measurements is None
+                or process_version_measurements is None
         ):
             cls.save_total_score(process_version_version, None)
             return
@@ -165,15 +165,14 @@ class Health_service:
             cycle_time_values, cost_values, quality_values, flexibility_values
         )
         if current_values_check is not None:
-            return current_values_check
-
+            raise Exception(current_values_check["message"])
         cycle_time_score = cls.pl_method(cycle_time_values, "cycle_time")
         cost_score = cls.pl_method(cost_values, "cost")
         quality_score = cls.pl_method(quality_values, "quality")
         flexibility_score = cls.pl_method(flexibility_values, "flexibility")
         total_score = (
-            cycle_time_score + cost_score + quality_score + flexibility_score
-        ) / 4
+                              cycle_time_score + cost_score + quality_score + flexibility_score
+                      ) / 4
         # save in database
         cls.save_total_score(process_version_version, total_score)
 

@@ -107,33 +107,36 @@ class ProcessVersionService_Get:
 
     @classmethod
     def get_all_process_versions_in_process(cls, workspace_id, process_id, user_id):
-        workspace_owner = Permission_check.check_if_user_is_workspace_owner(
-            workspace_id, user_id
-        )
-        # calculate score before getting
+        try:
+            workspace_owner = Permission_check.check_if_user_is_workspace_owner(
+                workspace_id, user_id
+            )
+            # calculate score before getting
 
-        process_versions_list = ProcessVersion.get_all_process_versions_in_process(
-            process_id
-        )
-        for process in process_versions_list:
-            Health_service.calculate_total_score(workspace_id, user_id, process.version)
-        # get list again
-        process_versions_list = ProcessVersion.get_all_process_versions_in_process(
-            process_id
-        )
-        return [
-            {
-                "projectId": process.project_id,
-                "processId": process.process_id,
-                "version": process.version,
-                "isActive": process.is_active,
-                "health": process.health,
-                "strategicImportance": process.strategic_importance,
-                "feasibility": process.feasibility,
-                "num": process.num,
-            }
-            for process in process_versions_list
-        ]
+            process_versions_list = ProcessVersion.get_all_process_versions_in_process(
+                process_id
+            )
+            for process in process_versions_list:
+                Health_service.calculate_total_score(workspace_id, user_id, process.version)
+            # get list again
+            process_versions_list = ProcessVersion.get_all_process_versions_in_process(
+                process_id
+            )
+            return [
+                {
+                    "projectId": process.project_id,
+                    "processId": process.process_id,
+                    "version": process.version,
+                    "isActive": process.is_active,
+                    "health": process.health,
+                    "strategicImportance": process.strategic_importance,
+                    "feasibility": process.feasibility,
+                    "num": process.num,
+                }
+                for process in process_versions_list
+            ]
+        except Exception as e:
+            raise Exception(e)
 
 
 class ProcessVersionService_Update:
