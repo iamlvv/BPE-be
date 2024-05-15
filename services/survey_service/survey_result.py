@@ -285,7 +285,7 @@ class Survey_result_service:
             question_in_section_id
         )
         # get number of each question options
-        dict_number_of_each_answer = {}
+        dict_number_of_each_answer = defaultdict(int)
         for question_option in list_of_question_options:
             dict_number_of_each_answer[question_option.content] = 0
         for answer in list_of_answers:
