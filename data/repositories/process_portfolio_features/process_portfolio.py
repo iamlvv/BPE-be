@@ -114,6 +114,7 @@ class Process_portfolio:
                 .filter(
                     Project_model.workspaceid == workspace_id,
                     Process_version_model.is_active == True,
+                    Project_model.is_delete == False,
                     or_(
                         Health_model.total_score == None,
                         Strategic_importance_model.total_score == None,
