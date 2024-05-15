@@ -165,7 +165,7 @@ class Health_service:
             cycle_time_values, cost_values, quality_values, flexibility_values
         )
         if current_values_check is not None:
-            raise Exception(current_values_check["message"])
+            return current_values_check
         cycle_time_score = cls.pl_method(cycle_time_values, "cycle_time")
         cost_score = cls.pl_method(cost_values, "cost")
         quality_score = cls.pl_method(quality_values, "quality")
