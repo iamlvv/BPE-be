@@ -188,7 +188,10 @@ class Survey_result_service:
                 )
 
         # normalize the nps score to range [0,1]
-        result = (result + 1) / 2
+        if current_number_of_responses == 0:
+            result = 0
+        else:
+            result = (result + 1) / 2
         num_of_promoters = sum(dict_promoters_for_each_question.values())
         num_of_detractors = sum(dict_detractors_for_each_question.values())
         return {
