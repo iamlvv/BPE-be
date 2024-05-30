@@ -6,8 +6,9 @@ from oauthlib.oauth2 import WebApplicationClient
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI", None)
+GOOGLE_REDIRECT_URI_PROD = os.environ.get("GOOGLE_REDIRECT_URI_PROD", None)
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
-
+ENV = os.environ.get("FLASK_ENV", None)
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 
@@ -20,14 +21,21 @@ class LoginWithGoogle:
     def login(cls):
         google_provider_cfg = get_google_provider_cfg()
         authorization_endpoint = google_provider_cfg["authorization_endpoint"]
-
+        print("env", ENV)
         # Use library to construct the request for Google login and provide
         # scopes that let you retrieve user's profile from Google
-        request_uri = client.prepare_request_uri(
-            authorization_endpoint,
-            redirect_uri=GOOGLE_REDIRECT_URI,
-            scope=["openid", "email", "profile"],
-        )
+        if ENV == "development":
+            request_uri = client.prepare_request_uri(
+                authorization_endpoint,
+                redirect_uri=GOOGLE_REDIRECT_URI,
+                scope=["openid", "email", "profile"],
+            )
+        else:
+            request_uri = client.prepare_request_uri(
+                authorization_endpoint,
+                redirect_uri=GOOGLE_REDIRECT_URI_PROD,
+                scope=["openid", "email", "profile"],
+            )
         return request_uri
 
     @classmethod
@@ -35,12 +43,21 @@ class LoginWithGoogle:
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
         google_provider_cfg = get_google_provider_cfg()
         token_endpoint = google_provider_cfg["token_endpoint"]
-
-        token_url, headers, body = client.prepare_token_request(
+        print("env", ENV)
+        if ENV == "development":
+            token_url, headers, body = client.prepare_token_request(
             token_endpoint,
             authorization_response=request_url,
             # authorization_response="http://localhost:5173",
             redirect_url=GOOGLE_REDIRECT_URI,
+            code=code,
+        )
+        else:
+            token_url, headers, body = client.prepare_token_request(
+            token_endpoint,
+            authorization_response=request_url,
+            # authorization_response="http://localhost:5173",
+            redirect_url=GOOGLE_REDIRECT_URI_PROD,
             code=code,
         )
 
