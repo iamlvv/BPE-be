@@ -406,7 +406,6 @@ class Survey_service:
                     )
 
                 # update end date and start date of the survey
-
                 return Survey.publish_survey(
                     survey_id, start_date, end_date, survey_url, "pending"
                 )

@@ -40,7 +40,11 @@ def user_signup():
 
 @bpsky.route("/api/v1/user/verify/<string:token>", methods=["GET"])
 def user_verify(token):
-    host = os.environ.get("HOST")
+    current_env = os.environ.get("FLASK_ENV")
+    if current_env == "development":
+        host = os.environ.get("HOST")
+    else:
+        host = os.environ.get("HOST_FE_PROD")
     try:
         email = get_email_from_token(token)
         print("email: ", email)

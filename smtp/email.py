@@ -26,7 +26,11 @@ class Email:
     def verify_account(cls, receiver_email, name, token):
         sender_email = os.environ.get("EMAIL")
         password = os.environ.get("PASSWORD")
-        host = os.environ.get("HOST_BE")
+        current_env = os.environ.get("FLASK_ENV")
+        if current_env == "development":
+            host = os.environ.get("HOST_BE")
+        else:
+            host = os.environ.get("HOST_BE_PROD")
         subject = "Verify your email"
         # Create the plain-text and HTML version of your message
         html = f"""\
