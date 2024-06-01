@@ -117,7 +117,9 @@ class ProcessVersionService_Get:
                 process_id
             )
             for process in process_versions_list:
-                Health_service.calculate_total_score(workspace_id, user_id, process.version)
+                Health_service.calculate_total_score(
+                    workspace_id, user_id, process.version
+                )
             # get list again
             process_versions_list = ProcessVersion.get_all_process_versions_in_process(
                 process_id
@@ -235,8 +237,8 @@ class ProcessVersionService_Insert(OldestVersionOperation):
     def create_new_version(cls, user_id, file, project_id, process_id):
         if not WorkOnService.can_edit(user_id, project_id):
             raise Exception("permission denied")
-        if len(ProcessVersion.get_by_process(project_id, process_id)) == 5:
-            raise Exception("current number of versions is equal to 5")
+        # if len(ProcessVersion.get_by_process(project_id, process_id)) == 5:
+        #     raise Exception("current number of versions is equal to 5")
         version = str(uuid.uuid1())[:8]
         file_name = os.path.splitext(file.filename)[0]
         extension_name = os.path.splitext(file.filename)[1]
