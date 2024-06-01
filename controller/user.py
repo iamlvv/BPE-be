@@ -158,7 +158,11 @@ def user_auth_with_google():
 
 @bpsky.route("/api/v1/auth/login/google/callback", methods=["GET"])
 def user_callback():
-    host = os.environ.get("HOST")
+    current_env = os.environ.get("FLASK_ENV")
+    if current_env == "development":
+        host = os.environ.get("HOST")
+    else:
+        host = os.environ.get("HOST_FE_PROD")
     try:
         code = request.args.get("code")
         data = LoginWithGoogle.get(request.url, code)
